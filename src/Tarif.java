@@ -24,6 +24,8 @@ public class Tarif {
     }
 
     public String getTranche() { return tranche; }
+    public double getQfMin() { return qfMin; }
+    public double getQfMax() { return qfMax; }
     public double getRepas() { return repas; }
     public double getJourneeAccueilLoisirs() { return journeeAccueilLoisirs; }
     public double getDemiJourneeAvecRepas() { return demiJourneeAvecRepas; }
