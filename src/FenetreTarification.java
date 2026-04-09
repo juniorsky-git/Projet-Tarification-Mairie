@@ -95,9 +95,12 @@ public class FenetreTarification extends JFrame {
 
     private void chargerDonnees(String chemin) {
         try {
-            List<Tarif> tarifs = DonneesTarifs.chargerTarifs(chemin);
+            // Sélection automatique de l'extracteur selon le nom du fichier
+            IExtracteurCiril extracteur = choisirExtracteur(chemin);
+            List<Tarif> tarifs = extracteur.chargerTarifs(chemin);
+
             if (tarifs.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Aucune donnée trouvée. Fichier invalide.");
+                JOptionPane.showMessageDialog(this, "Aucune donnée trouvée. Fichier invalide ou format non reconnu.");
                 return;
             }
             this.currentTarifs = tarifs;
@@ -118,5 +121,19 @@ public class FenetreTarification extends JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Erreur de lecture du fichier :\n" + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Choisit automatiquement l'extracteur Ciril adapté selon le nom du fichier.
+     * Si le nom du fichier contient "loisirs" ou "periscolaire" → ExtractionLoisirs.
+     * Sinon → ExtractionRestaurateur par défaut.
+     */
+    private IExtracteurCiril choisirExtracteur(String chemin) {
+        String nomFichier = chemin.toLowerCase();
+        if (nomFichier.contains("loisirs") || nomFichier.contains("periscolaire")) {
+            return new ExtractionLoisirs();
+        }
+        // Par défaut : restauration (format Classeur1.xlsx de la mairie)
+        return new ExtractionRestaurateur();
     }
 }
