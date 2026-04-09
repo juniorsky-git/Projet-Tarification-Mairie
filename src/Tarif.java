@@ -1,0 +1,32 @@
+public class Tarif {
+    private String tranche;
+    private double qfMin;
+    private double qfMax;
+    private double repas;
+    private double journeeAccueilLoisirs;
+    private double demiJourneeAvecRepas;
+    private double matinEtSoir;
+    private double matinOuSoir;
+
+    public Tarif(String tranche, double qfMin, double qfMax, double repas, double journeeAccueilLoisirs, double demiJourneeAvecRepas, double matinEtSoir, double matinOuSoir) {
+        this.tranche = tranche;
+        this.qfMin = qfMin;
+        this.qfMax = qfMax;
+        this.repas = repas;
+        this.journeeAccueilLoisirs = journeeAccueilLoisirs;
+        this.demiJourneeAvecRepas = demiJourneeAvecRepas;
+        this.matinEtSoir = matinEtSoir;
+        this.matinOuSoir = matinOuSoir;
+    }
+
+    public boolean contientQf(double qf) {
+        return qf >= qfMin && qf <= qfMax;
+    }
+
+    public String getTranche() { return tranche; }
+    public double getRepas() { return repas; }
+    public double getJourneeAccueilLoisirs() { return journeeAccueilLoisirs; }
+    public double getDemiJourneeAvecRepas() { return demiJourneeAvecRepas; }
+    public double getMatinEtSoir() { return matinEtSoir; }
+    public double getMatinOuSoir() { return matinOuSoir; }
+}
