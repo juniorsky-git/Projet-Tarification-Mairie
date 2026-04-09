@@ -7,8 +7,10 @@ public class Tarif {
     private double demiJourneeAvecRepas;
     private double matinEtSoir;
     private double matinOuSoir;
+    private int usagers;
+    private double recettes;
 
-    public Tarif(String tranche, double qfMin, double qfMax, double repas, double journeeAccueilLoisirs, double demiJourneeAvecRepas, double matinEtSoir, double matinOuSoir) {
+    public Tarif(String tranche, double qfMin, double qfMax, double repas, double journeeAccueilLoisirs, double demiJourneeAvecRepas, double matinEtSoir, double matinOuSoir, int usagers, double recettes) {
         this.tranche = tranche;
         this.qfMin = qfMin;
         this.qfMax = qfMax;
@@ -17,6 +19,8 @@ public class Tarif {
         this.demiJourneeAvecRepas = demiJourneeAvecRepas;
         this.matinEtSoir = matinEtSoir;
         this.matinOuSoir = matinOuSoir;
+        this.usagers = usagers;
+        this.recettes = recettes;
     }
 
     public boolean contientQf(double qf) {
@@ -31,4 +35,6 @@ public class Tarif {
     public double getDemiJourneeAvecRepas() { return demiJourneeAvecRepas; }
     public double getMatinEtSoir() { return matinEtSoir; }
     public double getMatinOuSoir() { return matinOuSoir; }
+    public int getUsagers() { return usagers; }
+    public double getRecettes() { return recettes; }
 }

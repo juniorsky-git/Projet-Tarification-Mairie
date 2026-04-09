@@ -6,9 +6,10 @@ public class Main {
         List<Tarif> tarifs = DonneesTarifs.chargerTarifs();
 
         // PTM-4 : Afficher les données extraites en console pour vérification
-        System.out.println("=== Données extraites du fichier (" + tarifs.size() + " tranches chargées) ===");
+        System.out.println("=== Données extraites du fichier Classeur1.csv (" + tarifs.size() + " tranches chargées) ===");
         for (Tarif t : tarifs) {
-            System.out.println("Tranche " + t.getTranche() + " - Plage QF : " + t.getQfMin() + " à " + t.getQfMax() + " | Prix Repas : " + t.getRepas() + " €");
+            System.out.println(String.format("Tranche %-3s | Prix Repas: %5.2f € | Usagers: %4d | Recettes: %10.2f €", 
+                t.getTranche(), t.getRepas(), t.getUsagers(), t.getRecettes()));
         }
         System.out.println("==================================================================\n");
 
