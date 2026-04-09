@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DonneesTarifs {
 
-    // Ancienne méthode pour respecter le code pré-existant sans tout casser
+    // Méthode par défaut vers le fichier connu
     public static List<Tarif> chargerTarifs() {
         return chargerTarifs("Donnees/Tableau-grille/Classeur1.xlsx");
     }
@@ -17,135 +17,141 @@ public class DonneesTarifs {
         List<Tarif> tarifs = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(new File(cheminFichier));
-                Workbook workbook = new XSSFWorkbook(fis)) {
+             Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
 
-            // On boucle à partir de l'index 3 (parce que les données commencent ligne 4
-            // dans l'Excel)
+            // Evaluateur POI : il détecte RÉELLEMENT les résultats des formules Excel
+            // (ex: "=C4*D4*140" → 308107.8) au lieu de lire 0.
+            FormulaEvaluator evaluateur = workbook.getCreationHelper().createFormulaEvaluator();
+
+            // Ligne 4 dans l'Excel = index 3 en Java (base 0)
             for (int i = 3; i <= sheet.getLastRowNum(); i++) {
                 Row ligne = sheet.getRow(i);
-                if (ligne == null) {
-                    continue;
-                }
+                if (ligne == null) continue;
 
-                Cell premiereCellule = ligne.getCell(0);
-                if (premiereCellule != null && premiereCellule.getCellType() == CellType.STRING) {
-                    if (premiereCellule.getStringCellValue().startsWith("Total")) {
-                        break; // Fin du tableau
-                    }
-                }
+                // Arrêt propre si on atteint la ligne "Total" ou une ligne entièrement vide
+                if (estLigneFin(ligne)) break;
 
-                // Colonne Tranche (B = index 1, fallback A = index 0)
-                String tranche = "";
-                Cell cellTranche = ligne.getCell(1);
-                if (cellTranche != null && cellTranche.getCellType() == CellType.STRING
-                        && !cellTranche.getStringCellValue().trim().isEmpty()) {
-                    tranche = cellTranche.getStringCellValue().trim();
-                } else if (premiereCellule != null && premiereCellule.getCellType() == CellType.STRING) {
-                    tranche = premiereCellule.getStringCellValue().trim();
-                }
+                // Lecture de la Tranche (colonne B = index 1, fallback colonne A = index 0 pour "EXT")
+                String tranche = lireTrancheDepuisLigne(ligne);
+                if (tranche.isEmpty()) continue;
 
-                if (!tranche.isEmpty()) {
-                    double repas = parseCellDouble(ligne.getCell(2)); // Col C = 2
-                    int usagers = (int) parseCellDouble(ligne.getCell(3)); // Col D = 3
-                    double depenses = parseCellDouble(ligne.getCell(5)); // Col F = 5
-                    double recettes = parseCellDouble(ligne.getCell(6)); // Col G = 6
+                // Lecture des valeurs avec l'évaluateur de formules (AMELIORATION MAJEURE)
+                double repas     = lireValeurCellule(ligne.getCell(2), evaluateur); // Col C
+                int    usagers   = (int) lireValeurCellule(ligne.getCell(3), evaluateur); // Col D
+                double depenses  = lireValeurCellule(ligne.getCell(5), evaluateur); // Col F
+                double recettes  = lireValeurCellule(ligne.getCell(6), evaluateur); // Col G
 
-                    double qfMin = getQfMin(tranche);
-                    double qfMax = getQfMax(tranche);
+                // Les bornes QF ne sont pas dans l'Excel : on les déduit de la tranche officielle
+                double qfMin = borneQfMin(tranche);
+                double qfMax = borneQfMax(tranche);
 
-                    tarifs.add(new Tarif(tranche, qfMin, qfMax, repas, 0, 0, 0, 0, usagers, depenses, recettes));
-                }
+                tarifs.add(new Tarif(tranche, qfMin, qfMax, repas, 0, 0, 0, 0, usagers, depenses, recettes));
             }
+
         } catch (Exception e) {
-            System.err.println("Erreur fatale de lecture du fichier Excel avec Apache POI : " + e.getMessage());
+            System.err.println("[DonneesTarifs] Erreur de lecture du fichier Excel : " + e.getMessage());
         }
 
         return tarifs;
     }
 
-    private static double parseCellDouble(Cell cell) {
-        if (cell == null) {
-            return 0.0;
+    // ─── MÉTHODES UTILITAIRES ───────────────────────────────────────────────────
+
+    /**
+     * Détermine si une ligne marque la fin du tableau utile.
+     * Critères : ligne "Total" OU ligne entièrement composée de cellules vides.
+     */
+    private static boolean estLigneFin(Row ligne) {
+        Cell c0 = ligne.getCell(0);
+        if (c0 != null && c0.getCellType() == CellType.STRING
+                && c0.getStringCellValue().trim().toLowerCase().startsWith("total")) {
+            return true;
         }
-        
+        // Ligne vide si aucune cellule parmi les 9 premières n'a de valeur utile
+        for (int col = 0; col < 9; col++) {
+            Cell c = ligne.getCell(col);
+            if (c != null && c.getCellType() != CellType.BLANK) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Lit la lettre de la tranche tarifaire depuis une ligne.
+     * Priorité : colonne B (pour "A", "B", "B2"...) puis colonne A (pour "EXT").
+     */
+    private static String lireTrancheDepuisLigne(Row ligne) {
+        Cell colB = ligne.getCell(1);
+        if (colB != null && colB.getCellType() == CellType.STRING) {
+            String val = colB.getStringCellValue().trim();
+            if (!val.isEmpty()) return val;
+        }
+        Cell colA = ligne.getCell(0);
+        if (colA != null && colA.getCellType() == CellType.STRING) {
+            return colA.getStringCellValue().trim();
+        }
+        return "";
+    }
+
+    /**
+     * Lit la valeur numérique d'une cellule, quelle que soit sa nature :
+     * - Valeur numérique simple (ex: 5.54)
+     * - Résultat d'une formule Excel évalué par POI (ex: =C4*D4*140)
+     * - Texte contenant un nombre avec virgule ou symbole euro (ex: "5,54 €")
+     */
+    private static double lireValeurCellule(Cell cell, FormulaEvaluator evaluateur) {
+        if (cell == null) return 0.0;
         try {
-            if (cell.getCellType() == CellType.NUMERIC) {
-                return cell.getNumericCellValue();
-            } else if (cell.getCellType() == CellType.FORMULA) {
-                // Dans Excel, les champs "Dépense" et "Recette" sont souvent le résultat de `A4 * B4`
-                // getNumericCellValue extraira le dernier cache du résultat pré-calculé 
-                try {
-                    return cell.getNumericCellValue();
-                } catch (Exception ex) {
-                    // Si l'évaluation échoue (par exemple type chaîne issu d'une formule)
-                    String stringResult = cell.getStringCellValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
-                    if (!stringResult.isEmpty()) return Double.parseDouble(stringResult);
-                }
-            } else if (cell.getCellType() == CellType.STRING) {
-                // Repli si jamais une cellule contient "5,54 €" en mode texte pur
-                String text = cell.getStringCellValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
-                if (!text.isEmpty()) {
-                    return Double.parseDouble(text);
-                }
+            // Évaluation via l'outil Apache POI dédié
+            CellValue valeur = evaluateur.evaluate(cell);
+            if (valeur == null) return 0.0;
+
+            switch (valeur.getCellType()) {
+                case NUMERIC:
+                    return valeur.getNumberValue();
+                case STRING:
+                    String text = valeur.getStringValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
+                    if (!text.isEmpty()) return Double.parseDouble(text);
+                    break;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
-            // Sécurité anti-crash
+            // Anti-crash de sécurité
         }
-        
         return 0.0;
     }
 
-    private static double getQfMin(String tranche) {
+    // ─── CORRESPONDANCES TRANCHE → BORNES QF OFFICIELLES ───────────────────────
+
+    private static double borneQfMin(String tranche) {
         switch (tranche) {
-            case "EXT":
-            case "A":
-                return 18000;
-            case "B":
-                return 15000;
-            case "B2":
-                return 13000;
-            case "C":
-                return 11000;
-            case "D":
-                return 9000;
-            case "E":
-                return 7000;
-            case "F":
-                return 5000;
-            case "F2":
-                return 3000;
-            case "G":
-                return 0;
-            default:
-                return 0;
+            case "EXT": case "A":  return 18000;
+            case "B":              return 15000;
+            case "B2":             return 13000;
+            case "C":              return 11000;
+            case "D":              return 9000;
+            case "E":              return 7000;
+            case "F":              return 5000;
+            case "F2":             return 3000;
+            case "G":              return 0;
+            default:               return 0;
         }
     }
 
-    private static double getQfMax(String tranche) {
+    private static double borneQfMax(String tranche) {
         switch (tranche) {
-            case "EXT":
-            case "A":
-                return 999999;
-            case "B":
-                return 17999.99;
-            case "B2":
-                return 14999.99;
-            case "C":
-                return 12999.99;
-            case "D":
-                return 10999.99;
-            case "E":
-                return 8999.99;
-            case "F":
-                return 6999.99;
-            case "F2":
-                return 4999.99;
-            case "G":
-                return 2999.99;
-            default:
-                return 0;
+            case "EXT": case "A":  return 999999;
+            case "B":              return 17999.99;
+            case "B2":             return 14999.99;
+            case "C":              return 12999.99;
+            case "D":              return 10999.99;
+            case "E":              return 8999.99;
+            case "F":              return 6999.99;
+            case "F2":             return 4999.99;
+            case "G":              return 2999.99;
+            default:               return 0;
         }
     }
 }
