@@ -8,10 +8,13 @@ import java.util.List;
 
 public class DonneesTarifs {
 
+    // Ancienne méthode pour respecter le code pré-existant sans tout casser
     public static List<Tarif> chargerTarifs() {
+        return chargerTarifs("Donnees/Tableau-grille/Classeur1.xlsx");
+    }
+
+    public static List<Tarif> chargerTarifs(String cheminFichier) {
         List<Tarif> tarifs = new ArrayList<>();
-        // On cible le VRAI fichier Excel
-        String cheminFichier = "Donnees/Tableau-grille/Classeur1.xlsx";
 
         try (FileInputStream fis = new FileInputStream(new File(cheminFichier));
                 Workbook workbook = new XSSFWorkbook(fis)) {
@@ -66,19 +69,31 @@ public class DonneesTarifs {
         if (cell == null) {
             return 0.0;
         }
-        if (cell.getCellType() == CellType.NUMERIC) {
-            return cell.getNumericCellValue();
-        } else if (cell.getCellType() == CellType.STRING) {
-            // Repli si jamais une cellule contient "5,54 €" en mode texte (plus rare avec
-            // POI, mais possible)
-            String text = cell.getStringCellValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
-            if (!text.isEmpty()) {
+        
+        try {
+            if (cell.getCellType() == CellType.NUMERIC) {
+                return cell.getNumericCellValue();
+            } else if (cell.getCellType() == CellType.FORMULA) {
+                // Dans Excel, les champs "Dépense" et "Recette" sont souvent le résultat de `A4 * B4`
+                // getNumericCellValue extraira le dernier cache du résultat pré-calculé 
                 try {
+                    return cell.getNumericCellValue();
+                } catch (Exception ex) {
+                    // Si l'évaluation échoue (par exemple type chaîne issu d'une formule)
+                    String stringResult = cell.getStringCellValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
+                    if (!stringResult.isEmpty()) return Double.parseDouble(stringResult);
+                }
+            } else if (cell.getCellType() == CellType.STRING) {
+                // Repli si jamais une cellule contient "5,54 €" en mode texte pur
+                String text = cell.getStringCellValue().replaceAll("[^0-9,\\.-]", "").replace(',', '.');
+                if (!text.isEmpty()) {
                     return Double.parseDouble(text);
-                } catch (NumberFormatException ignored) {
                 }
             }
+        } catch (Exception ignored) {
+            // Sécurité anti-crash
         }
+        
         return 0.0;
     }
 
