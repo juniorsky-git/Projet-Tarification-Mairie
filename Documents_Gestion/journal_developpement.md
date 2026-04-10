@@ -1,66 +1,134 @@
 # Journal de Developpement : Projet de Tarification Municipale
 
-Ce document retrace la chronologie des travaux effectues pour la Ville de Crosne. Chaque etape represente un jalon dans la comprehension des finances municipales.
+Ce document retrace la chronologie complete des travaux effectues pour la Ville de Crosne dans le cadre d un stage BUT 2 Informatique. Chaque etape represente un jalon dans la comprehension et l automatisation des finances municipales.
+
+---
 
 ## Etape 1 : Analyse Initiale et Calcul du Cout de Revient Reel
-L'objectif premier etait d'identifier le cout reel d'un repas produit pour la commune.
-- **Action** : Filtrage de la comptabilite (Ciril) sur le perimetre de la restauration scolaire (Michali).
-- **Resultat Constat** : Un cout de revient de **3,97 euros** par repas.
-- **Analyse** : Ce chiffre est base uniquement sur les factures directes payees au prestataire et les matieres premieres. Il ne prend pas encore en compte les charges indirectes lourdes.
+
+L objectif premier etait d identifier le cout reel d un repas produit pour la commune en croisant les donnees comptables.
+
+- Action : Filtrage de l export Ciril (CALC DEP.xlsx) sur le perimetre de la restauration scolaire, antenne RESTMICH, perimetre service 2-RE.
+- Resultat constate : Un cout de revient de 3,97 euros par repas.
+- Methode : Division du total des depenses TTC par le nombre total de repas annuels (effectifs x 140 jours de classe).
+- Limite : Ce chiffre represente uniquement les factures directes payees au prestataire (Scolarest) et les matieres premieres. Il ne tient pas encore compte des charges indirectes de la commune (personnel, fluides, amortissements).
+
+---
 
 ## Etape 2 : Confrontation avec les References de la Mairie
-Comparaison entre le calcul informatique et les donnees du pole financier.
-- **Donnee de Reference** : La mairie a etabli un cout de reference de **4,42 euros** apres un audit complet incluant la masse salariale et les fluides.
-- **Observation de l'Ecart** : Une difference de 0,45 euro par repas a ete identifiee. 
-- **Decision** : L'outil a ete mis a jour pour utiliser les 4,42 euros comme cible contractuelle pour le calcul du taux de couverture, tout en gardant les 3,97 euros comme "Cout Reel Constate" pour l'audit.
 
-## Etape 3 : Correction des Statistiques d'Effectifs (Dataviz)
-Lors de l'analyse des fichiers de statistiques, un bug a ete identifie sur le volume d'usagers.
-- **Probleme** : Le total initial etait de 1058 enfants car la tranche "EXT" (Exterieurs) n'etait pas comptabilisee par l'algorithme.
-- **Resolution** : Elargissement du filtre de recherche Excel pour inclure la tranche EXT.
-- **Resultat Final** : Volume corrige a **1 128 enfants**, garantissant la precision des recettes theoriques calcules (640 963,40 euros).
+Comparaison entre le calcul informatique automatise et les donnees produites manuellement par le pole financier.
 
-## Etape 4 : Refonte "Clean Code" et Optimisation Professionnelle
-A la demande des services informatiques, le code source a ete integralement refondu.
-- **Suppression des Ternaires** : Remplacement de tous les operateurs symboliques (?) par des structures if/else explicites pour une meilleure maintenance.
-- **Documentation JavaDoc** : Ajout de commentaires normalises pour chaque methode.
-- **Aeration du Code** : Application des normes professionnelles pour le placement des accolades et des sauts de ligne.
+- Donnee de reference fournie : La mairie a etabli un cout moyen de reference de 4,42 euros par repas apres un audit complet.
+- Perimetre de ce cout de reference : Il integre la masse salariale des agents communaux, les fluides (eau, electricite, gaz), l entretien des locaux et les provisions.
+- Ecart identifie : 0,45 euro entre le cout reel comptable (3,97 euros) et le cout de reference complet (4,42 euros).
+- Decision de conception : L outil utilise desormais 4,42 euros comme cible contractuelle pour le calcul du taux de couverture, tout en affichant les 3,97 euros comme cout reel constate pour l audit comptable direct.
 
-## Etape 5 : Expansion Multi-Poles et Grille Tarifaire Massive
-L'outil a desormais depasse le cadre de la fresque scolaire pour devenir une plateforme globale.
-- **Integration** : Ajout d'une grille tarifaire complete (Ados, Loisirs, Etudes) basee sur une Map dynamique permettant de gerer des dizaines de prix differents par tranche.
-- **Filtrage Intelligent** : Creation de regles d'inclusion/exclusion par antenne (RESTMICH, RESTGAV, RESTCA) pour generer des rapports financiers par service independant.
+---
 
-## Etape 6 : Outillage de Diagnostic et Audit des Fichiers Excel
-Pour garantir la fiabilite des calculs, une batterie d'outils de diagnostic a ete developpee en marge de l'application principale.
-- **Isolation des Outils** : Creation du dossier `outils_diagnostic` contenant des scripts specifiques (AnalyseTotale, InspecteurSource, DetecteurAdos).
-- **Audit de la Structure Excel** : Ces scripts ont permis de decouvrir que les fichiers Dataviz et Ciril n'avaient pas les memes identifiants (exemple : l'Espace Ados etait cache dans l'antenne RESTCA alors que le Scolaire etait dans RESTMICH).
-- **Transparence** : Ces outils permettent a la mairie de verifier elle-meme comment les donnees sont extraites, ce qui renforce la confiance dans les chiffres du Dashboard.
+## Etape 3 : Correction des Statistiques d Effectifs (Tranche EXT)
+
+Lors de l analyse des fichiers de statistiques, un bug a ete identifie sur le volume total d usagers.
+
+- Probleme initial : Le total affiche etait de 1058 enfants. La tranche EXT (usagers exterieurs a la commune dont le QF est superieur a 18 000 euros) n etait pas comptabilisee par l algorithme.
+- Cause technique : Le filtre de lecture dans le fichier Excel s arretait avant d atteindre cette ligne car le code EXT n etait pas reconnu comme une tranche valide.
+- Resolution : Elargissement du filtre de lecture pour inclure explicitement la tranche EXT.
+- Resultat final : Volume corrige a 1128 enfants, garantissant la precision des recettes theoriques.
+
+---
+
+## Etape 4 : Refonte du Moteur de Calcul (Calculateur.java)
+
+Creation d un moteur de filtrage intelligent pour lire et croiser plusieurs sources de donnees Excel.
+
+### Gestion des Antennes de Facturation
+Le code identifie chaque service via son code antenne dans les depenses :
+- RESTMICH : Restauration scolaire, ecole Louise Michel.
+- RESTGAV : Restauration, centre de loisirs Gaveroche.
+- RESTCA : Restauration Espace Ados.
+- CRCOLL : Periscolaire et etudes surveillees.
+
+### Algorithme de Filtrage Dynamique
+Pour chaque pole, le moteur applique des regles d inclusion et d exclusion par mot-cle dans les libelles de factures. Cela evite de comptabiliser deux fois les memes depenses quand deux services partagent une meme antenne dans Ciril.
+
+---
+
+## Etape 5 : Refonte Clean Code et Standardisation
+
+A la demande du projet, le code source a ete integralement refondu selon des standards professionnels.
+
+- Suppression des operateurs ternaires : Tout operateur symbolique (?) a ete remplace par des structures if/else explicites et lisibles.
+- Documentation Javadoc : Ajout de commentaires normalises pour chaque classe et methode, expliquant la logique metier et les parametres.
+- Aeration du code : Application des conventions de placement des accolades et des sauts de ligne entre les blocs logiques.
+- Standardisation ASCII : Remplacement des caracteres accentues dans les chaines affichees pour eviter les problemes d encodage sur les terminaux Windows.
+
+---
+
+## Etape 6 : Expansion Multi-Poles et Grille Tarifaire Complete
+
+L outil a depasse le cadre de la restauration scolaire pour devenir une plateforme de pilotage multi-services.
+
+### Integration de la Grille Tarifaire Massive
+Une grille de prix complete pour 2025 a ete fournie et integree dans DonneesTarifs.java. Elle couvre tous les services municipaux :
+- Restauration scolaire (tarif REPAS).
+- Accueil de loisirs (ACCUEIL_JOURNEE, ACCUEIL_DEMI_REPAS).
+- Espace Ados (ADOS_VAC_JOURNEE_REPAS, ADOS_VAC_JOURNEE_SANS, ADOS_SORTIE_DEMI, ADOS_SORTIE_JOURNEE...).
+- Periscolaire (PERISCOLAIRE_MATIN_SOIR, PERISCOLAIRE_MATIN_OU_SOIR).
+- Etudes surveillees (ETUDES_FORFAIT_MENSUEL, ETUDES_DEMI_FORFAIT).
+
+La structure de donnees a ete migree de champs fixes vers une Map dynamique (Map<String, Double>) dans la classe Tarif.java, permettant une recherche du prix par cle de service.
+
+### Outillage de Diagnostic
+Pour garantir la fiabilite des calculs, des scripts specifiques ont ete developpes dans le dossier outils_diagnostic :
+- InventairePoles.java : Liste toutes les antennes presentes dans Ciril.
+- ScannerTotalDataviz.java : Parcourt le fichier de statistiques pour reperer les sections.
+- DetecteurAdos.java : Identifie les factures liees a l Espace Ados.
+- InspecteurCalcDep.java : Liste les onglets du fichier CALC DEP.xlsx.
+- InspecteurSimulation.java : Affiche le contenu de l onglet Simulation ligne par ligne.
+
+---
 
 ## Etape 7 : Correction Fondamentale de la Source de Donnees (Onglet Simulation)
-Identification d une erreur de conception sur la provenance des effectifs.
+
+Identification d une erreur de conception majeure sur la provenance des effectifs et des prix utilises.
 
 ### Probleme Identifie
-Jusqu a cette etape, le code lisait les effectifs par tranche depuis le fichier Feuille_dataviz.xlsx. Ce fichier contient des donnees generiques qui ne correspondent pas exactement aux prix rellement factures aux familles pour l annee 2025.
+Jusqu a cette etape, le code lisait les effectifs par tranche depuis le fichier Feuille_dataviz.xlsx, et utilisait les prix de la grille theorique (DonneesTarifs.java). Ces deux sources ne correspondaient pas aux donnees reellement utilisees par la mairie en 2025.
 
 ### Source Correcte : Onglet Simulation de CALC DEP.xlsx
-Le fichier CALC DEP.xlsx contient un onglet nomme Simulation (index 8) qui est la veritable source de reference. Il contient :
-- Le code de chaque tranche (EXT, A, B, C, D, E, F, F2, G).
-- Le prix reel facture a cette tranche en 2025 (colonne C). Ces prix different de la grille theorique car ils integrent des ajustements specifiques.
-- Le nombre reel d enfants inscrits dans cette tranche en 2025 (colonne D).
-- Le cout moyen de reference de la mairie (4.42 euros, colonne E).
+Le fichier CALC DEP.xlsx contient 9 onglets. L onglet numero 8 (index 8) est nomme Simulation. C est la veritable source de reference construite par le pole financier. Il contient :
+- Colonne A (index 0) : Libelle de la tranche (ex : Plus de 18 000 euros). Pour la ligne EXT, le code est directement dans cette colonne.
+- Colonne B (index 1) : Code court de la tranche (A, B, B2, C, D, E, F, F2, G).
+- Colonne C (index 2) : Prix reel facture a cette tranche en 2025. Ces prix sont inferieurs a la grille theorique car ils refletent les tarifs negocies avec la CAF et appliques concretement aux familles.
+- Colonne D (index 3) : Nombre reel d enfants inscrits dans cette tranche.
+- Colonne E (index 4) : Cout moyen de reference de la mairie (4,42 euros, valeur fixe).
 
-### Difficulte Technique Rencontree
-La ligne EXT a une structure differente des autres : son code est en colonne A (index 0) alors que les codes A, B, C... sont en colonne B (index 1). L algorithme a dû etre adapte pour detecter ces deux cas.
+### Difficulte Technique Rencontree et Resolution
+La ligne EXT a une structure differente des autres lignes :
+- Son code EXT est en colonne A (index 0) alors que la colonne B (index 1) est vide.
+- Pour toutes les autres tranches (A a G), le code court est en colonne B et la colonne A contient le libelle verbeux.
 
-### Nouveaux Indicateurs Produits par l Onglet Simulation
-- Effectifs : 1128 enfants (identiques a avant, validation croisee reussie).
-- Recettes theoriques reelles : 593 380,20 euros (vs 640 963,40 euros precedemment).
-- Taux de couverture reel : 85,01 %.
-- Ecart budgetaire : -104 626,20 euros.
+L algorithme a du etre adapte avec une logique double :
+- Si la colonne A contient exactement EXT, on prend EXT comme code de tranche.
+- Sinon, on prend le contenu de la colonne B comme code de tranche.
+- On s arrete quand la colonne A contient Total.
 
-### Ecart avec le Calcul Precedent
-La difference entre 640 963 euros et 593 380 euros s explique par les prix de la colonne C de l onglet Simulation. Par exemple, la tranche A est facturee a 5,13 euros dans ce fichier contre 5,54 euros dans la grille theorique. Ce sont ces prix reels qu il faut utiliser pour une analyse budgetaire fiable.
+---
 
-## Bilan Final et Conclusion
-L'analyse finale a revele un taux de couverture de 102,25% pour le pole scolaire (Michali). L'outil est desormais capable de s'adapter a n'importe quel nouveau service municipal des que les volumes d'usagers sont renseignes dans les fichiers sources.
+## Bilan Final : Indicateurs Definitifs (Apres Etape 7)
+
+Ces chiffres sont produits par l outil en lisant directement l onglet Simulation de CALC DEP.xlsx et les depenses reelles de l onglet Depenses restau 2025.
+
+| Indicateur | Valeur |
+| :--- | :--- |
+| Effectifs totaux (1128 enfants) | valides par croisement des deux sources |
+| Total repas annuels (140 jours) | 157 920 repas |
+| Cout moyen de reference mairie | 4,42 euros par repas |
+| Cout reel constate (Ciril) | 3,97 euros par repas |
+| Depenses de reference (1128 x 140 x 4,42) | 698 006,40 euros |
+| Recettes theoriques reelles (Simulation) | 593 380,20 euros |
+| Taux de couverture definitif | 85,01 % |
+| Ecart budgetaire (Recettes - Depenses ref.) | -104 626,20 euros |
+
+### Interpretation du Taux de Couverture
+Un taux de 85,01% signifie que les tarifs actuellement factures aux familles couvrent 85% du cout total (base 4,42 euros) de la restauration. Les 15% restants representent une contribution nette de la commune au service de restauration, ce qui est une information cle pour les decisions tarifaires futures.
