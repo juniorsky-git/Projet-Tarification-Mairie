@@ -4,7 +4,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Point d'entrée de l'application de tarification municipale.
+ * Gère la boucle principale du menu interactif et la navigation.
+ */
 public class Main {
+    
+    /**
+     * Méthode principale qui initialise les services et lance le menu.
+     * @param args Arguments ligne de commande (non utilisés).
+     */
     public static void main(String[] args) {
         Calculateur calculateur = new Calculateur();
         TarificationService service = new TarificationService();
@@ -42,6 +51,10 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Option [1] : Traite et affiche le tableau de bord financier.
+     * Calcule les indicateurs basés sur les fichiers Excel réels.
+     */
     private static void afficherDashboard(Calculateur calculateur, Scanner scanner) {
         ConsoleUI.printHeader("Tableau de bord financier (MICHALI)");
         
@@ -50,15 +63,17 @@ public class Main {
         double recettesTheoriques = calculateur.calculerRecettesTheoriques(effectifs);
         
         double totalEnfants = 0;
-        for (double nb : effectifs.values()) totalEnfants += nb;
+        for (double nb : effectifs.values()) {
+            totalEnfants += nb;
+        }
         double totalRepas = totalEnfants * 140;
 
-        // On utilise ici le coût de référence de 4.42 euros
+        // Utilisation du coût de référence (4.42 euros)
         double coutMoyenRef = calculateur.getCoutMoyenReference();
         double depensesTheoriques = totalRepas * coutMoyenRef;
         double tauxCouverture = (depensesTheoriques > 0) ? (recettesTheoriques / depensesTheoriques * 100) : 0;
 
-        // Analyse de l'écart (optionnel mais utile pour le rapport)
+        // Analyse de l'écart budgétaire
         double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
         double ecartTotal = depensesTotales - depensesTheoriques;
 
@@ -77,6 +92,9 @@ public class Main {
         scanner.nextLine();
     }
 
+    /**
+     * Option [2] : Calcule le tarif individuel selon le QF saisi.
+     */
     private static void consulterTarif(TarificationService service, List<Tarif> grilleRef, Scanner scanner) {
         ConsoleUI.printHeader("Calculateur individuel");
         System.out.print("\n   Entrez le Quotient Familial : ");
@@ -93,7 +111,7 @@ public class Main {
             ConsoleUI.printSeparator();
             System.out.println("   RÉSULTAT POUR LE QF " + qf);
             System.out.println("   Tranche  : " + t.getTranche());
-            System.out.println("   Activité : " +  activite);
+            System.out.println("   Activité : " + activite);
             System.out.printf("   Tarif    : %.2f euros%n", prix);
             ConsoleUI.printSeparator();
         } catch (NumberFormatException e) {
@@ -106,6 +124,9 @@ public class Main {
         scanner.nextLine();
     }
 
+    /**
+     * Option [3] : Affiche la grille tarifaire complète de 2025.
+     */
     private static void afficherGrilleReference(List<Tarif> grille, Scanner scanner) {
         ConsoleUI.printHeader("Grille tarifaire de référence 2025");
         

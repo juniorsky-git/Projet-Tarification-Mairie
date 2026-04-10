@@ -1,71 +1,73 @@
 package fr.mairie.tarification;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+/**
+ * Représente une tranche tarifaire avec ses plafonds de Quotient Familial
+ * et les prix associés pour les différentes activités.
+ */
 public class Tarif {
     private String tranche;
     private double qfMin;
     private double qfMax;
+    private double repas;
+    private double garde;
 
-    // Données statistiques (depuis le CSV Classeur1)
-    private int usagers;
-    private double recettes;
-
-    // Stockage de tous les tarifs par activité (HashMap)
-    private Map<String, Double> tarifs;
-
-    // --- Constructeur principal (HashMap) ---
-    public Tarif(String tranche, double qfMin, double qfMax, Map<String, Double> tarifs) {
+    /**
+     * Constructeur complet pour un tarif.
+     * @param tranche Nom de la tranche (A, B, C...)
+     * @param qfMin Quotient Familial minimum
+     * @param qfMax Quotient Familial maximum
+     * @param repas Prix unitaire du repas
+     * @param garde Prix unitaire de la garde (optionnel)
+     */
+    public Tarif(String tranche, double qfMin, double qfMax, double repas, double garde) {
         this.tranche = tranche;
         this.qfMin = qfMin;
         this.qfMax = qfMax;
-        this.tarifs = new HashMap<>(tarifs);
-        this.usagers = 0;
-        this.recettes = 0.0;
+        this.repas = repas;
+        this.garde = garde;
     }
 
-    // --- Constructeur avec stats CSV ---
-    public Tarif(String tranche, double qfMin, double qfMax, Map<String, Double> tarifs, int usagers, double recettes) {
-        this(tranche, qfMin, qfMax, tarifs);
-        this.usagers = usagers;
-        this.recettes = recettes;
-    }
+    // --- Getters et Setters aérés ---
 
-    // --- Méthodes ---
-    public boolean contientQf(double qf) {
-        return qf >= qfMin && qf <= qfMax;
+    /**
+     * @return Le nom de la tranche tarifaire.
+     */
+    public String getTranche() {
+        return tranche;
     }
 
     /**
-     * Retourne le prix pour une activité donnée.
-     * @param activite la clé de l'activité (ex: "repas", "etudes-forfait-mensuel", "ados-journee-repas")
-     * @return le prix, ou 0.0 si l'activité n'est pas définie pour cette tranche
+     * @param tranche Le nom de la tranche à définir.
      */
-    public double getPrix(String activite) {
-        return tarifs.getOrDefault(activite.toLowerCase(), 0.0);
+    public void setTranche(String tranche) {
+        this.tranche = tranche;
     }
 
-    public boolean aActivite(String activite) {
-        return tarifs.containsKey(activite.toLowerCase());
+    /**
+     * @return Le Quotient Familial minimum de la tranche.
+     */
+    public double getQfMin() {
+        return qfMin;
     }
 
-    public Set<String> getActivitesDisponibles() {
-        return tarifs.keySet();
+    /**
+     * @return Le Quotient Familial maximum de la tranche.
+     */
+    public double getQfMax() {
+        return qfMax;
     }
 
-    // --- Getters ---
-    public String getTranche()    { return tranche; }
-    public double getQfMin()      { return qfMin; }
-    public double getQfMax()      { return qfMax; }
-    public int getUsagers()       { return usagers; }
-    public double getRecettes()   { return recettes; }
+    /**
+     * @return Le prix du repas pour cette tranche.
+     */
+    public double getRepas() {
+        return repas;
+    }
 
-    // Retrocompatibilité
-    public double getRepas()                  { return getPrix("repas"); }
-    public double getJourneeAccueilLoisirs()  { return getPrix("accueil-journee"); }
-    public double getDemiJourneeAvecRepas()   { return getPrix("accueil-demi-repas"); }
-    public double getMatinEtSoir()            { return getPrix("periscolaire-matin-soir"); }
-    public double getMatinOuSoir()            { return getPrix("periscolaire-matin-ou-soir"); }
+    /**
+     * @return Le prix de la garde pour cette tranche.
+     */
+    public double getGarde() {
+        return garde;
+    }
 }
