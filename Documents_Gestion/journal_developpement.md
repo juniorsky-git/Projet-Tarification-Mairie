@@ -43,3 +43,9 @@ Pour rappel, avant filtrage des services annexes (Ados, Loisirs, Restaurant Comm
 - **Symptôme** : Affichage de `?` à la place de `€` ou d'`É`.
 - **Cause** : Le terminal Windows (CMD) n'utilise pas par défaut l'UTF-8 de Java.
 - **Solution** : Remplacement des symboles par du texte clair ("euros", "SANS LIMITE") pour garantir un affichage premium et lisible sur n'importe quel ordinateur de la mairie.
+
+## 4. Professionnalisation et Qualité du Code (Clean Code)
+Dans la dernière phase du projet, une attention particulière a été portée à la **lisibilité** et à la **maintenabilité** du logiciel :
+- **Documentation Javadoc** : Chaque classe et chaque méthode est désormais documentée (`/** ... */`) pour expliquer son rôle et ses paramètres (important pour la passation de projet).
+- **Formatage standardisé** : Aération des blocs de code (accolades, sauts de ligne dans les getters/setters) pour respecter les conventions professionnelles.
+- **Modularisation** : Isolation des scripts de recherche (`outils_diagnostic`) pour garder le code source (`src`) propre et prêt pour la production.

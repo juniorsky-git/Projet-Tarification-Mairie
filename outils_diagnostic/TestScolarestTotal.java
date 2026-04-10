@@ -34,7 +34,15 @@ public class TestScolarestTotal {
                 }
                 
                 String tiers = cTiers.toString().toUpperCase();
-                double montant = (cTTC.getCellType() == CellType.NUMERIC) ? cTTC.getNumericCellValue() : 0;
+                
+                double montant = 0;
+                if (cTTC.getCellType() == CellType.NUMERIC) {
+                    montant = cTTC.getNumericCellValue();
+                } else {
+                    try {
+                        montant = Double.parseDouble(cTTC.toString());
+                    } catch (Exception e) {}
+                }
                 
                 // On isole uniquement le prestataire COMPASS GROUP (Scolarest)
                 if (tiers.contains("SCOLAREST")) {

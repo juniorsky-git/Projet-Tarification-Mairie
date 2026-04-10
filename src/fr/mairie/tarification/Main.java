@@ -71,10 +71,18 @@ public class Main {
         // Utilisation du coût de référence (4.42 euros)
         double coutMoyenRef = calculateur.getCoutMoyenReference();
         double depensesTheoriques = totalRepas * coutMoyenRef;
-        double tauxCouverture = (depensesTheoriques > 0) ? (recettesTheoriques / depensesTheoriques * 100) : 0;
+        
+        double tauxCouverture = 0;
+        if (depensesTheoriques > 0) {
+            tauxCouverture = (recettesTheoriques / depensesTheoriques * 100);
+        }
 
         // Analyse de l'écart budgétaire
-        double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
+        double coutMoyenReel = 0;
+        if (totalRepas > 0) {
+            coutMoyenReel = (depensesTotales / totalRepas);
+        }
+        
         double ecartTotal = depensesTotales - depensesTheoriques;
 
         System.out.printf("\n   - Dépenses (Base 4.42 euros) : %10.2f euros%n", depensesTheoriques);
@@ -134,7 +142,13 @@ public class Main {
         System.out.println("   " + "-".repeat(45));
         
         for (Tarif t : grille) {
-            String qfMaxStr = (t.getQfMax() > 1000000) ? "SANS LIMITE" : String.format("%.0f", t.getQfMax());
+            String qfMaxStr = "";
+            if (t.getQfMax() > 1000000) {
+                qfMaxStr = "SANS LIMITE";
+            } else {
+                qfMaxStr = String.format("%.0f", t.getQfMax());
+            }
+
             System.out.printf("   %-5s | %10.0f | %11s | %-8.2f euros%n", 
                 t.getTranche(), t.getQfMin(), qfMaxStr, t.getRepas());
         }

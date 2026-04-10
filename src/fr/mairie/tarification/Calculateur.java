@@ -43,7 +43,9 @@ public class Calculateur {
             Sheet s = wb.getSheetAt(0);
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
 
                 String antenneLigne = getValeurTexte(row.getCell(COL_DEP_ANTENNE));
                 String serviceLigne = getValeurTexte(row.getCell(COL_DEP_SERVICE));
@@ -79,7 +81,9 @@ public class Calculateur {
             Sheet s = wb.getSheetAt(0);
             for (int i = LIGNE_DEBUT_VOLUMES; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
 
                 String code = getValeurTexte(row.getCell(COL_VOL_CODE_TRANCHE));
                 String desc = getValeurTexte(row.getCell(0));
@@ -93,7 +97,10 @@ public class Calculateur {
                     code = desc;
                 }
 
-                if (code == null || code.isEmpty()) continue;
+                if (code == null || code.isEmpty()) {
+                    continue;
+                }
+                
                 if (code.contains("Restauration") || code.contains("Tranches") || code.length() > 5) {
                     continue;
                 }
@@ -156,25 +163,33 @@ public class Calculateur {
         return 4.42;
     }
 
-    // --- Utilitaires de lecture Excel ---
+    // --- Utilitaires de lecture Excel (Sans ternaires) ---
 
     /**
      * Récupère le texte d'une cellule de manière sécurisée.
      */
     private String getValeurTexte(Cell c) {
-        return (c == null) ? "" : c.toString().trim();
+        if (c == null) {
+            return "";
+        } else {
+            return c.toString().trim();
+        }
     }
 
     /**
      * Récupère la valeur numérique d'une cellule de manière sécurisée.
      */
     private double getValeurNumerique(Cell c) {
-        if (c == null) return 0;
+        if (c == null) {
+            return 0;
+        }
+        
         try {
             if (c.getCellType() == CellType.NUMERIC) {
                 return c.getNumericCellValue();
+            } else {
+                return Double.parseDouble(c.toString().trim());
             }
-            return Double.parseDouble(c.toString().trim());
         } catch (Exception e) {
             return 0;
         }

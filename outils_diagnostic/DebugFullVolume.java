@@ -30,9 +30,20 @@ public class DebugFullVolume {
                 Cell cDesc = r.getCell(0); // Col A
                 Cell cNb = r.getCell(3);   // Col D
                 
-                String code = (cCode == null) ? "" : cCode.toString();
-                String desc = (cDesc == null) ? "" : cDesc.toString();
-                double nb = (cNb != null && cNb.getCellType() == CellType.NUMERIC) ? cNb.getNumericCellValue() : 0;
+                String code = "";
+                if (cCode != null) {
+                    code = cCode.toString();
+                }
+
+                String desc = "";
+                if (cDesc != null) {
+                    desc = cDesc.toString();
+                }
+
+                double nb = 0;
+                if (cNb != null && cNb.getCellType() == CellType.NUMERIC) {
+                    nb = cNb.getNumericCellValue();
+                }
                 
                 // On affiche les lignes ayant des données numériques pour debugging
                 if (nb > 0) {

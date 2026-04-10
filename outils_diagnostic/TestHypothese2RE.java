@@ -35,8 +35,20 @@ public class TestHypothese2RE {
                 }
                 
                 String service = cServ.toString();
-                String antenne = (cAnt == null) ? "" : cAnt.toString();
-                double montant = (cTTC.getCellType() == CellType.NUMERIC) ? cTTC.getNumericCellValue() : 0;
+                
+                String antenne = "";
+                if (cAnt != null) {
+                    antenne = cAnt.toString();
+                }
+
+                double montant = 0;
+                if (cTTC.getCellType() == CellType.NUMERIC) {
+                    montant = cTTC.getNumericCellValue();
+                } else {
+                    try {
+                        montant = Double.parseDouble(cTTC.toString());
+                    } catch (Exception e) {}
+                }
                 
                 // HYPOTHESE : Le service 2-RE (Cantine Ecoles) mais sans Louise Michel (Centre)
                 if (service.contains("2-RE") && !antenne.equalsIgnoreCase("CLMICH")) {

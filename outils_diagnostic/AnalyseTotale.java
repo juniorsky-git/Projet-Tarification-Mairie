@@ -36,10 +36,25 @@ public class AnalyseTotale {
                     continue;
                 }
 
-                String tiers = (cTiers == null) ? "INCONNU" : cTiers.toString();
-                String libelle = (cLib == null) ? "" : cLib.toString();
-                String antenne = (cAnt == null) ? "" : cAnt.toString();
-                double montant = (cTTC.getCellType() == CellType.NUMERIC) ? cTTC.getNumericCellValue() : 0;
+                String tiers = "INCONNU";
+                if (cTiers != null) {
+                    tiers = cTiers.toString();
+                }
+
+                String libelle = "";
+                if (cLib != null) {
+                    libelle = cLib.toString();
+                }
+
+                String antenne = "";
+                if (cAnt != null) {
+                    antenne = cAnt.toString();
+                }
+
+                double montant = 0;
+                if (cTTC.getCellType() == CellType.NUMERIC) {
+                    montant = cTTC.getNumericCellValue();
+                }
 
                 // On filtre sur les codes services identifiés
                 if (antenne.equalsIgnoreCase("CLMICH") || (r.getCell(18) != null && r.getCell(18).toString().contains("2-RE"))) {
