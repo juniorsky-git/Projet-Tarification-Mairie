@@ -281,6 +281,25 @@ public class DonneesTarifs {
         return Double.parseDouble(clean);
     }
 
+    /** Accessible par ExcelReader */
+    public static double getQfMinPublic(String tranche) {
+        return getQfMin(tranche);
+    }
+
+    /** Accessible par ExcelReader */
+    public static double getQfMaxPublic(String tranche) {
+        return getQfMax(tranche);
+    }
+
+    /**
+     * Charge les tarifs depuis un fichier Excel (.xlsx ou .xls).
+     * @param cheminFichier chemin vers le fichier Excel
+     * @return liste des tarifs extraits
+     */
+    public static List<Tarif> chargerTarifsDepuisExcel(String cheminFichier) {
+        return ExcelReader.lire(cheminFichier);
+    }
+
     private static double getQfMin(String tranche) {
         switch (tranche) {
             case "EXT":

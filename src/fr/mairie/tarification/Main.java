@@ -5,6 +5,29 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+        // -----------------------------------------------------------------
+        // TEST 1 : Chargement depuis le fichier EXCEL (nouvelle méthode)
+        // -----------------------------------------------------------------
+        System.out.println("=== [EXCEL] Lecture depuis Classeur1.xlsx ===");
+        String cheminExcel = "Donnees/Tableau-grille/Classeur1.xlsx";
+        List<Tarif> tarifsExcel = DonneesTarifs.chargerTarifsDepuisExcel(cheminExcel);
+
+        if (tarifsExcel.isEmpty()) {
+            System.out.println("Aucune donnée chargée depuis le fichier Excel.");
+        } else {
+            System.out.printf("%n%-5s | %-10s | %-10s | %-12s%n", "Trnch", "Repas (€)", "Usagers", "Recettes (€)");
+            System.out.println("-".repeat(50));
+            for (Tarif t : tarifsExcel) {
+                System.out.printf("%-5s | %9.2f | %7d   | %12.2f%n",
+                        t.getTranche(), t.getRepas(), t.getUsagers(), t.getRecettes());
+            }
+        }
+        System.out.println("=".repeat(50) + "\n");
+
+        // -----------------------------------------------------------------
+        // TEST 2 : Chargement depuis le fichier CSV (ancienne méthode)
+        // -----------------------------------------------------------------
         List<Tarif> tarifs = DonneesTarifs.chargerTarifs();
 
         // Afficher les données extraites en console pour vérification
