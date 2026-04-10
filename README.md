@@ -91,49 +91,50 @@ Les premières tâches consistent à :
 
 ---
 
-## Installation et Exécution (Windows)
+## Phase 2 : Automatisation des Calculs (Avril 2026)
 
-Le projet utilise désormais des bibliothèques externes (Apache POI). Pour compiler et lancer le projet simplement sans configuration complexe :
+L'application a évolué pour intégrer un moteur de calcul métier (`Calculateur.java`). Elle croise désormais les dépenses budgétaires et les effectifs d'usagers.
 
-Utilisez le script PowerShell `build.ps1` fourni à la racine :
+### Indicateurs générés automatiquement :
+- **Coût Moyen du repas** (Dépenses / (Usagers * Jours)).
+- **Recettes théoriques par tranche**.
+- **Taux de couverture global**.
 
-```powershell
-# Pour compiler et lancer l'application d'un coup
-powershell -ExecutionPolicy Bypass -File ./build.ps1 run
+### Nouveaux problèmes techniques résolus :
 
-# Pour compiler uniquement
-powershell -ExecutionPolicy Bypass -File ./build.ps1 build
+#### 1. Format de fichier "faux XLS"
+- **Problème** : Le fichier `Detail_des_ecritures_...xls` ne s'ouvrait pas avec les outils Excel standards (POI).
+- **Analyse** : Après examen du contenu brut, il s'agissait d'un fichier **SpreadsheetML (XML)** portant l'extension `.xls`.
+- **Solution** : Pivot vers le fichier `CALC DEP.xlsx` qui contient les mêmes données au format binaire standard.
 
-# Pour nettoyer les fichiers de build
-powershell -ExecutionPolicy Bypass -File ./build.ps1 clean
-```
+#### 2. Décalage des colonnes dans les exports
+- **Problème** : Les montants et les services étaient lus à 0.
+- **Solution** : Correction des index de recherche (décalage de -1) après analyse avec les scripts d'inspection.
+
+#### 3. Logique de calcul annuelle
+- **Problème** : Les dépenses sont annuelles mais les effectifs sont par jour moyen.
+- **Solution** : Intégration du **coefficient de 140 jours** (moyenne académique) pour ramener les calculs sur la même base temporelle.
 
 ---
 
-## Notes Techniques & Problèmes Résolus
+## Installation et Exécution (Windows)
 
-Lors du développement, plusieurs défis techniques ont été surmontés :
+Le projet utilise désormais des bibliothèques externes (Apache POI). Pour lancer l'application et voir les résultats :
 
-### 1. Gestion des dépendances (Apache POI)
-Le projet n'utilisant pas Maven ou Gradle, toutes les dépendances JAR ont été téléchargées manuellement dans un dossier `lib/`. Le script de build gère automatiquement l'inclusion de ces JARs dans le `classpath` lors de la compilation et de l'exécution.
+```powershell
+powershell -ExecutionPolicy Bypass -File ./build.ps1 run
+```
 
-### 2. Automatisation du Build (Makefile vs PowerShell)
-- **Problème** : L'installation de l'utilitaire `make` sur Windows a échoué à cause des restrictions de droits (UAC).
-- **Solution** : Création d'un script `build.ps1` natif Windows qui remplace le Makefile et offre les mêmes fonctionnalités sans installation requise.
-
-### 3. Sécurité PowerShell (Execution Policy)
-- **Problème** : Erreur `UnauthorizedAccess` lors du lancement du script .ps1.
-- **Solution** : Utilisation de l'option `-ExecutionPolicy Bypass` pour autoriser l'exécution du script de build local.
+Les documents détaillés de gestion de projet (plans, tâches, bilans) sont disponibles dans le dossier `/Documents_Gestion`.
 
 ---
 
 ## Évolutions possibles
 
 Par la suite, le projet pourra être enrichi avec :
-- L’analyse des exports réels Ciril (fichiers plus volumineux).
-- L’automatisation des calculs de tarification.
-- La simulation de nouvelles grilles tarifaires.
-- Une interface utilisateur.
+- L’analyse automatisée des autres services (Accueil de loisirs, Espace Ados).
+- Le calcul des recettes réelles à partir des fichiers de facturation Ciril.
+- Une fonctionnalité de simulation d'impact lors d'un changement de tarif.
 
 ---
 
