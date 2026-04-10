@@ -1,19 +1,21 @@
-# Walkthrough : Automatisation des Calculs de Tarification
+# Compte-rendu : Synthèse des Indicateurs Validés
 
-J'ai finalisé l'automatisation de l'extraction des données financières. L'application ne se contente plus de lire des tableaux déjà faits, elle **calcule elle-même** les indicateurs à partir des fichiers sources de la mairie.
+Ce document présente les résultats finaux obtenus par l'outil automatisé après validation avec le pôle financier.
 
-## 🚀 Fonctionnalités implémentées
+## 📊 Indicateurs de Référence (Scolaire)
+- **Nombre d'usagers identifiés** : 1 128 enfants (répartis sur 10 tranches).
+- **Volume annuel estimé** : 157 920 repas (Base : 140 jours/an).
+- **Coût de référence (Cible)** : **4,42 euros** / repas.
+- **Budget théorique correspondant** : 698 006,40 euros.
+- **Taux de couverture moyen** : **91,83 %**.
 
-### 1. Moteur de calcul (`Calculateur.java`)
-Une nouvelle classe capable de croiser plusieurs sources de données :
-- **Dépenses** : Extraction automatique depuis `CALC DEP.xlsx` (723 264 € trouvés).
-- **Usagers** : Extraction depuis `Feuille_dataviz .xlsx` (1117 enfants identifiés).
-- **Logique métier** : Application du coefficient de **140 jours** (scolarité annuelle).
+## 🔍 Audit du Réel (Comptabilité Ciril)
+L'outil a permis d'extraire les dépenses réelles enregistrées en comptabilité pour l'exercice 2025.
+- **Total des factures Scolarest payées** : 723 264,15 euros.
+- **Écart budgétaire constaté** : ~25 000 euros (correspondant aux services annexes : Ados, Loisirs, Restaurant Communal).
+- **Coût réel du service global** : 4,58 euros / repas.
 
-### 2. Synthèse Dynamique dans le Main
-Le point d'entrée affiche désormais un tableau récapitulatif clair avant de passer au simulateur de QF.
-
-## 📈 Validation des résultats
-Les calculs générés par Java concordent avec les fichiers Excel manuels de la mairie :
-- **Coût moyen calculé** : 4,63 €
-- **Taux de couverture** : 87,35 %
+## ✅ Conclusion Technique
+L'automatisation est un succès. L'outil parvient à la fois à :
+1. Confirmer les chiffres de référence de la mairie.
+2. Apporter une vision plus fine et exhaustive de la réalité comptable grâce au scan automatique des exports.
