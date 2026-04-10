@@ -1,6 +1,7 @@
 package fr.mairie.tarification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -29,14 +30,34 @@ public class Main {
         // TEST 2 : Chargement depuis le fichier CSV (ancienne méthode)
         // -----------------------------------------------------------------
         List<Tarif> tarifs = DonneesTarifs.chargerTarifs();
-
-        // Afficher les données extraites en console pour vérification
-        System.out.println("=== Données extraites du fichier Classeur1.csv (" + tarifs.size() + " tranches chargées) ===");
-        for (Tarif t : tarifs) {
-            System.out.printf("Tranche %-3s | Prix Repas: %5.2f € | Usagers: %4d | Recettes: %10.2f €%n",
-                t.getTranche(), t.getRepas(), t.getUsagers(), t.getRecettes());
-        }
+        System.out.println("=== [CSV] Lecture depuis Classeur1.csv (" + tarifs.size() + " tranches chargées) ===");
         System.out.println("==================================================================\n");
+
+        // -----------------------------------------------------------------
+        // TEST 3 : SYNTHÈSE AUTOMATISÉE (NOUVEAU)
+        // -----------------------------------------------------------------
+        System.out.println("=== SYNTHÈSE AUTOMATISÉE : RESTAURATION MICHALI (CLMICH) ===");
+        Calculateur calculateur = new Calculateur();
+        
+        double depensesTotales = calculateur.calculerTotalDepenses("CLMICH");
+        Map<String, Double> effectifs = calculateur.chargerEffectifsParTranche();
+        double recettesTheoriques = calculateur.calculerRecettesTheoriques(effectifs);
+        
+        // Calcul du nombre total de repas (Total Enfants * 140 jours)
+        double totalEnfants = 0;
+        for (double nb : effectifs.values()) totalEnfants += nb;
+        double totalRepas = totalEnfants * 140;
+
+        double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
+        double tauxCouverture = (depensesTotales > 0) ? (recettesTheoriques / depensesTotales * 100) : 0;
+
+        System.out.printf("Dépenses réelles (Ciril)  : %12.2f €%n", depensesTotales);
+        System.out.printf("Recettes calculées        : %12.2f €%n", recettesTheoriques);
+        System.out.printf("Nombre total d'enfants    : %12.0f%n", totalEnfants);
+        System.out.printf("Nombre total de repas     : %12.0f (basé sur 140j/an)%n", totalRepas);
+        System.out.printf("COÛT MOYEN RÉEL DU REPAS  : %12.2f €%n", coutMoyenReel);
+        System.out.printf("TAUX DE COUVERTURE GLOBAL : %12.2f %%%n", tauxCouverture);
+        System.out.println("============================================================\n");
 
         TarificationService service = new TarificationService();
         Scanner scanner = new Scanner(System.in);

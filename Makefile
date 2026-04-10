@@ -35,12 +35,14 @@ SOURCES = $(SRC_PATH)Tarif.java \
           $(SRC_PATH)DonneesTarifs.java \
           $(SRC_PATH)TarificationService.java \
           $(SRC_PATH)ExcelReader.java \
+          $(SRC_PATH)Calculateur.java \
           $(SRC_PATH)Main.java
 
 CLASSES = $(BUILD_PATH)Tarif.class \
           $(BUILD_PATH)DonneesTarifs.class \
           $(BUILD_PATH)TarificationService.class \
           $(BUILD_PATH)ExcelReader.class \
+          $(BUILD_PATH)Calculateur.class \
           $(BUILD_PATH)Main.class
 
 JAR_APP = $(DIST_PATH)tarification.jar
@@ -87,12 +89,17 @@ $(BUILD_PATH)TarificationService.class: $(SRC_PATH)TarificationService.java $(BU
 $(BUILD_PATH)ExcelReader.class: $(SRC_PATH)ExcelReader.java $(BUILD_PATH)Tarif.class
 	$(JC) $(JCFLAGS) $(SRC_PATH)ExcelReader.java
 
+# Calculateur automatique
+$(BUILD_PATH)Calculateur.class: $(SRC_PATH)Calculateur.java $(BUILD_PATH)DonneesTarifs.class
+	$(JC) $(JCFLAGS) $(SRC_PATH)Calculateur.java
+
 # Point d'entrée (dépend de tout)
 $(BUILD_PATH)Main.class: $(SRC_PATH)Main.java \
 	$(BUILD_PATH)Tarif.class \
 	$(BUILD_PATH)DonneesTarifs.class \
 	$(BUILD_PATH)TarificationService.class \
-	$(BUILD_PATH)ExcelReader.class
+	$(BUILD_PATH)ExcelReader.class \
+	$(BUILD_PATH)Calculateur.class
 	$(JC) $(JCFLAGS) $(SRC_PATH)Main.java
 
 # =========================
