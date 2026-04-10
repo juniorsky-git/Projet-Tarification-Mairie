@@ -37,9 +37,7 @@ public class DonneesTarifs {
     public static final String ADOS_SORTIE_DEMI = "ados-sortie-demi";
     public static final String ADOS_SORTIE_JOURNEE = "ados-sortie-journee";
 
-    // =========================================================================
     // GRILLE TARIFAIRE DE RÉFÉRENCE 2025 (+8%) - Données complètes
-    // =========================================================================
     public static List<Tarif> chargerTarifsReference() {
         List<Tarif> tarifs = new ArrayList<>();
 
@@ -260,6 +258,29 @@ public class DonneesTarifs {
     }
 
     // =========================================================================
+    // UTILITAIRES PUBLICS POUR EXCEL
+    // =========================================================================
+
+    /** Accessible par ExcelReader */
+    public static double getQfMinPublic(String tranche) {
+        return getQfMin(tranche);
+    }
+
+    /** Accessible par ExcelReader */
+    public static double getQfMaxPublic(String tranche) {
+        return getQfMax(tranche);
+    }
+
+    /**
+     * Charge les tarifs depuis un fichier Excel (.xlsx ou .xls).
+     * @param cheminFichier chemin vers le fichier Excel
+     * @return liste des tarifs extraits
+     */
+    public static List<Tarif> chargerTarifsDepuisExcel(String cheminFichier) {
+        return ExcelReader.lire(cheminFichier);
+    }
+
+    // =========================================================================
     // UTILITAIRES PRIVÉS
     // =========================================================================
 
@@ -279,25 +300,6 @@ public class DonneesTarifs {
         if (clean.isEmpty())
             return 0.0;
         return Double.parseDouble(clean);
-    }
-
-    /** Accessible par ExcelReader */
-    public static double getQfMinPublic(String tranche) {
-        return getQfMin(tranche);
-    }
-
-    /** Accessible par ExcelReader */
-    public static double getQfMaxPublic(String tranche) {
-        return getQfMax(tranche);
-    }
-
-    /**
-     * Charge les tarifs depuis un fichier Excel (.xlsx ou .xls).
-     * @param cheminFichier chemin vers le fichier Excel
-     * @return liste des tarifs extraits
-     */
-    public static List<Tarif> chargerTarifsDepuisExcel(String cheminFichier) {
-        return ExcelReader.lire(cheminFichier);
     }
 
     private static double getQfMin(String tranche) {

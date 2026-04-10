@@ -84,19 +84,56 @@ Les premières tâches consistent à :
 ## État actuel du projet
 
 À ce stade :
-- l’analyse métier sur Excel a déjà été réalisée,
-- les tableaux de tarification ont été construits,
-- la partie développement Java commence avec la lecture des fichiers Excel.
+- L’analyse métier sur Excel a déjà été réalisée.
+- Les grilles tarifaires 2025 sont intégrées dans le code.
+- La lecture dynamique des fichiers **Excel (.xlsx/.xls)** via Apache POI est opérationnelle.
+- Un système d'automatisation (script de build) a été mis en place.
+
+---
+
+## Installation et Exécution (Windows)
+
+Le projet utilise désormais des bibliothèques externes (Apache POI). Pour compiler et lancer le projet simplement sans configuration complexe :
+
+Utilisez le script PowerShell `build.ps1` fourni à la racine :
+
+```powershell
+# Pour compiler et lancer l'application d'un coup
+powershell -ExecutionPolicy Bypass -File ./build.ps1 run
+
+# Pour compiler uniquement
+powershell -ExecutionPolicy Bypass -File ./build.ps1 build
+
+# Pour nettoyer les fichiers de build
+powershell -ExecutionPolicy Bypass -File ./build.ps1 clean
+```
+
+---
+
+## Notes Techniques & Problèmes Résolus
+
+Lors du développement, plusieurs défis techniques ont été surmontés :
+
+### 1. Gestion des dépendances (Apache POI)
+Le projet n'utilisant pas Maven ou Gradle, toutes les dépendances JAR ont été téléchargées manuellement dans un dossier `lib/`. Le script de build gère automatiquement l'inclusion de ces JARs dans le `classpath` lors de la compilation et de l'exécution.
+
+### 2. Automatisation du Build (Makefile vs PowerShell)
+- **Problème** : L'installation de l'utilitaire `make` sur Windows a échoué à cause des restrictions de droits (UAC).
+- **Solution** : Création d'un script `build.ps1` natif Windows qui remplace le Makefile et offre les mêmes fonctionnalités sans installation requise.
+
+### 3. Sécurité PowerShell (Execution Policy)
+- **Problème** : Erreur `UnauthorizedAccess` lors du lancement du script .ps1.
+- **Solution** : Utilisation de l'option `-ExecutionPolicy Bypass` pour autoriser l'exécution du script de build local.
 
 ---
 
 ## Évolutions possibles
 
 Par la suite, le projet pourra être enrichi avec :
-- l’automatisation des calculs de tarification,
-- la simulation de nouvelles grilles tarifaires,
-- une interface utilisateur,
-- l’import automatique de nouveaux fichiers.
+- L’analyse des exports réels Ciril (fichiers plus volumineux).
+- L’automatisation des calculs de tarification.
+- La simulation de nouvelles grilles tarifaires.
+- Une interface utilisateur.
 
 ---
 
