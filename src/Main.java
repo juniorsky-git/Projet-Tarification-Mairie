@@ -24,11 +24,20 @@ public class Main {
             // Gestion de l'erreur "texte au lieu d'un nombre"
             double qf = Double.parseDouble(qfInput);
 
-            System.out.print("Entrez l'activité (repas, journee, demi-journee, matin-et-soir, matin-ou-soir) : ");
+            System.out.println("Activités disponibles :");
+            System.out.println("  [Repas]           repas");
+            System.out.println("  [Accueil loisirs] accueil-journee | accueil-demi-repas");
+            System.out.println("  [Périscolaire]    periscolaire-matin-soir | periscolaire-matin-ou-soir");
+            System.out.println("  [Études surv.]    etudes-forfait-mensuel | etudes-demi-forfait");
+            System.out.println("  [Espace Ados]     ados-journee-repas | ados-journee-sans | ados-demi-repas | ados-demi-sans | ados-sortie-demi | ados-sortie-journee");
+            System.out.print("Entrez l'activité : ");
             String activite = scanner.nextLine();
 
+            // Charger les tarifs de référence (qui contiennent toutes les activités)
+            List<Tarif> tarifsRef = DonneesTarifs.chargerTarifsReference();
+
             // Gestion "QF négatif" et "aucune tranche trouvée"
-            Tarif tarif = service.trouverTarif(qf, tarifs);
+            Tarif tarif = service.trouverTarif(qf, tarifsRef);
 
             // Gestion "activité inconnue"
             double prix = service.obtenirPrix(tarif, activite);

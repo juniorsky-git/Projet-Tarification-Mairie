@@ -1,4 +1,6 @@
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TarificationService {
 
@@ -18,20 +20,12 @@ public class TarificationService {
         if (tarif == null) {
             throw new IllegalArgumentException("Aucun tarif trouvé.");
         }
-
-        switch (activite.toLowerCase()) {
-            case "repas":
-                return tarif.getRepas();
-            case "journee":
-                return tarif.getJourneeAccueilLoisirs();
-            case "demi-journee":
-                return tarif.getDemiJourneeAvecRepas();
-            case "matin-et-soir":
-                return tarif.getMatinEtSoir();
-            case "matin-ou-soir":
-                return tarif.getMatinOuSoir();
-            default:
-                throw new IllegalArgumentException("Activité inconnue : " + activite);
+        if (!tarif.aActivite(activite.toLowerCase())) {
+            throw new IllegalArgumentException(
+                "Activité inconnue ou non disponible pour cette tranche : " + activite +
+                "\nActivités disponibles : " + tarif.getActivitesDisponibles()
+            );
         }
+        return tarif.getPrix(activite);
     }
 }
