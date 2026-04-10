@@ -49,3 +49,19 @@ Dans la dernière phase du projet, une attention particulière a été portée �
 - **Documentation Javadoc** : Chaque classe et chaque méthode est désormais documentée (`/** ... */`) pour expliquer son rôle et ses paramètres (important pour la passation de projet).
 - **Formatage standardisé** : Aération des blocs de code (accolades, sauts de ligne dans les getters/setters) pour respecter les conventions professionnelles.
 - **Modularisation** : Isolation des scripts de recherche (`outils_diagnostic`) pour garder le code source (`src`) propre et prêt pour la production.
+
+## 5. Vision Multi-Pôles (Extensions futures)
+L'utilisateur a demandé d'étendre le Dashboard à tous les services (Ados, Loisirs, Périscolaire).
+
+### Problématique des Recettes Théoriques
+Pour chaque nouveau service, la formule de calcul change :
+- **Scolaire** : Enfants x Prix Repas x 140 jours.
+- **Ados** : Ados x Prix (Journée/Demi-journée) x Nombre de jours de vacances.
+- **Périscolaire** : Enfants x Prix (Matin/Soir) x Jours d'école.
+
+### Questionnement sur les Données Source (Effectifs)
+> [!IMPORTANT]
+> **Le défi des effectifs pour les nouveaux pôles**
+> Actuellement, le fichier `Feuille_dataviz.xlsx` ne donne pas le nombre d'enfants par tranche (A, B, C...) pour les Ados ou le Périscolaire. 
+> - Sans ces chiffres, nous ne pouvons pas calculer les **Recettes Théoriques** réelles. 
+> - **Solution temporaire** : L'outil affichera les **Dépenses Réelles** (Audit comptable) mais indiquera qu'une saisie manuelle des volumes est nécessaire pour obtenir le taux de couverture final de ces services.

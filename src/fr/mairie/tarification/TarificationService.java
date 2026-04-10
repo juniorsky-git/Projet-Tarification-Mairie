@@ -27,18 +27,13 @@ public class TarificationService {
     }
 
     /**
-     * Extrait le prix spécifique d'une activité (repas ou garde).
+     * Extrait le prix spécifique d'une activité.
      * 
      * @param t Le tarif de base.
-     * @param activite Le nom de l'activité (repas, garde, etc.)
+     * @param activite La clé de l'activité (ex: REPAS, ADOS_VAC_JOURNEE_REPAS).
      * @return Le prix unitaire de l'activité.
      */
     public double obtenirPrix(Tarif t, String activite) {
-        if (activite.equalsIgnoreCase("repas")) {
-            return t.getRepas();
-        } else if (activite.equalsIgnoreCase("garde")) {
-            return t.getGarde();
-        }
-        return 0;
+        return t.getPrix(activite);
     }
 }

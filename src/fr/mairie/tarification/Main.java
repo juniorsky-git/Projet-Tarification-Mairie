@@ -5,15 +5,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Point d'entrée de l'application de tarification municipale.
- * Gère la boucle principale du menu interactif et la navigation.
+ * Application Multi-Pôles : Gère les finances de tous les services municipaux.
  */
 public class Main {
     
-    /**
-     * Méthode principale qui initialise les services et lance le menu.
-     * @param args Arguments ligne de commande (non utilisés).
-     */
     public static void main(String[] args) {
         Calculateur calculateur = new Calculateur();
         TarificationService service = new TarificationService();
@@ -25,135 +20,91 @@ public class Main {
         while (continuer) {
             ConsoleUI.clearConsole();
             ConsoleUI.printLogo();
-            ConsoleUI.printMenu();
+            System.out.println("\n   [1] Dashboard SCOLAIRE (L. Michel)");
+            System.out.println("   [2] Dashboard LOISIRS (C. de Loisirs)");
+            System.out.println("   [3] Dashboard ADOS (Espace Ados)");
+            System.out.println("   [4] Consulter un tarif individuel");
+            System.out.println("   [5] Quitter");
+            System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
 
             switch (choix) {
                 case "1":
-                    afficherDashboard(calculateur, scanner);
+                    // Scolaire : Antenne RESTMICH, Service 2-RE, Exclure ADOS, LOISIRS, COMMUNAL
+                    String[] exclScol = {"ADOS", "LOISIRS", "COMMUNAL"};
+                    afficherPole(calculateur, "Scolaire", "RESTMICH", "2-RE", null, exclScol, 4, DonneesTarifs.REPAS, 140, scanner);
                     break;
                 case "2":
-                    consulterTarif(service, grilleRef, scanner);
+                    // Loisirs : Antenne RESTGAV, Inclure LOISIRS
+                    afficherPole(calculateur, "Loisirs", "RESTGAV", "2-RE", "LOISIRS", null, 39, DonneesTarifs.ACCUEIL_JOURNEE, 1, scanner);
                     break;
                 case "3":
-                    afficherGrilleReference(grilleRef, scanner);
+                    // Ados : Antenne RESTCA, Inclure ADOS
+                    afficherPole(calculateur, "Ados", "RESTCA", "2-RE", "ADOS", null, 72, DonneesTarifs.ADOS_VAC_JOURNEE_REPAS, 1, scanner);
                     break;
                 case "4":
+                    consulterTarif(service, grilleRef, scanner);
+                    break;
+                case "5":
                     continuer = false;
                     System.out.println("\n   Merci de votre visite. Au revoir !");
                     break;
                 default:
-                    System.out.println("\n   Choix invalide. Appuyez sur Entrée pour continuer.");
+                    System.out.println("\n   Choix invalide.");
                     scanner.nextLine();
             }
         }
         scanner.close();
     }
 
-    /**
-     * Option [1] : Traite et affiche le tableau de bord financier.
-     * Calcule les indicateurs basés sur les fichiers Excel réels.
-     */
-    private static void afficherDashboard(Calculateur calculateur, Scanner scanner) {
-        ConsoleUI.printHeader("Tableau de bord financier (MICHALI)");
+    private static void afficherPole(Calculateur calc, String nom, String antenna, String service, String include, String[] exclude, int rowExcel, String tarifKey, double factor, Scanner sc) {
+        ConsoleUI.printHeader("TABLEAU DE BORD : " + nom);
         
-        double depensesTotales = calculateur.calculerTotalDepenses("CLMICH");
-        Map<String, Double> effectifs = calculateur.chargerEffectifsParTranche();
-        double recettesTheoriques = calculateur.calculerRecettesTheoriques(effectifs);
+        double depenses = calc.calculerDepensesPole(antenna, service, include, exclude);
+        Map<String, Double> effectifs = calc.chargerEffectifs(rowExcel - 1);
+        double recettes = calc.calculerRecettes(effectifs, tarifKey, factor);
         
-        double totalEnfants = 0;
-        for (double nb : effectifs.values()) {
-            totalEnfants += nb;
-        }
-        double totalRepas = totalEnfants * 140;
-
-        // Utilisation du coût de référence (4.42 euros)
-        double coutMoyenRef = calculateur.getCoutMoyenReference();
-        double depensesTheoriques = totalRepas * coutMoyenRef;
-        
-        double tauxCouverture = 0;
-        if (depensesTheoriques > 0) {
-            tauxCouverture = (recettesTheoriques / depensesTheoriques * 100);
+        double totalUsagers = 0;
+        for (double v : effectifs.values()) {
+            totalUsagers += v;
         }
 
-        // Analyse de l'écart budgétaire
-        double coutMoyenReel = 0;
-        if (totalRepas > 0) {
-            coutMoyenReel = (depensesTotales / totalRepas);
+        double taux = 0;
+        if (depenses > 0) {
+            taux = (recettes / depenses * 100);
         }
-        
-        double ecartTotal = depensesTotales - depensesTheoriques;
 
-        System.out.printf("\n   - Dépenses (Base 4.42 euros) : %10.2f euros%n", depensesTheoriques);
-        System.out.printf("   - Recettes prévisionnelles   : %10.2f euros%n", recettesTheoriques);
-        System.out.printf("   - Nombre total d'enfants     : %10.0f%n", totalEnfants);
-        System.out.printf("   - Nombre total de repas      : %10.0f (140j)%n", totalRepas);
-        System.out.println("   " + "-".repeat(45));
-        System.out.printf("   > COÛT MOYEN (RÉFÉRENCE)     : %10.2f euros%n", coutMoyenRef);
-        System.out.printf("   > TAUX DE COUVERTURE         : %10.2f %%%n", tauxCouverture);
-        System.out.println("   " + "-".repeat(45));
-        System.out.printf("   [ANALYSE] Coût réel constaté : %10.2f euros%n", coutMoyenReel);
-        System.out.printf("   [ANALYSE] Écart budgétaire   : %10.2f euros%n", ecartTotal);
+        System.out.printf("\n   Pôle          : %s%n", nom);
+        System.out.printf("   Effectifs     : %.0f usagers%n", totalUsagers);
+        System.out.printf("   Dépenses      : %.2f euros%n", depenses);
+        System.out.printf("   Recettes (th) : %.2f euros%n", recettes);
+        System.out.println("   " + "-".repeat(40));
+        System.out.printf("   TAUX DE COUVERTURE : %.2f %%%n", taux);
         
+        if (totalUsagers == 0) {
+            System.out.println("\n   [NOTE] Données théoriques à compléter (Effectifs non trouvés dans le pôle).");
+        }
+
         System.out.println("\n   Appuyez sur Entrée pour revenir au menu.");
-        scanner.nextLine();
+        sc.nextLine();
     }
 
-    /**
-     * Option [2] : Calcule le tarif individuel selon le QF saisi.
-     */
-    private static void consulterTarif(TarificationService service, List<Tarif> grilleRef, Scanner scanner) {
-        ConsoleUI.printHeader("Calculateur individuel");
+    private static void consulterTarif(TarificationService service, List<Tarif> grille, Scanner scanner) {
+        ConsoleUI.printHeader("Consultation de la grille multi-services");
         System.out.print("\n   Entrez le Quotient Familial : ");
         String qfStr = scanner.nextLine();
-        
         try {
             double qf = Double.parseDouble(qfStr);
-            System.out.print("   Entrez l'activité (ex: repas) : ");
-            String activite = scanner.nextLine();
-
-            Tarif t = service.trouverTarif(qf, grilleRef);
-            double prix = service.obtenirPrix(t, activite);
-
-            ConsoleUI.printSeparator();
-            System.out.println("   RÉSULTAT POUR LE QF " + qf);
-            System.out.println("   Tranche  : " + t.getTranche());
-            System.out.println("   Activité : " + activite);
-            System.out.printf("   Tarif    : %.2f euros%n", prix);
-            ConsoleUI.printSeparator();
-        } catch (NumberFormatException e) {
-            System.out.println("   Erreur : Veuillez entrer un nombre valide.");
+            Tarif t = service.trouverTarif(qf, grille);
+            System.out.println("\n   RÉSULTATS POUR LE QF " + qf + " (Tranche " + t.getTranche() + ") :");
+            System.out.printf("   - Repas Scolaire  : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
+            System.out.printf("   - Loisirs Journée : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
+            System.out.printf("   - Ados Vacances   : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
         } catch (Exception e) {
             System.out.println("   Erreur : " + e.getMessage());
         }
-
-        System.out.println("\n   Appuyez sur Entrée pour continuer.");
-        scanner.nextLine();
-    }
-
-    /**
-     * Option [3] : Affiche la grille tarifaire complète de 2025.
-     */
-    private static void afficherGrilleReference(List<Tarif> grille, Scanner scanner) {
-        ConsoleUI.printHeader("Grille tarifaire de référence 2025");
-        
-        System.out.printf("\n   %-5s | %-10s | %-10s | %-8s%n", "TR.", "QF MIN", "QF MAX", "REPAS");
-        System.out.println("   " + "-".repeat(45));
-        
-        for (Tarif t : grille) {
-            String qfMaxStr = "";
-            if (t.getQfMax() > 1000000) {
-                qfMaxStr = "SANS LIMITE";
-            } else {
-                qfMaxStr = String.format("%.0f", t.getQfMax());
-            }
-
-            System.out.printf("   %-5s | %10.0f | %11s | %-8.2f euros%n", 
-                t.getTranche(), t.getQfMin(), qfMaxStr, t.getRepas());
-        }
-        
-        System.out.println("\n   Appuyez sur Entrée pour revenir au menu.");
+        System.out.println("\n   Appuyez sur Entrée.");
         scanner.nextLine();
     }
 }
