@@ -11,14 +11,21 @@ Nous avons dû faire communiquer deux mondes différents :
 - **Les Statistiques (Dataviz)** : Donnent des effectifs journaliers.
 **Vision choisie** : Utiliser un "coefficient de pont" (140 jours de scolarité) pour transformer des enfants par jour en un volume de repas annuel comparable aux factures comptables.
 
-## 2. Analyse des Écarts Budgétaires (Le cas des 4,42 €)
-### Problématique
-Le programme détectait un coût réel de **4,58 €/repas** alors que le chiffre officiel du pôle financier était de **4,42 €**.
-### Analyse de pensée
-Plutôt que de simplement "corriger" le chiffre, nous avons cherché à comprendre l'écart. 
-- **Le 4,42 €** est une cible contractuelle (le prix du prestataire).
-- **Le 4,58 €** inclut les extras (repas occasionnels, ados, centres) identifiés dans la comptabilité globale par l'outil.
-**Décision technique** : Implémenter un système à double lecture dans le Dashboard : afficher la **référence officielle** (4,42 €) tout en alertant sur l'**écart réel constaté** en comptabilité.
+## 2. Analyse des Écarts Budgétaires (Comparaison 4,42 € vs 3,97 €)
+
+### Le calcul du "Coût réel" (3,97 €)
+L'outil a calculé ce chiffre selon la décomposition suivante :
+- **Numérateur** : 626 861,31 € (Somme des factures Scolarest filtrées pour le scolaire pur).
+- **Dénominateur** : 157 920 repas (1 128 enfants x 140 jours).
+- **Résultat** : **3,97 € / repas**.
+
+### Pourquoi cet écart avec la cible de 4,42 € ?
+Le programme identifie un **écart budgétaire favorable** de ~71 000 €. 
+- **L'hypothèse métier** : Les 4,42 € sont le prix unitaire "négocié" au contrat. Le coût de 3,97 € est le coût "payé" constaté en comptabilité sur l'exercice. 
+- **L'intérêt de l'outil** : Cette différence met en évidence que sur l'année 2025, la ville a dépensé moins que son budget prévisionnel théorique.
+
+### Le cas du coût Global (4,58 €)
+Pour rappel, avant filtrage des services annexes (Ados, Loisirs, Restaurant Communal), le coût global du pôle restauration s'élevait à 4,58 € (723 264 € de dépenses totales).
 
 ## 3. Journal des Problèmes Résolus (Troubleshooting)
 
