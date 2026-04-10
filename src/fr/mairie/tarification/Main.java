@@ -53,16 +53,25 @@ public class Main {
         for (double nb : effectifs.values()) totalEnfants += nb;
         double totalRepas = totalEnfants * 140;
 
-        double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
-        double tauxCouverture = (depensesTotales > 0) ? (recettesTheoriques / depensesTotales * 100) : 0;
+        // On utilise ici le coût de référence de 4.42 euros
+        double coutMoyenRef = calculateur.getCoutMoyenReference();
+        double depensesTheoriques = totalRepas * coutMoyenRef;
+        double tauxCouverture = (depensesTheoriques > 0) ? (recettesTheoriques / depensesTheoriques * 100) : 0;
 
-        System.out.printf("\n   - Dépenses réelles (Ciril)  : %10.2f euros%n", depensesTotales);
-        System.out.printf("   - Recettes prévisionnelles  : %10.2f euros%n", recettesTheoriques);
-        System.out.printf("   - Nombre total d'enfants    : %10.0f%n", totalEnfants);
-        System.out.printf("   - Nombre total de repas     : %10.0f (140j)%n", totalRepas);
+        // Analyse de l'écart (optionnel mais utile pour le rapport)
+        double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
+        double ecartTotal = depensesTotales - depensesTheoriques;
+
+        System.out.printf("\n   - Dépenses (Base 4.42 euros) : %10.2f euros%n", depensesTheoriques);
+        System.out.printf("   - Recettes prévisionnelles   : %10.2f euros%n", recettesTheoriques);
+        System.out.printf("   - Nombre total d'enfants     : %10.0f%n", totalEnfants);
+        System.out.printf("   - Nombre total de repas      : %10.0f (140j)%n", totalRepas);
         System.out.println("   " + "-".repeat(45));
-        System.out.printf("   > COÛT MOYEN RÉEL / REPAS   : %10.2f euros%n", coutMoyenReel);
-        System.out.printf("   > TAUX DE COUVERTURE GLOBAL : %10.2f %%%n", tauxCouverture);
+        System.out.printf("   > COÛT MOYEN (RÉFÉRENCE)     : %10.2f euros%n", coutMoyenRef);
+        System.out.printf("   > TAUX DE COUVERTURE         : %10.2f %%%n", tauxCouverture);
+        System.out.println("   " + "-".repeat(45));
+        System.out.printf("   [ANALYSE] Coût réel constaté : %10.2f euros%n", coutMoyenReel);
+        System.out.printf("   [ANALYSE] Écart budgétaire   : %10.2f euros%n", ecartTotal);
         
         System.out.println("\n   Appuyez sur Entrée pour revenir au menu.");
         scanner.nextLine();
@@ -84,7 +93,7 @@ public class Main {
             ConsoleUI.printSeparator();
             System.out.println("   RÉSULTAT POUR LE QF " + qf);
             System.out.println("   Tranche  : " + t.getTranche());
-            System.out.println("   Activité : " + activite);
+            System.out.println("   Activité : " +  activite);
             System.out.printf("   Tarif    : %.2f euros%n", prix);
             ConsoleUI.printSeparator();
         } catch (NumberFormatException e) {

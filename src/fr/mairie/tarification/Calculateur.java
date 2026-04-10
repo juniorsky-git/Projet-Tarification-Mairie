@@ -3,6 +3,7 @@ package fr.mairie.tarification;
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,15 +41,18 @@ public class Calculateur {
 
                 String antenneLigne = getValeurTexte(row.getCell(COL_DEP_ANTENNE));
                 String serviceLigne = getValeurTexte(row.getCell(COL_DEP_SERVICE));
+                String libelle = getValeurTexte(row.getCell(3)).toUpperCase();
 
-                // On filtre sur l'antenne (ex: CLMICH) OU le service global (2-RE)
-                if (antenneLigne.equalsIgnoreCase(codeAntenne) || serviceLigne.contains("2-RE")) {
+                // On exclut uniquement ce qui est clairement identifié comme "non-scolaire"
+                boolean estAnnexe = libelle.contains("ADOS") || libelle.contains("LOISIRS") || libelle.contains("COMMUNAL");
+
+                if ((antenneLigne.equalsIgnoreCase(codeAntenne) || serviceLigne.contains("2-RE")) && !estAnnexe) {
                     double montant = getValeurNumerique(row.getCell(COL_DEP_MONTANT_TTC));
                     total += Math.abs(montant);
                     lignesTrouvees++;
                 }
             }
-            System.out.println("[Debug] Dépenses : " + lignesTrouvees + " lignes trouvées dans " + FICHIER_DEPENSES);
+            System.out.println("[Debug] Dépenses Scolaires : " + lignesTrouvees + " lignes (Total: " + String.format("%.2f", total) + " euros)");
         } catch (Exception e) {
             System.err.println("Erreur calcul dépenses : " + e.getMessage());
         }
@@ -68,46 +72,65 @@ public class Calculateur {
                 Row row = s.getRow(i);
                 if (row == null) continue;
 
+                // On regarde en priorité la colonne 1, puis la 0 (pour EXT)
                 String code = getValeurTexte(row.getCell(COL_VOL_CODE_TRANCHE));
-                if (code == null || code.isEmpty() || code.equals("Total")) continue;
+                String desc = getValeurTexte(row.getCell(0));
 
-                // On s'assure que c'est bien une tranche (A, B, C...)
-                if (code.length() > 3) continue; 
+                // Si on voit "Total", on arrête la lecture pour ne pas prendre les autres services (Ados, etc.)
+                if ("Total".equalsIgnoreCase(code) || "Total".equalsIgnoreCase(desc)) break;
+
+                if (code == null || code.isEmpty()) {
+                    code = desc;
+                }
+
+                if (code == null || code.isEmpty()) continue;
+                if (code.contains("Restauration") || code.contains("Tranches") || code.length() > 5) continue;
 
                 double nbEnfants = getValeurNumerique(row.getCell(COL_VOL_NB_ENFANTS));
                 if (nbEnfants > 0) {
                     effectifs.put(code, nbEnfants);
                 }
             }
-            System.out.println("[Debug] Effectifs : " + effectifs.size() + " tranches chargées depuis Dataviz");
+            System.out.println("[Debug] Effectifs : " + effectifs.size() + " tranches chargées (" + sommeEffectifs(effectifs) + " enfants)");
         } catch (Exception e) {
             System.err.println("Erreur chargement effectifs : " + e.getMessage());
         }
         return effectifs;
     }
 
+    private double sommeEffectifs(Map<String, Double> map) {
+        double total = 0;
+        for (double v : map.values()) total += v;
+        return total;
+    }
+
     /**
-     * Calcule les recettes théoriques annuelles basées sur les effectifs et les tarifs.
+     * Calcule le total des recettes théoriques annuelles basées sur les effectifs et les tarifs.
      */
     public double calculerRecettesTheoriques(Map<String, Double> effectifs) {
-        double totalRecettes = 0;
-        // On récupère les tarifs de référence (ceux qu'on a codés en dur)
-        Map<String, Tarif> catalogue = new HashMap<>();
-        for (Tarif t : DonneesTarifs.chargerTarifsReference()) {
-            catalogue.put(t.getTranche(), t);
-        }
-
+        double total = 0;
+        List<Tarif> grille = DonneesTarifs.chargerTarifsReference();
+        
         for (Map.Entry<String, Double> entry : effectifs.entrySet()) {
-            String tranche = entry.getKey();
-            double nbEnfants = entry.getValue();
-            
-            if (catalogue.containsKey(tranche)) {
-                double prixRepas = catalogue.get(tranche).getRepas();
-                // Formule validée : Nb Enfants * Tarif * 140 jours
-                totalRecettes += (nbEnfants * prixRepas * 140);
-            }
+            try {
+                // Pour chaque tranche, on cherche le tarif repas
+                // On utilise un QF arbitraire au milieu de la tranche pour trouver le prix
+                Tarif t = null;
+                for(Tarif ref : grille) {
+                    if(ref.getTranche().equalsIgnoreCase(entry.getKey())) {
+                        t = ref; break;
+                    }
+                }
+                if (t != null) {
+                    total += t.getRepas() * entry.getValue() * 140;
+                }
+            } catch (Exception e) {}
         }
-        return totalRecettes;
+        return total;
+    }
+
+    public double getCoutMoyenReference() {
+        return 4.42;
     }
 
     // --- Utilitaires de lecture ---
