@@ -56,12 +56,12 @@ public class Main {
         double coutMoyenReel = (totalRepas > 0) ? (depensesTotales / totalRepas) : 0;
         double tauxCouverture = (depensesTotales > 0) ? (recettesTheoriques / depensesTotales * 100) : 0;
 
-        System.out.printf("\n   - Dépenses réelles (Ciril)  : %10.2f €%n", depensesTotales);
-        System.out.printf("   - Recettes prévisionnelles  : %10.2f €%n", recettesTheoriques);
+        System.out.printf("\n   - Dépenses réelles (Ciril)  : %10.2f euros%n", depensesTotales);
+        System.out.printf("   - Recettes prévisionnelles  : %10.2f euros%n", recettesTheoriques);
         System.out.printf("   - Nombre total d'enfants    : %10.0f%n", totalEnfants);
         System.out.printf("   - Nombre total de repas     : %10.0f (140j)%n", totalRepas);
         System.out.println("   " + "-".repeat(45));
-        System.out.printf("   > COÛT MOYEN RÉEL / REPAS   : %10.2f €%n", coutMoyenReel);
+        System.out.printf("   > COÛT MOYEN RÉEL / REPAS   : %10.2f euros%n", coutMoyenReel);
         System.out.printf("   > TAUX DE COUVERTURE GLOBAL : %10.2f %%%n", tauxCouverture);
         
         System.out.println("\n   Appuyez sur Entrée pour revenir au menu.");
@@ -85,7 +85,7 @@ public class Main {
             System.out.println("   RÉSULTAT POUR LE QF " + qf);
             System.out.println("   Tranche  : " + t.getTranche());
             System.out.println("   Activité : " + activite);
-            System.out.printf("   Tarif    : %.2f €%n", prix);
+            System.out.printf("   Tarif    : %.2f euros%n", prix);
             ConsoleUI.printSeparator();
         } catch (NumberFormatException e) {
             System.out.println("   Erreur : Veuillez entrer un nombre valide.");
@@ -104,8 +104,9 @@ public class Main {
         System.out.println("   " + "-".repeat(45));
         
         for (Tarif t : grille) {
-            System.out.printf("   %-5s | %10.0f | %10.0f | %-8.2f €%n", 
-                t.getTranche(), t.getQfMin(), t.getQfMax(), t.getRepas());
+            String qfMaxStr = (t.getQfMax() > 1000000) ? "SANS LIMITE" : String.format("%.0f", t.getQfMax());
+            System.out.printf("   %-5s | %10.0f | %11s | %-8.2f euros%n", 
+                t.getTranche(), t.getQfMin(), qfMaxStr, t.getRepas());
         }
         
         System.out.println("\n   Appuyez sur Entrée pour revenir au menu.");
