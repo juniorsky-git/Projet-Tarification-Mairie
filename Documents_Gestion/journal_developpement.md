@@ -37,5 +37,30 @@ Pour garantir la fiabilite des calculs, une batterie d'outils de diagnostic a et
 - **Audit de la Structure Excel** : Ces scripts ont permis de decouvrir que les fichiers Dataviz et Ciril n'avaient pas les memes identifiants (exemple : l'Espace Ados etait cache dans l'antenne RESTCA alors que le Scolaire etait dans RESTMICH).
 - **Transparence** : Ces outils permettent a la mairie de verifier elle-meme comment les donnees sont extraites, ce qui renforce la confiance dans les chiffres du Dashboard.
 
+## Etape 7 : Correction Fondamentale de la Source de Donnees (Onglet Simulation)
+Identification d une erreur de conception sur la provenance des effectifs.
+
+### Probleme Identifie
+Jusqu a cette etape, le code lisait les effectifs par tranche depuis le fichier Feuille_dataviz.xlsx. Ce fichier contient des donnees generiques qui ne correspondent pas exactement aux prix rellement factures aux familles pour l annee 2025.
+
+### Source Correcte : Onglet Simulation de CALC DEP.xlsx
+Le fichier CALC DEP.xlsx contient un onglet nomme Simulation (index 8) qui est la veritable source de reference. Il contient :
+- Le code de chaque tranche (EXT, A, B, C, D, E, F, F2, G).
+- Le prix reel facture a cette tranche en 2025 (colonne C). Ces prix different de la grille theorique car ils integrent des ajustements specifiques.
+- Le nombre reel d enfants inscrits dans cette tranche en 2025 (colonne D).
+- Le cout moyen de reference de la mairie (4.42 euros, colonne E).
+
+### Difficulte Technique Rencontree
+La ligne EXT a une structure differente des autres : son code est en colonne A (index 0) alors que les codes A, B, C... sont en colonne B (index 1). L algorithme a dû etre adapte pour detecter ces deux cas.
+
+### Nouveaux Indicateurs Produits par l Onglet Simulation
+- Effectifs : 1128 enfants (identiques a avant, validation croisee reussie).
+- Recettes theoriques reelles : 593 380,20 euros (vs 640 963,40 euros precedemment).
+- Taux de couverture reel : 85,01 %.
+- Ecart budgetaire : -104 626,20 euros.
+
+### Ecart avec le Calcul Precedent
+La difference entre 640 963 euros et 593 380 euros s explique par les prix de la colonne C de l onglet Simulation. Par exemple, la tranche A est facturee a 5,13 euros dans ce fichier contre 5,54 euros dans la grille theorique. Ce sont ces prix reels qu il faut utiliser pour une analyse budgetaire fiable.
+
 ## Bilan Final et Conclusion
 L'analyse finale a revele un taux de couverture de 102,25% pour le pole scolaire (Michali). L'outil est desormais capable de s'adapter a n'importe quel nouveau service municipal des que les volumes d'usagers sont renseignes dans les fichiers sources.

@@ -46,3 +46,19 @@ Pour valider ces chiffres, une procedure d'audit automatisée a été mise en pl
 - **Securite de Calcul** : L'algorithme rejette automatiquement les montants nuls ou negatifs incoherents pour eviter de fausser les moyennes.
 
 Ces verifications garantissent que le Dashboard reflete une image fidele de la situation budgetaire de la Ville.
+
+## Phase 6 : Recalibrage sur l Onglet Simulation (Indicateurs Definitifs)
+Correction fondamentale apres identification de la vraie source de donnees.
+
+### Explication de l Erreur Precedente
+Les recettes de 640 963,40 euros et le taux de 102,25% etaient calcules avec les prix de la grille theorique (DonneesTarifs.java). Or l onglet Simulation de CALC DEP.xlsx contient les prix reellement factures aux familles en 2025, qui sont inferieurs car negocies avec la CAF.
+
+### Indicateurs Definitifs (Source : Onglet Simulation de CALC DEP.xlsx)
+- Effectifs : 1128 enfants (valide par croisement des deux sources).
+- Prix reel tranche A : 5,13 euros (vs 5,54 euros dans la grille theorique).
+- Prix reel tranche G : 1,32 euros (vs 1,43 euros dans la grille theorique).
+- Recettes theoriques reelles : 593 380,20 euros.
+- Depenses de reference (1128 x 140 x 4,42) : 698 006,40 euros.
+- Taux de couverture definitif : 85,01 %.
+- Ecart budgetaire : -104 626,20 euros.
+- Cout reel constate (comptabilite Ciril) : 3,97 euros par repas.
