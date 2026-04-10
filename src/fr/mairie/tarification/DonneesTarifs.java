@@ -1,3 +1,5 @@
+package fr.mairie.tarification;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,27 +15,27 @@ public class DonneesTarifs {
     // =========================================================================
 
     // Repas
-    public static final String REPAS                    = "repas";
+    public static final String REPAS                      = "repas";
 
     // Accueil de Loisirs
-    public static final String ACCUEIL_JOURNEE          = "accueil-journee";
-    public static final String ACCUEIL_DEMI_REPAS       = "accueil-demi-repas";
+    public static final String ACCUEIL_JOURNEE            = "accueil-journee";
+    public static final String ACCUEIL_DEMI_REPAS         = "accueil-demi-repas";
 
     // Accueil Périscolaire
     public static final String PERISCOLAIRE_MATIN_SOIR    = "periscolaire-matin-soir";
     public static final String PERISCOLAIRE_MATIN_OU_SOIR = "periscolaire-matin-ou-soir";
 
     // Études surveillées
-    public static final String ETUDES_FORFAIT_MENSUEL   = "etudes-forfait-mensuel";
-    public static final String ETUDES_DEMI_FORFAIT      = "etudes-demi-forfait";
+    public static final String ETUDES_FORFAIT_MENSUEL     = "etudes-forfait-mensuel";
+    public static final String ETUDES_DEMI_FORFAIT        = "etudes-demi-forfait";
 
     // Espace Ados (vacances scolaires)
-    public static final String ADOS_VAC_JOURNEE_REPAS   = "ados-journee-repas";
-    public static final String ADOS_VAC_JOURNEE_SANS    = "ados-journee-sans";
-    public static final String ADOS_VAC_DEMI_REPAS      = "ados-demi-repas";
-    public static final String ADOS_VAC_DEMI_SANS       = "ados-demi-sans";
-    public static final String ADOS_SORTIE_DEMI         = "ados-sortie-demi";
-    public static final String ADOS_SORTIE_JOURNEE      = "ados-sortie-journee";
+    public static final String ADOS_VAC_JOURNEE_REPAS     = "ados-journee-repas";
+    public static final String ADOS_VAC_JOURNEE_SANS      = "ados-journee-sans";
+    public static final String ADOS_VAC_DEMI_REPAS        = "ados-demi-repas";
+    public static final String ADOS_VAC_DEMI_SANS         = "ados-demi-sans";
+    public static final String ADOS_SORTIE_DEMI           = "ados-sortie-demi";
+    public static final String ADOS_SORTIE_JOURNEE        = "ados-sortie-journee";
 
     // =========================================================================
     // GRILLE TARIFAIRE DE RÉFÉRENCE 2025 (+8%) - Données complètes
@@ -242,9 +244,9 @@ public class DonneesTarifs {
                         tranche = valeurs[0].trim();
                     }
 
-                    double repasVal  = parseValeurNumerique(valeurs[2]);
-                    int    usagers   = (int) parseValeurNumerique(valeurs[3]);
-                    double recettes  = parseValeurNumerique(valeurs[6]);
+                    double repasVal = parseValeurNumerique(valeurs[2]);
+                    int    usagers  = (int) parseValeurNumerique(valeurs[3]);
+                    double recettes = parseValeurNumerique(valeurs[6]);
 
                     Map<String, Double> tarifsMap = new HashMap<>();
                     tarifsMap.put(REPAS, repasVal);

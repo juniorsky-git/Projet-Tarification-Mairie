@@ -1,3 +1,5 @@
+package fr.mairie.tarification;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +40,7 @@ public class Tarif {
 
     /**
      * Retourne le prix pour une activité donnée.
-     * @param activite la clé de l'activité (ex: "repas", "etudes-forfait", "ados-journee-repas")
+     * @param activite la clé de l'activité (ex: "repas", "etudes-forfait-mensuel", "ados-journee-repas")
      * @return le prix, ou 0.0 si l'activité n'est pas définie pour cette tranche
      */
     public double getPrix(String activite) {
@@ -60,7 +62,7 @@ public class Tarif {
     public int getUsagers()       { return usagers; }
     public double getRecettes()   { return recettes; }
 
-    // Retrocompatibilité avec le code existant
+    // Retrocompatibilité
     public double getRepas()                  { return getPrix("repas"); }
     public double getJourneeAccueilLoisirs()  { return getPrix("accueil-journee"); }
     public double getDemiJourneeAvecRepas()   { return getPrix("accueil-demi-repas"); }
