@@ -1,42 +1,39 @@
-# Documentation Technique : Plateforme Multi-Poles Municipal
+# Walkthrough : Guide d'Utilisation de l'Outil de Tarification Municipale
 
-Cette documentation detaille la structure finale de l'application apres la refonte multi-poles. L'outil est desormais capable d'analyser separement le Scolaire, le Centre de Loisirs et l'Espace Ados.
+Ce document est un guide complet pour l'exploitation et la maintenance de la plateforme de pilotage financier de la Ville de Crosne.
 
-## 1. Evolution de l'Architecture des Donnees
+## 1. Fonctionnement du Dashboard Multi-Poles
+L'application a evolue pour devenir un outil de synthese multi-services. Chaque pole (Scolaire, Loisirs, Ados) dispose de sa propre logique d'analyse.
 
-### Grille Tarifaire Massive (DonneesTarifs.java)
-L'application n'utilise plus une liste simple de prix mais une structure de type Map pour chaque tranche (A a G + EXT). 
-Cela permet de stocker pour chaque quotient familial :
-- Le prix unitaire du repas scolaire.
-- Les prix de l'accueil de loisirs (Journee, Demi-journee, avec ou sans repas).
-- Les tarifs specifiques de l'Espace Ados (Vacances, Sorties).
-- Les forfaits mensuels pour les etudes surveillees.
+### Navigation dans le Menu Principal
+Lors du lancement de l'outil via le script build.ps1, l'utilisateur a acces a quatre options :
+- Dashboard SCOLAIRE : Affiche le bilan de la restauration scolaire de Louise Michel.
+- Dashboard LOISIRS : Analyse le centre de loisirs (Antenne Gaveriaux).
+- Dashboard ADOS : Analyse specifiquement l'Espace Ados (Antenne RESTCA).
+- Consulter un tarif : Calculateur de prix individuel base sur le Quotient Familial.
 
-### Moteur de Calcul (Calculateur.java)
-Le calculateur a ete generalise pour accepter des filtres dynamiques lors de l'analyse des depenses comptables (Ciril) :
-- Filtrage par antenne : Utilisation des codes precis (RESTMICH pour Louise Michel, RESTGAV pour Gaveriaux, RESTCA pour les Ados).
-- Filtrage par libelle : Inclusion ou exclusion de mots-cles dans le libelle de la facture (exemple : extraire uniquement les factures contenant "ADOS" sur l'antenne RESTCA).
+## 2. Architecture du Moteur de Calcul (Calculateur.java)
 
-## 2. Analyse des Resultats par Pole
+### Mecanismes de Filtrage Comptable
+Le calculateur utilise des regles d'inclusion et d'exclusion pour isoler les depenses directes de chaque pole dans le fichier CALC DEP.xlsx :
+- Pole Scolaire : Interrogation de l'antenne RESTMICH et du service 2-RE. Exclusion des libelles contenant "ADOS" ou "LOISIRS" pour eviter les doublons.
+- Pole Ados : Interrogation de l'antenne RESTCA combinee a un filtre obligatoire sur le mot-cle "ADOS".
+- Pole Loisirs : Interrogation de l'antenne RESTGAV et du service 2-RE.
 
-### Pole Scolaire (Cantine)
-- Antenne utilisee : RESTMICH.
-- Service filtre : 2-RE.
-- Exclusions : Factures contenant "ADOS" ou "LOISIRS".
-- Resultat : Taux de couverture de 102,25%. Cela indique que les recettes theoriques generables par les 1128 enfants identifies couvrent integralement les depenses directes de la restauration scolaire.
+### Gestion des Effectifs (Dataviz)
+Le systeme scanne dynamiquement le fichier Feuille_dataviz.xlsx :
+- Il identifie les tranches (A a G et EXT) sous chaque titre de section (Restauration, Loisirs, etc.).
+- Il multiplie le nombre d'usagers par le tarif correspondant et par le facteur de temps (exemple : 140 jours pour la cantine).
 
-### Pole Espace Ados
-- Antenne utilisee : RESTCA.
-- Filtre obligatoire : "ADOS".
-- Resultat : Depenses identifiees de 9 301,34 euros. 
-- Note sur les recettes : Le fichier de statistiques (Dataviz) ne contient pas encore la repartition des ados par tranche (A, B, C...). Par consequent, les recettes theoriques sont affichees a 0 en attendant l'ajout de ces donnees dans le fichier Excel source.
+## 3. Maintenance de la Grille Tarifaire (DonneesTarifs.java)
+L'outil repose sur une structure de type Map permettant de gerer des dizaines de prix differents par tranche. Pour modifier un tarif (exemple : augmentation du prix du repas de 5.54 a 5.70), il suffit de modifier la valeur correspondante dans la methode chargerTarifsReference de la classe DonneesTarifs.java.
 
-## 3. Guide d'Exploitation
+## 4. Standards de Developpement et "Clean Code"
+Pour garantir la transmission du projet aux services techniques de la mairie, le code respecte les standards suivants :
+- Absence totale d'operateurs ternaires pour une lisibilite maximale des conditions.
+- Documentation Javadoc exhaustive pour chaque classe et methode.
+- Respect de la norme d'indentation professionnelle (accolades sur lignes separees).
+- Utilisation de la bibliotheque Apache POI v5.3.0 pour la lecture robuste des fichiers Excel.
 
-### Compilation et Lancement
-L'outil se compile via le script build.ps1. Le menu principal offre desormais un acces direct a chaque tableau de bord financier.
-
-### Maintenance des Donnees
-Pour mettre a jour les resultats :
-- Depenses : Remplacer le fichier CALC DEP.xlsx par l'export le plus recent.
-- Effectifs : Mettre a jour le fichier Feuille_dataviz.xlsx. L'outil detectera automatiquement les nouveaux volumes si les tranches (A, B, C...) sont renseignees sous les titres de sections correspondants.
+## 5. Bilan des Resultats de l'Analyse
+L'audit final effectue par l'outil sur les donnees 2025 montre un taux de couverture de 102,25% pour le pole scolaire, confirmant l'equilibre budgetaire de ce service sur son perimetre direct.
