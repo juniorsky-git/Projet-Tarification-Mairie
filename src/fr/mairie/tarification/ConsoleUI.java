@@ -215,6 +215,35 @@ public class ConsoleUI {
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         scanner.nextLine();
     }
+    /**
+     * Affiche le dashboard pour les Etudes surveillees.
+     */
+    public static void afficherDashboardEtudes(Calculateur calc, Scanner scanner) {
+        System.out.println("\n" + repeat("=", 50));
+        System.out.println("   DASHBOARD : ETUDES SURVEILLEES");
+        System.out.println(repeat("=", 50));
+
+        Map<String, Double> details = calc.getDepensesEtudesDetaillees();
+        double total = 0;
+
+        System.out.println("\n   DETAIL DES CHARGES REELLES :");
+        if (details.isEmpty()) {
+            System.out.println("   Aucune donnee trouvee.");
+        } else {
+            for (Map.Entry<String, Double> entry : details.entrySet()) {
+                printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
+                total += entry.getValue();
+            }
+        }
+
+        System.out.println(repeat("-", 50));
+        printLine("TOTAL BUDGET ETUDES", String.format("%.2f EUR", total));
+        System.out.println(repeat("-", 50));
+
+        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+        scanner.nextLine();
+    }
+
 
     /**
      * Affiche une ligne de donnees alignee.

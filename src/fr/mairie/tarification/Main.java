@@ -21,12 +21,13 @@ public class Main {
         while (continuer) {
             ConsoleUI.clearConsole();
             ConsoleUI.printLogo();
-            System.out.println("\n   [1] Dashboard SCOLAIRE (Cantine)");
+            System.out.println("   [1] Dashboard SCOLAIRE (Cantine)");
             System.out.println("   [2] Dashboard LOISIRS (Centre de loisirs)");
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
             System.out.println("   [4] Dashboard SÉJOURS (Vacances)");
-            System.out.println("   [5] Consulter un tarif individuel");
-            System.out.println("   [6] Quitter");
+            System.out.println("   [5] Dashboard ÉTUDES (Surveillées)");
+            System.out.println("   [6] Consulter un tarif individuel");
+            System.out.println("   [7] Quitter");
             System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
@@ -45,9 +46,12 @@ public class Main {
                     ConsoleUI.afficherDashboardSejours(calculateur, scanner);
                     break;
                 case "5":
-                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    ConsoleUI.afficherDashboardEtudes(calculateur, scanner);
                     break;
                 case "6":
+                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    break;
+                case "7":
                     continuer = false;
                     System.out.println("\n   Au revoir !");
                     break;
@@ -63,15 +67,17 @@ public class Main {
         ConsoleUI.printHeader("TABLEAU DE BORD : LOISIRS (Accueil loisirs)");
 
         double depensesReelles = calc.calculerTotalDepensesLoisirs();
-        Map<String, Double> details = calc.calculerDepensesReellesAccueilLoisirsParSegment();
+        Map<String, Double> detailsCategories = calc.getDepensesAccueilLoisirsDetaillees();
 
         ConsoleUI.printLine("Depenses reelles totales", String.format("%.2f euros", depensesReelles));
         ConsoleUI.printSeparator();
-        for (Map.Entry<String, Double> entry : details.entrySet()) {
-            ConsoleUI.printLine("   - " + entry.getKey(), String.format("%.2f euros", entry.getValue()));
+        
+        System.out.println("   DETAIL PAR CATEGORIE :\n");
+        for (Map.Entry<String, Double> entry : detailsCategories.entrySet()) {
+            ConsoleUI.printLine("   " + entry.getKey(), String.format("%.2f euros", entry.getValue()));
         }
         
-        System.out.println("\n   [SOURCE] onglet Simulation de CALC DEP.xlsx, colonne R");
+        System.out.println("\n   [SOURCE] CALC DEP (3).csv (synthetise)");
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         sc.nextLine();
     }

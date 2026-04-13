@@ -2,6 +2,9 @@ package fr.mairie.tarification;
 
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,8 +12,10 @@ import java.util.Map;
 /**
  * Moteur de calcul financier.
  *
- * Source principale des effectifs et des prix factures :
- * Onglet "Simulation" du fichier CALC DEP.xlsx (index 8).
+ * Source principale des depenses :
+ * Fichier CALC DEP (3).csv (synthetise).
+ * Source secondaire pour details :
+ * Onglet "Simulation" du fichier CALC DEP (1).xlsx (index 8).
  * Ce fichier contient par tranche (A a G + EXT) :
  * - Colonne B : Code de la tranche.
  * - Colonne C : Prix reel facture par repas pour cette tranche.
@@ -21,7 +26,8 @@ import java.util.Map;
  */
 public class Calculateur {
 
-    private static final String FICHIER_DEPENSES = "Donnees/Autres/CALC DEP.xlsx";
+    private static final String FICHIER_DEPENSES_CSV = "Donnees/Autres/CALC DEP (3).csv";
+    private static final String FICHIER_DEPENSES = "Donnees/Autres/CALC DEP (1).xlsx";
 
     // Index de l onglet Simulation dans CALC DEP.xlsx
     private static final int ONGLET_SIMULATION = 8;
@@ -31,7 +37,7 @@ public class Calculateur {
     private static final int COL_SIMU_PRIX_REEL = 2; // Colonne C : Prix reel facture
     private static final int COL_SIMU_NB_ENFANTS = 3; // Colonne D : Nombre d enfants
     private static final int COL_SIMU_COUT_REF = 4; // Colonne E : Cout de reference (4.42)
-    private static final int COL_SIMU_DEPENSES_REELLES = 17; // Colonne R : depenses reelles accueil loisirs
+    private static final int COL_SIMU_DEPENSES_REELLES = 14; // Colonne O : depenses reelles accueil loisirs
 
     // Colonnes dans l onglet Depenses (index 0-based)
     private static final int COL_DEP_MONTANT_TTC = 7; // Colonne H
@@ -57,6 +63,82 @@ public class Calculateur {
 
         public double getCoutMoyenReference() {
             return coutMoyenReference;
+        }
+    }
+
+    /**
+     * Lit les totaux des depenses depuis le fichier CSV synthetise.
+     * Retourne une Map avec les services comme cles et les montants comme valeurs.
+     */
+    public Map<String, Double> lireTotauxDepensesDepuisCSV() {
+        Map<String, Double> totaux = new HashMap<>();
+        try (BufferedReader br = Files.newBufferedReader(
+                Paths.get(FICHIER_DEPENSES_CSV), 
+                java.nio.charset.Charset.forName("ISO-8859-1"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("Total;;;")) {
+                    // Ligne des totaux : Total;;;montant1;montant2;...;total
+                    String[] parts = line.split(";");
+                    if (parts.length >= 10) {
+                        // Indices : 3=Restauration, 4=Accueil Loisirs, 5=Accueil periscolaire, 6=Etudes surveillees, 7=Espace Ados, 8=Sejours, 9=Total general
+                        try {
+                            totaux.put("Restauration", parseMontant(parts[3]));
+                            totaux.put("Accueil de Loisirs", parseMontant(parts[4]));
+                            totaux.put("Accueil periscolaire", parseMontant(parts[5]));
+                            totaux.put("Etudes surveillees", parseMontant(parts[6]));
+                            totaux.put("Espace Ados", parseMontant(parts[7]));
+                            totaux.put("Sejours", parseMontant(parts[8]));
+                            totaux.put("Total", parseMontant(parts[9]));
+                        } catch (Exception e) {
+                            LogService.error("Erreur parsing totaux CSV", e);
+                        }
+                    }
+                    break; // On a trouve la ligne Total, pas besoin de continuer
+                }
+            }
+        } catch (Exception e) {
+            LogService.error("Erreur lecture CSV depenses", e);
+        }
+        return totaux;
+    }
+
+    /**
+     * Parse un montant string en double, gerant tous les formats (1 234,56 ou 1.234,56 etc).
+     * Robuste aux caracteres speciaux comme €.
+     */
+    private double parseMontant(String s) {
+        if (s == null || s.trim().isEmpty()) return 0.0;
+        
+        // Enlever tous les caracteres non-numeriques sauf , et .
+        String clean = s.replaceAll("[^\\d.,]", "").trim();
+        
+        if (clean.isEmpty()) return 0.0;
+        
+        // Detecter le separateur decimal et gerer les separateurs de milliers
+        if (clean.contains(",") && clean.contains(".")) {
+            // Determiner lequel est le separateur decimal (le dernier)
+            int lastComma = clean.lastIndexOf(',');
+            int lastDot = clean.lastIndexOf('.');
+            
+            if (lastComma > lastDot) {
+                // Format: 1.234,56 -> enlever les points, remplacer , par .
+                clean = clean.replace(".", "").replace(",", ".");
+            } else {
+                // Format: 1,234.56 -> enlever les virgules
+                clean = clean.replace(",", "");
+            }
+        } else if (clean.contains(",")) {
+            // Seule la virgule -> c'est le separateur decimal
+            clean = clean.replace(",", ".");
+        }
+        // Sinon juste des points ou rien de special, garder comme est
+        
+        try {
+            return Double.parseDouble(clean);
+        } catch (NumberFormatException e) {
+            LogService.error("Erreur parsing montant: " + s, e);
+            return 0.0;
         }
     }
 
@@ -124,44 +206,64 @@ public class Calculateur {
      * segments).
      */
     public double calculerTotalDepensesLoisirs() {
-        double total = 0;
-        Map<String, Double> details = calculerDepensesReellesAccueilLoisirsParSegment();
-        for (Double montant : details.values()) {
-            total += montant;
-        }
-        return total;
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Accueil de Loisirs", 0.0);
     }
 
     public Map<String, Double> calculerDepensesReellesAccueilLoisirsParSegment() {
-        Map<String, Double> totaux = new HashMap<>();
-        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        double totalLoisirs = totaux.getOrDefault("Accueil de Loisirs", 0.0);
+        Map<String, Double> result = new HashMap<>();
+        result.put("Total", totalLoisirs);
+        return result;
+    }
 
-            Sheet s = wb.getSheet("Simulation");
-            if (s == null) {
-                LogService.log("Onglet 'Simulation' introuvable");
-                return totaux;
-            }
-
-            for (int i = 1; i <= s.getLastRowNum(); i++) {
-                Row row = s.getRow(i);
-                if (row == null) {
-                    continue;
+    /**
+     * Retourne le detail des depenses d Accueil de Loisirs par categorie.
+     * Source : Tableau des depenses du CSV CALC DEP (3).csv
+     * @return Map ordonnee (Categorie -> Montant)
+     */
+    public Map<String, Double> getDepensesAccueilLoisirsDetaillees() {
+        Map<String, Double> details = new LinkedHashMap<>();
+        try (BufferedReader br = Files.newBufferedReader(
+                Paths.get(FICHIER_DEPENSES_CSV), 
+                java.nio.charset.Charset.forName("ISO-8859-1"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Arreter a la ligne Total
+                if (line.startsWith("Total;;;")) {
+                    break;
                 }
-
-                String ligne = getRowTexte(row).toUpperCase();
-                String segment = determinerSegmentAccueilLoisirs(ligne);
-                if (segment != null) {
-                    double montant = Math.abs(getValeurNumerique(row.getCell(COL_SIMU_DEPENSES_REELLES)));
+                
+                String[] parts = line.split(";", -1);
+                
+                // Colonnes du CSV : A=Categorie, B=Detail, C=Code, D onwards=Services
+                // Accueil de Loisirs est la colonne E (index 4)
+                if (parts.length > 4) {
+                    String categorie = parts[0].trim();
+                    String detail = parts[1].trim();
+                    String montantStr = parts[4].trim();
+                    
+                    // Ignorer les lignes vides ou d'en-tete
+                    if (categorie.isEmpty() || montantStr.isEmpty()) {
+                        continue;
+                    }
+                    
+                    double montant = parseMontant(montantStr);
                     if (montant > 0) {
-                        totaux.put(segment, totaux.getOrDefault(segment, 0.0) + montant);
+                        // Creer un libelle en combinant categorie et detail
+                        String label = categorie;
+                        if (!detail.isEmpty() && !detail.equals(categorie)) {
+                            label = categorie + " - " + detail;
+                        }
+                        details.put(label, montant);
                     }
                 }
             }
         } catch (Exception e) {
-            LogService.error("Erreur lecture segments Loisirs", e);
+            LogService.error("Erreur lecture details depenses Accueil Loisirs", e);
         }
-        return totaux;
+        return details;
     }
 
     private String determinerSegmentAccueilLoisirs(String ligne) {
@@ -337,6 +439,43 @@ public class Calculateur {
             LogService.error("Erreur lecture detail sejours", e);
         }
         return sejours;
+    }
+    /**
+     * Retourne le detail des depenses pour le pole Etudes Surveillees.
+     * Source : Onglet Simulation, Ligne 59 (Personnel).
+     * @return Map (Libelle -> Montant)
+     */
+    public Map<String, Double> getDepensesEtudesDetaillees() {
+        Map<String, Double> details = new LinkedHashMap<>();
+        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
+                Workbook wb = WorkbookFactory.create(fis)) {
+            Sheet s = wb.getSheet("Simulation");
+            if (s == null) {
+                return details;
+            }
+            
+            // Ligne 59 (index 58) : Charges de personnel
+            Row rowPerso = s.getRow(58);
+            if (rowPerso != null) {
+                double montant = Math.abs(getValeurNumerique(rowPerso.getCell(2))); // Colonne C
+                if (montant > 0) {
+                    details.put("Charges de Personnel", montant);
+                }
+            }
+            
+            // On peut aussi chercher d'autres charges (Fournitures L60)
+            Row rowFourn = s.getRow(59);
+            if (rowFourn != null) {
+                double montant = Math.abs(getValeurNumerique(rowFourn.getCell(3))); // Colonne D
+                if (montant > 0) {
+                    details.put("Fournitures scolaires", montant);
+                }
+            }
+
+        } catch (Exception e) {
+            LogService.error("Erreur lecture detail depenses Etudes", e);
+        }
+        return details;
     }
 
     /**
