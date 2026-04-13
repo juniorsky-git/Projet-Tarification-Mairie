@@ -27,10 +27,15 @@ public class Calculateur {
     private static final int ONGLET_SIMULATION = 8;
 
     // Colonnes dans l onglet Simulation (index 0-based)
-    private static final int COL_SIMU_CODE_TRANCHE = 1; // Colonne B
-    private static final int COL_SIMU_PRIX_REEL    = 2; // Colonne C : Prix reel facture
-    private static final int COL_SIMU_NB_ENFANTS   = 3; // Colonne D : Nombre d enfants
-    private static final int COL_SIMU_COUT_REF     = 4; // Colonne E : Cout de reference (4.42)
+    private static final int COL_SIMU_CODE_TRANCHE      = 1; // Colonne B
+    private static final int COL_SIMU_PRIX_REEL         = 2; // Colonne C : Prix reel facture
+    private static final int COL_SIMU_NB_ENFANTS        = 3; // Colonne D : Nombre d enfants
+    private static final int COL_SIMU_COUT_REF          = 4; // Colonne E : Cout de reference (4.42)
+    private static final int COL_SIMU_DEPENSES_REELLES  = 17; // Colonne R : depenses reelles accueil loisirs
+
+    private static final String[] ACCUEIL_LOISIR_SEGMENTS = {
+            "MDJ", "CLGAV", "CLJP1", "CLLMICH", "P'TIT", "PTIT", "PRINCE", "ACCUEIL", "LOISIR"
+    };
 
     // Colonnes dans l onglet Depenses (index 0-based)
     private static final int COL_DEP_MONTANT_TTC   = 7;  // Colonne H
@@ -78,7 +83,9 @@ public class Calculateur {
                     codeTranche = col1;
                 }
 
-                if (codeTranche.isEmpty()) continue;
+                if (codeTranche.isEmpty()) {
+                    continue;
+                }
 
                 double nbEnfants = getValeurNumerique(row.getCell(COL_SIMU_NB_ENFANTS));
                 if (nbEnfants > 0) {
@@ -149,6 +156,73 @@ public class Calculateur {
             }
         } catch (Exception e) {}
         return 4.42; // Valeur de secours
+    }
+
+    /**
+     * Calcule les depenses reelles d accueil loisirs depuis l onglet Simulation.
+     * Les lignes cibles sont celles qui contiennent MDJ, CLGAV, CLJP1, CLLMICH ou P'TIT PRINCE.
+     *
+     * @return Somme des depenses reelles accueil loisirs dans la colonne R.
+     */
+    public double calculerDepensesReellesAccueilLoisirs() {
+        double total = 0;
+        Map<String, Double> details = calculerDepensesReellesAccueilLoisirsParSegment();
+        for (Double montant : details.values()) {
+            total += montant;
+        }
+        return total;
+    }
+
+    public Map<String, Double> calculerDepensesReellesAccueilLoisirsParSegment() {
+        Map<String, Double> totaux = new HashMap<>();
+        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
+             Workbook wb = WorkbookFactory.create(fis)) {
+
+            Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
+            for (int i = 1; i <= s.getLastRowNum(); i++) {
+                Row row = s.getRow(i);
+                if (row == null) {
+                    continue;
+                }
+
+                String ligne = getRowTexte(row).toUpperCase();
+                String segment = determinerSegmentAccueilLoisirs(ligne);
+                if (segment == null) {
+                    continue;
+                }
+
+                double montant = Math.abs(getValeurNumerique(row.getCell(COL_SIMU_DEPENSES_REELLES)));
+                if (montant > 0) {
+                    totaux.put(segment, totaux.getOrDefault(segment, 0.0) + montant);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lecture accueil loisirs Simulation : " + e.getMessage());
+        }
+        return totaux;
+    }
+
+    private String determinerSegmentAccueilLoisirs(String ligne) {
+        if (ligne.contains("MDJ")) return "MDJ";
+        if (ligne.contains("CLGAV")) return "CLGAV";
+        if (ligne.contains("CLJP1")) return "CLJP1";
+        if (ligne.contains("CLLMICH")) return "CLLMICH";
+        if (ligne.contains("P'TIT") || ligne.contains("PTIT") || ligne.contains("PRINCE")) return "P'TIT PRINCE";
+        if (ligne.contains("ACCUEIL") && ligne.contains("LOISIR")) return "ACCUEIL LOISIRS";
+        return null;
+    }
+
+    /**
+     * Retourne le texte complet d une ligne pour recherche de mots-cles.
+     */
+    private String getRowTexte(Row row) {
+        StringBuilder sb = new StringBuilder();
+        for (Cell c : row) {
+            if (c != null) {
+                sb.append(c.toString()).append(' ');
+            }
+        }
+        return sb.toString().trim();
     }
 
     /**
@@ -225,7 +299,16 @@ public class Calculateur {
         if (c == null) return 0;
         try {
             if (c.getCellType() == CellType.NUMERIC) return c.getNumericCellValue();
-            return Double.parseDouble(c.toString().trim());
+            if (c.getCellType() == CellType.FORMULA) {
+                 try {
+                     return c.getNumericCellValue(); // Rcupre le rsultat calcul mis en cache
+                 } catch (Exception e) {
+                     // Si pas numérique, on tombe dans le toString
+                 }
+            }
+            String s = c.toString().trim().replace(",", ".");
+            if (s.isEmpty()) return 0;
+            return Double.parseDouble(s);
         } catch (Exception e) {
             return 0;
         }

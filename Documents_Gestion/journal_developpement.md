@@ -132,3 +132,32 @@ Ces chiffres sont produits par l outil en lisant directement l onglet Simulation
 
 ### Interpretation du Taux de Couverture
 Un taux de 85,01% signifie que les tarifs actuellement factures aux familles couvrent 85% du cout total (base 4,42 euros) de la restauration. Les 15% restants representent une contribution nette de la commune au service de restauration, ce qui est une information cle pour les decisions tarifaires futures.
+
+---
+
+## Etape 8 : Correction et Finalisation du Dashboard LOISIRS (13/04/2026 10h39)
+
+L'objectif de cette etape etait de rendre fonctionnel le tableau de bord pour l'Accueil Loisirs, qui affichait precedemment 0,00 euros malgré la presence de donnees dans le fichier source.
+
+### Analyse du Probleme
+- **Diagnostic** : Les lignes 42 a 46 de l'onglet Simulation (CALC DEP.xlsx) contiennent les donnees de depenses reelles pour les segments MDJ, P'TIT PRINCE, CLGAV, CLJP1 et CLLMICH.
+- **Blocage technique** : La colonne R (index 17) utilise des formules Excel (`SUM(...)`) et des formats numeriques pouvant contenir des virgules. L'ancien code ne recuperait pas la valeur calculee en cache et echouait au parsing des chaines non standard.
+
+### Resolution et Ameliorations
+- **Moteur de calcul** : Refonte de `getValeurNumerique` dans `Calculateur.java` pour :
+    - Extraire le resultat numerique des cellules de type `FORMULA`.
+    - Harmoniser les separateurs decimaux (virgule vers point) pour `Double.parseDouble`.
+- **Identification des Segments** : Amelioration de la recherche par mots-cles pour capturer correctement "p'tit prince" (insensible a la casse).
+- **Compatibilite Java 8** : Correction de `ConsoleUI.java` qui utilisait `String.repeat()` (Java 11+). Une methode utilitaire compatible Java 8 a ete implementee pour garantir le fonctionnement sur l'environnement client.
+
+### Resultat Final
+Le dashboard LOISIRS est desormais certifie avec les indicateurs suivants :
+- **Depenses reelles totales** : 141 497,74 euros.
+- **Repartition par segment** :
+    - CLGAV : 33 278,77 euros.
+    - CLLMICH : 39 645,38 euros.
+    - CLJP1 : 4 746,38 euros.
+    - MDJ : 43 325,17 euros.
+    - P'TIT PRINCE : 20 502,04 euros.
+
+Cette etape marque la fiabilisation du pilotage financier pour l'ensemble des poles enfance.

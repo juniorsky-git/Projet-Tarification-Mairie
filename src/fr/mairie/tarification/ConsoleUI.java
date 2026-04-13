@@ -53,14 +53,14 @@ public class ConsoleUI {
      */
     public static void printHeader(String title) {
         System.out.println("\n " + BOLD + title.toUpperCase() + RESET);
-        System.out.println(" " + "=".repeat(title.length()));
+        System.out.println(" " + repeat("=", title.length()));
     }
 
     /**
      * Affiche un séparateur horizontal.
      */
     public static void printSeparator() {
-        System.out.println("   " + "-".repeat(50));
+        System.out.println("   " + repeat("-", 50));
     }
 
     /**
@@ -93,10 +93,10 @@ public class ConsoleUI {
 
         System.out.printf("\n   Effectifs totaux (Simulation)    : %.0f enfants%n", totalEnfants);
         System.out.printf("   Total repas annuels (x140j)      : %.0f repas%n", totalRepas);
-        System.out.println("   " + "-".repeat(48));
+        System.out.println("   " + repeat("-", 48));
         System.out.printf("   Cout moyen de reference (mairie) : %.2f euros%n", coutRef);
         System.out.printf("   Cout reel constate (comptabilite): %.2f euros%n", coutReel);
-        System.out.println("   " + "-".repeat(48));
+        System.out.println("   " + repeat("-", 48));
         System.out.printf("   Depenses (base ref. 4.42)        : %.2f euros%n", depensesRef);
         System.out.printf("   Recettes theoriques (Simulation) : %.2f euros%n", recettes);
         System.out.printf("   Taux de couverture               : %.2f %%%n", tauxCouverture);
@@ -151,5 +151,11 @@ public class ConsoleUI {
 
         System.out.println("\n   Appuyez sur Entree.");
         scanner.nextLine();
+    }
+
+    private static String repeat(String s, int n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) sb.append(s);
+        return sb.toString();
     }
 }

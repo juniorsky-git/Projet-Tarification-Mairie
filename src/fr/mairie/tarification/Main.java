@@ -35,8 +35,7 @@ public class Main {
                     ConsoleUI.afficherDashboardScolaire(calculateur, scanner);
                     break;
                 case "2":
-                    String[] exclLoisirs = {};
-                    ConsoleUI.afficherPoleSimple(calculateur, "Loisirs", "RESTGAV", "2-RE", "LOISIRS", exclLoisirs, scanner);
+                    afficherDashboardLoisirs(calculateur, scanner);
                     break;
                 case "3":
                     String[] exclAdos = {};
@@ -56,3 +55,22 @@ public class Main {
         }
         scanner.close();
     }
+
+    private static void afficherDashboardLoisirs(Calculateur calc, Scanner sc) {
+        ConsoleUI.printHeader("TABLEAU DE BORD : LOISIRS (Accueil loisirs)");
+
+        Map<String, Double> details = calc.calculerDepensesReellesAccueilLoisirsParSegment();
+        double depensesReelles = 0;
+        for (double montant : details.values()) {
+            depensesReelles += montant;
+        }
+
+        System.out.printf("\n   Depenses reelles Accueil Loisirs : %.2f euros%n", depensesReelles);
+        for (Map.Entry<String, Double> entry : details.entrySet()) {
+            System.out.printf("      - %s : %.2f euros%n", entry.getKey(), entry.getValue());
+        }
+        System.out.println("\n   [SOURCE] onglet Simulation de CALC DEP.xlsx, colonne R");
+        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+        sc.nextLine();
+    }
+}
