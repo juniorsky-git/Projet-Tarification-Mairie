@@ -1,37 +1,34 @@
 # Outil de Tarification Municipale - Ville de Crosne
 
-Ce projet Java automatise l'analyse financière des services municipaux en croisant les dépenses réelles et les recettes théoriques.
+Ce projet Java automatise l'analyse financière des services municipaux en croisant les dépenses réelles et les recettes théoriques au sein d'un moteur unifié.
 
 ## 1. Fonctionnalités de l'Application
 
 ### Dashboard Financier Multi-Pôles
-L'application propose désormais 5 tableaux de bord distincts :
-1. **Scolaire** : Cantine Louise Michel.
-2. **Loisirs** : Centres de loisirs Gaviériaux.
-3. **Espace Ados** : Diagnostic des charges réelles (17k€).
-4. **Séjours** : Détail par destination (Curie, Brassens, Ados - 107k€).
-5. **Audit Eau** : Suivi des consommations et facturations fluides (via scripts de diagnostic).
+L'application propose 6 tableaux de bord consolidés :
+1. **Scolaire** : Restauration scolaire (1,81 M€).
+2. **Loisirs** : Accueil de loisirs (1,59 M€).
+3. **Espace Ados** : Diagnostic des charges réelles.
+4. **Séjours** : Détail complet des vacances.
+5. **Études surveillées** : Suivi du personnel et des fournitures.
+6. **Accueil Périscolaire** : Analyse des recettes et dépenses périscolaires.
 
 ### Consultation Tarifaire
 Un moteur de recherche permet de trouver instantanément le tarif applicable à une famille pour tous les services à partir de son **Quotient Familial (QF)**.
 
 ## 2. Structure Technique
 
-### Dossiers Clés
-- `src` : Source Java (Calculateur, UI).
-- `outils_diagnostic` : **CRITIQUE**. Contient les outils d'audit (Java et Python) permettant de vérifier les données Excel avant intégration.
-- `Donnees/Autres/CALC DEP (3).csv` : **Source primaire de données** pour les totaux des dépenses.
-- `Donnees/Autres/CALC DEP (3).xlsx` : **Source secondaire** pour les détails de simulation.
+### Source de Vérité Unique
+- **`Donnees/Autres/CALC DEP (3).xlsx`** : L'onglet **`syntheses charges`** est la source unique de vérité. Il regroupe les dépenses par nature comptable, les effectifs par tranche et les tarifs.
 
-### Logique d'Extraction (Maintenance)
-Pour les pôles complexes (Ados, Séjours), l'application ne se contente pas de lire la cellule "Total" d'Excel (souvent erronée car liée à des fichiers externes absents). 
-**Elle recalcule manuellement la somme des colonnes C à K** dans le code Java (`Calculateur.java`) pour garantir l'exactitude des chiffres affichés.
+### Logique d'Extraction
+Le projet utilise une structure **`SyntheseGlobale`** dans `Calculateur.java` qui charge l'intégralité des données en une seule lecture pour garantir la rapidité et la cohérence des calculs (évite les décalages entre dépenses et recettes).
 
 ## 3. Guide de Maintenance
 Si vous devez modifier les sources de données :
-1. Consultez le `Documents_Gestion/journal_developpement.md` pour comprendre l'historique des étapes.
-2. Utilisez les outils dans `outils_diagnostic/` (ex: `DiagnosticSejours.java`) pour valider les nouveaux numéros de lignes/colonnes dans Excel.
-3. Recompilez avec `./build.ps1 run` ou via la commande `javac` standard.
+1. Mettez à jour les montants ou effectifs directement dans l'onglet `syntheses charges` de l'Excel.
+2. L'application détectera automatiquement toute nouvelle ligne de dépense insérée entre les lignes 4 et 21.
+3. Recompilez et lancez via `./build.ps1` ou `Main.java`.
 
 ## 4. Prérequis
 - Java 8 ou supérieur.
