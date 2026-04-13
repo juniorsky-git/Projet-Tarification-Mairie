@@ -20,7 +20,8 @@ Un moteur de recherche permet de trouver instantanément le tarif applicable à 
 ### Dossiers Clés
 - `src` : Source Java (Calculateur, UI).
 - `outils_diagnostic` : **CRITIQUE**. Contient les outils d'audit (Java et Python) permettant de vérifier les données Excel avant intégration.
-- `Donnees/Autres/CALC DEP.xlsx` : **Source Unique de Vérité**. L'application lit principalement l'onglet **Simulation**.
+- `Donnees/Autres/CALC DEP (3).csv` : **Source primaire de données** pour les totaux des dépenses.
+- `Donnees/Autres/CALC DEP (3).xlsx` : **Source secondaire** pour les détails de simulation.
 
 ### Logique d'Extraction (Maintenance)
 Pour les pôles complexes (Ados, Séjours), l'application ne se contente pas de lire la cellule "Total" d'Excel (souvent erronée car liée à des fichiers externes absents). 
