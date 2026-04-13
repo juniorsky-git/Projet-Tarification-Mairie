@@ -159,6 +159,27 @@ public class ConsoleUI {
     }
 
     /**
+     * Affiche le dashboard simplifie pour l'Espace Ados (Depenses uniquement).
+     */
+    public static void afficherDashboardAdos(Calculateur calc, Scanner scanner) {
+        System.out.println("\n" + repeat("=", 50));
+        System.out.println("   DASHBOARD : ESPACE ADOS (Diagnostic)");
+        System.out.println(repeat("=", 50));
+
+        double depenses = calc.getDepensesReellesAdos();
+
+        System.out.println("\n   CADRAGE FINANCIER :");
+        printLine("Depenses Reelles Totales", String.format("%.2f EUR", depenses));
+        System.out.println("   (Source: Simulation - Ligne 75)");
+
+        System.out.println("\n   Note : Les volumes et recettes ne sont pas encore");
+        System.out.println("          disponibles pour ce pole.");
+
+        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+        scanner.nextLine();
+    }
+
+    /**
      * Affiche une ligne de donnees alignee.
      */
     public static void printLine(String label, String value) {

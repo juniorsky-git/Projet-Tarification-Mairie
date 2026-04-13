@@ -264,6 +264,28 @@ public class Calculateur {
     }
 
     /**
+     * Retourne le total des depenses reelles pour le pole Ados.
+     * Source : Onglet Simulation, Ligne 75, Colonne T.
+     */
+    public double getDepensesReellesAdos() {
+        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
+                Workbook wb = WorkbookFactory.create(fis)) {
+            Sheet s = wb.getSheet("Simulation");
+            if (s == null) {
+                return 0;
+            }
+            Row r = s.getRow(74); // Ligne 75
+            if (r == null) {
+                return 0;
+            }
+            return getValeurNumerique(r.getCell(19)); // Colonne T
+        } catch (Exception e) {
+            LogService.error("Erreur lecture depenses Ados", e);
+            return 0;
+        }
+    }
+
+    /**
      * Retourne la valeur texte d une cellule, ou une chaine vide si la cellule est
      * nulle.
      */

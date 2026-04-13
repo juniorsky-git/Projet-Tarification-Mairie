@@ -38,8 +38,7 @@ public class Main {
                     afficherDashboardLoisirs(calculateur, scanner);
                     break;
                 case "3":
-                    String[] exclAdos = {};
-                    ConsoleUI.afficherPoleSimple(calculateur, "Ados", "RESTCA", "2-RE", "ADOS", exclAdos, scanner);
+                    ConsoleUI.afficherDashboardAdos(calculateur, scanner);
                     break;
                 case "4":
                     ConsoleUI.consulterTarif(service, grilleRef, scanner);
