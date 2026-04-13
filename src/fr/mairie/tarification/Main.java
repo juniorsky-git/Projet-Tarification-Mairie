@@ -26,8 +26,9 @@ public class Main {
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
             System.out.println("   [4] Dashboard SÉJOURS (Vacances)");
             System.out.println("   [5] Dashboard ÉTUDES (Surveillées)");
-            System.out.println("   [6] Consulter un tarif individuel");
-            System.out.println("   [7] Quitter");
+            System.out.println("   [6] Rapport COMPLET par PÔLE");
+            System.out.println("   [7] Consulter un tarif individuel");
+            System.out.println("   [8] Quitter");
             System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
@@ -49,9 +50,12 @@ public class Main {
                     ConsoleUI.afficherDashboardEtudes(calculateur, scanner);
                     break;
                 case "6":
-                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    afficherRapportCompletParPole(calculateur, scanner);
                     break;
                 case "7":
+                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    break;
+                case "8":
                     continuer = false;
                     System.out.println("\n   Au revoir !");
                     break;
@@ -77,6 +81,17 @@ public class Main {
             ConsoleUI.printLine("   " + entry.getKey(), String.format("%.2f euros", entry.getValue()));
         }
         
+        System.out.println("\n   [SOURCE] CALC DEP (3).csv (synthetise)");
+        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+        sc.nextLine();
+    }
+
+    private static void afficherRapportCompletParPole(Calculateur calc, Scanner sc) {
+        ConsoleUI.printHeader("RAPPORT COMPLET PAR PÔLE");
+
+        String rapport = calc.genererRapportCompletParPole();
+        System.out.println(rapport);
+
         System.out.println("\n   [SOURCE] CALC DEP (3).csv (synthetise)");
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         sc.nextLine();

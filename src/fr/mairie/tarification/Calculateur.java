@@ -478,6 +478,343 @@ public class Calculateur {
         return details;
     }
 
+    // =====================================================================================
+    // CALCULS PAR POLE BASES SUR CALC DEP (3).CSV
+    // =====================================================================================
+
+    /**
+     * Calcule les depenses totales pour la Restauration scolaire.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesRestauration() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Restauration", 0.0);
+    }
+
+    /**
+     * Calcule les depenses totales pour l'Accueil de Loisirs.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesAccueilLoisirs() {
+        return calculerTotalDepensesLoisirs(); // Utilise la methode existante
+    }
+
+    /**
+     * Calcule les depenses totales pour l'Accueil Periscolaire.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesAccueilPeriscolaire() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Accueil periscolaire", 0.0);
+    }
+
+    /**
+     * Calcule les depenses totales pour les Etudes Surveillees.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesEtudesSurveillees() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Etudes surveillees", 0.0);
+    }
+
+    /**
+     * Calcule les depenses totales pour l'Espace Ados.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesEspaceAdos() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Espace Ados", 0.0);
+    }
+
+    /**
+     * Calcule les depenses totales pour les Sejours.
+     * @return Montant total des depenses
+     */
+    public double calculerDepensesSejours() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Sejours", 0.0);
+    }
+
+    /**
+     * Calcule le total general de toutes les depenses.
+     * @return Montant total de toutes les depenses
+     */
+    public double calculerTotalDepensesGenerales() {
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+        return totaux.getOrDefault("Total", 0.0);
+    }
+
+    /**
+     * Calcule les recettes theoriques pour la Restauration scolaire.
+     * Base sur les tarifs et effectifs depuis l'onglet Simulation.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesRestauration() {
+        SimulationData data = chargerDonneesSimulation();
+        return data.getRecettesTheoriques();
+    }
+
+    /**
+     * Calcule les recettes theoriques pour l'Accueil de Loisirs.
+     * Base sur les tarifs moyens et estimation d'effectifs.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesAccueilLoisirs() {
+        // Estimation basee sur les tarifs moyens du CSV
+        // EXT: 14.96€, A: 13.86€, B: 12.26€, etc.
+        // Pour une estimation simple, utiliser un tarif moyen pondere
+        return 0.0; // A implementer selon les donnees disponibles
+    }
+
+    /**
+     * Calcule les recettes theoriques pour l'Accueil Periscolaire.
+     * Base sur les tarifs du CSV.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesAccueilPeriscolaire() {
+        // Tarifs depuis le CSV: EXT: 4.48€, A: 4.17€, B: 3.66€, etc.
+        return 0.0; // A implementer selon les donnees disponibles
+    }
+
+    /**
+     * Calcule les recettes theoriques pour les Etudes Surveillees.
+     * Base sur les tarifs du CSV.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesEtudesSurveillees() {
+        // Tarifs depuis le CSV: EXT: 16.12€, A: 14.49€, B: 13.02€, etc.
+        return 0.0; // A implementer selon les donnees disponibles
+    }
+
+    /**
+     * Calcule les recettes theoriques pour l'Espace Ados.
+     * Base sur les tarifs du CSV.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesEspaceAdos() {
+        // Tarifs depuis le CSV: EXT: 8.19€, A: 6.94€, B: 7.01€, etc.
+        return 0.0; // A implementer selon les donnees disponibles
+    }
+
+    /**
+     * Calcule les recettes theoriques pour les Sejours.
+     * Base sur les tarifs du CSV.
+     * @return Montant total des recettes theoriques
+     */
+    public double calculerRecettesSejours() {
+        // Tarif fixe: 70.00€ pour EXT, 56.00€ pour A, etc.
+        return 0.0; // A implementer selon les donnees disponibles
+    }
+
+    /**
+     * Calcule le resultat financier (Recettes - Depenses) pour chaque pole.
+     * @return Map avec les resultats par pole
+     */
+    public Map<String, Double> calculerResultatsFinanciersParPole() {
+        Map<String, Double> resultats = new LinkedHashMap<>();
+
+        // Restauration
+        double depRestau = calculerDepensesRestauration();
+        double recRestau = calculerRecettesRestauration();
+        resultats.put("Restauration", recRestau - depRestau);
+
+        // Accueil de Loisirs
+        double depLoisirs = calculerDepensesAccueilLoisirs();
+        double recLoisirs = calculerRecettesAccueilLoisirs();
+        resultats.put("Accueil de Loisirs", recLoisirs - depLoisirs);
+
+        // Accueil Periscolaire
+        double depPeriscolaire = calculerDepensesAccueilPeriscolaire();
+        double recPeriscolaire = calculerRecettesAccueilPeriscolaire();
+        resultats.put("Accueil Periscolaire", recPeriscolaire - depPeriscolaire);
+
+        // Etudes Surveillees
+        double depEtudes = calculerDepensesEtudesSurveillees();
+        double recEtudes = calculerRecettesEtudesSurveillees();
+        resultats.put("Etudes Surveillees", recEtudes - depEtudes);
+
+        // Espace Ados
+        double depAdos = calculerDepensesEspaceAdos();
+        double recAdos = calculerRecettesEspaceAdos();
+        resultats.put("Espace Ados", recAdos - depAdos);
+
+        // Sejours
+        double depSejours = calculerDepensesSejours();
+        double recSejours = calculerRecettesSejours();
+        resultats.put("Sejours", recSejours - depSejours);
+
+        return resultats;
+    }
+
+    /**
+     * Calcule les couts moyens par enfant pour chaque pole.
+     * Base sur les depenses totales et les nombres d'enfants du CSV.
+     * @return Map avec les couts moyens par pole
+     */
+    public Map<String, Double> calculerCoutsMoyensParPole() {
+        Map<String, Double> coutsMoyens = new LinkedHashMap<>();
+        Map<String, Double> totaux = lireTotauxDepensesDepuisCSV();
+
+        // Lire les nombres d'enfants depuis le CSV
+        Map<String, Integer> effectifs = lireEffectifsDepuisCSV();
+
+        // Calculer les couts moyens
+        for (Map.Entry<String, Double> entry : totaux.entrySet()) {
+            String pole = entry.getKey();
+            if (!pole.equals("Total")) {
+                double depenses = entry.getValue();
+                int nbEnfants = effectifs.getOrDefault(pole, 0);
+                if (nbEnfants > 0) {
+                    coutsMoyens.put(pole, depenses / nbEnfants);
+                } else {
+                    coutsMoyens.put(pole, 0.0);
+                }
+            }
+        }
+
+        return coutsMoyens;
+    }
+
+    /**
+     * Lit les effectifs (nombres d'enfants) depuis le CSV.
+     * @return Map avec les effectifs par pole
+     */
+    private Map<String, Integer> lireEffectifsDepuisCSV() {
+        Map<String, Integer> effectifs = new HashMap<>();
+        try (BufferedReader br = Files.newBufferedReader(
+                Paths.get(FICHIER_DEPENSES_CSV), 
+                java.nio.charset.Charset.forName("ISO-8859-1"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("Nombre d'enfants;;;")) {
+                    // Ligne suivante contient les nombres d'enfants
+                    String nextLine = br.readLine();
+                    if (nextLine != null) {
+                        String[] parts = nextLine.split(";");
+                        if (parts.length >= 6) {
+                            try {
+                                effectifs.put("Restauration", (int) parseMontant(parts[3]));
+                                effectifs.put("Accueil de Loisirs", (int) parseMontant(parts[4]));
+                                effectifs.put("Accueil periscolaire", (int) parseMontant(parts[5]));
+                                effectifs.put("Etudes surveillees", (int) parseMontant(parts[6]));
+                                effectifs.put("Espace Ados", (int) parseMontant(parts[7]));
+                                effectifs.put("Sejours", (int) parseMontant(parts[8]));
+                            } catch (Exception e) {
+                                LogService.error("Erreur parsing effectifs CSV", e);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            LogService.error("Erreur lecture effectifs CSV", e);
+        }
+        return effectifs;
+    }
+
+    /**
+     * Calcule les ratios depenses/recettes pour chaque pole.
+     * @return Map avec les ratios par pole (valeur > 1 = deficit)
+     */
+    public Map<String, Double> calculerRatiosDepensesRecettes() {
+        Map<String, Double> ratios = new LinkedHashMap<>();
+        Map<String, Double> resultats = calculerResultatsFinanciersParPole();
+
+        for (Map.Entry<String, Double> entry : resultats.entrySet()) {
+            String pole = entry.getKey();
+            double resultat = entry.getValue();
+
+            // Calculer les depenses pour ce pole
+            double depenses = 0.0;
+            switch (pole) {
+                case "Restauration":
+                    depenses = calculerDepensesRestauration();
+                    break;
+                case "Accueil de Loisirs":
+                    depenses = calculerDepensesAccueilLoisirs();
+                    break;
+                case "Accueil Periscolaire":
+                    depenses = calculerDepensesAccueilPeriscolaire();
+                    break;
+                case "Etudes Surveillees":
+                    depenses = calculerDepensesEtudesSurveillees();
+                    break;
+                case "Espace Ados":
+                    depenses = calculerDepensesEspaceAdos();
+                    break;
+                case "Sejours":
+                    depenses = calculerDepensesSejours();
+                    break;
+            }
+
+            if (depenses > 0) {
+                // Ratio depenses/recettes = depenses / (depenses - resultat)
+                double recettes = depenses - resultat;
+                ratios.put(pole, recettes > 0 ? depenses / recettes : Double.POSITIVE_INFINITY);
+            } else {
+                ratios.put(pole, 0.0);
+            }
+        }
+
+        return ratios;
+    }
+
+    /**
+     * Retourne un rapport complet de tous les calculs par pole.
+     * @return String formate avec tous les indicateurs
+     */
+    public String genererRapportCompletParPole() {
+        StringBuilder rapport = new StringBuilder();
+        rapport.append("================================================================================\n");
+        rapport.append("RAPPORT COMPLET PAR POLE - CALC DEP (3)\n");
+        rapport.append("================================================================================\n\n");
+
+        Map<String, Double> depenses = lireTotauxDepensesDepuisCSV();
+        Map<String, Double> resultats = calculerResultatsFinanciersParPole();
+        Map<String, Double> coutsMoyens = calculerCoutsMoyensParPole();
+        Map<String, Double> ratios = calculerRatiosDepensesRecettes();
+        Map<String, Integer> effectifs = lireEffectifsDepuisCSV();
+
+        String[] poles = {"Restauration", "Accueil de Loisirs", "Accueil Periscolaire", "Etudes Surveillees", "Espace Ados", "Sejours"};
+
+        for (String pole : poles) {
+            rapport.append(String.format("POLE: %s\n", pole.toUpperCase()));
+            rapport.append("-".repeat(50) + "\n");
+
+            double dep = depenses.getOrDefault(pole, 0.0);
+            double res = resultats.getOrDefault(pole, 0.0);
+            double coutMoyen = coutsMoyens.getOrDefault(pole, 0.0);
+            double ratio = ratios.getOrDefault(pole, 0.0);
+            int effectif = effectifs.getOrDefault(pole, 0);
+
+            rapport.append(String.format("  Effectif: %d enfants\n", effectif));
+            rapport.append(String.format("  Depenses totales: %.2f €\n", dep));
+            rapport.append(String.format("  Cout moyen/enfant: %.2f €\n", coutMoyen));
+            rapport.append(String.format("  Resultat financier: %.2f € %s\n",
+                Math.abs(res), res >= 0 ? "(benefice)" : "(deficit)"));
+            rapport.append(String.format("  Ratio depenses/recettes: %.2f\n",
+                Double.isInfinite(ratio) ? 0.0 : ratio));
+
+            if (ratio > 1.0 && !Double.isInfinite(ratio)) {
+                rapport.append("  Status: DEFICITAIRE\n");
+            } else if (ratio == 1.0) {
+                rapport.append("  Status: EQUILIBRE\n");
+            } else {
+                rapport.append("  Status: BENEFICIAIRE\n");
+            }
+
+            rapport.append("\n");
+        }
+
+        double totalDepenses = depenses.getOrDefault("Total", 0.0);
+        rapport.append("SYNTHASE GENERALE\n");
+        rapport.append("-".repeat(50) + "\n");
+        rapport.append(String.format("Total depenses: %.2f €\n", totalDepenses));
+
+        return rapport.toString();
+    }
+
     /**
      * Retourne la valeur texte d une cellule, ou une chaine vide si la cellule est
      * nulle.
