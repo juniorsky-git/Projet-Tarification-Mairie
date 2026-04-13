@@ -3,7 +3,6 @@ package fr.mairie.tarification;
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileInputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,10 +11,10 @@ import java.util.Map;
  * Source principale des effectifs et des prix factures :
  * Onglet "Simulation" du fichier CALC DEP.xlsx (index 8).
  * Ce fichier contient par tranche (A a G + EXT) :
- *   - Colonne B : Code de la tranche.
- *   - Colonne C : Prix reel facture par repas pour cette tranche.
- *   - Colonne D : Nombre d enfants inscrits dans cette tranche.
- *   - Colonne E : Cout moyen de reference de la mairie (4.42 euros, fixe).
+ * - Colonne B : Code de la tranche.
+ * - Colonne C : Prix reel facture par repas pour cette tranche.
+ * - Colonne D : Nombre d enfants inscrits dans cette tranche.
+ * - Colonne E : Cout moyen de reference de la mairie (4.42 euros, fixe).
  *
  * Le fichier Feuille_dataviz.xlsx n est plus utilise pour les effectifs.
  */
@@ -27,55 +26,67 @@ public class Calculateur {
     private static final int ONGLET_SIMULATION = 8;
 
     // Colonnes dans l onglet Simulation (index 0-based)
-    private static final int COL_SIMU_CODE_TRANCHE      = 1; // Colonne B
-    private static final int COL_SIMU_PRIX_REEL         = 2; // Colonne C : Prix reel facture
-    private static final int COL_SIMU_NB_ENFANTS        = 3; // Colonne D : Nombre d enfants
-    private static final int COL_SIMU_COUT_REF          = 4; // Colonne E : Cout de reference (4.42)
-    private static final int COL_SIMU_DEPENSES_REELLES  = 17; // Colonne R : depenses reelles accueil loisirs
-
-    private static final String[] ACCUEIL_LOISIR_SEGMENTS = {
-            "MDJ", "CLGAV", "CLJP1", "CLLMICH", "P'TIT", "PTIT", "PRINCE", "ACCUEIL", "LOISIR"
-    };
+    private static final int COL_SIMU_CODE_TRANCHE = 1; // Colonne B
+    private static final int COL_SIMU_PRIX_REEL = 2; // Colonne C : Prix reel facture
+    private static final int COL_SIMU_NB_ENFANTS = 3; // Colonne D : Nombre d enfants
+    private static final int COL_SIMU_COUT_REF = 4; // Colonne E : Cout de reference (4.42)
+    private static final int COL_SIMU_DEPENSES_REELLES = 17; // Colonne R : depenses reelles accueil loisirs
 
     // Colonnes dans l onglet Depenses (index 0-based)
-    private static final int COL_DEP_MONTANT_TTC   = 7;  // Colonne H
-    private static final int COL_DEP_SERVICE        = 18; // Colonne S
-    private static final int COL_DEP_ANTENNE        = 19; // Colonne T
-    private static final int COL_DEP_LIBELLE        = 3;  // Colonne D
+    private static final int COL_DEP_MONTANT_TTC = 7; // Colonne H
+    private static final int COL_DEP_SERVICE = 18; // Colonne S
+    private static final int COL_DEP_ANTENNE = 19; // Colonne T
+    private static final int COL_DEP_LIBELLE = 3; // Colonne D
 
     /**
-     * Lit l onglet Simulation et retourne les effectifs reels par tranche.
-     *
-     * Structure observee dans le fichier :
-     *   - Ligne EXT : code "EXT" en colonne 0 (A), colonne 1 (B) vide.
-     *   - Autres tranches : libelle en colonne 0, code (A,B,C...) en colonne 1.
-     *   - Colonne 3 (D) : nombre d enfants.
-     *   - La ligne "Total" en colonne 0 marque la fin du tableau.
-     *
-     * @return Map associant le code de tranche (EXT, A, B...) au nombre d enfants.
+     * Structure de donnees regroupant les resultats de l onglet Simulation.
      */
-    public Map<String, Double> chargerEffectifsDepuisSimulation() {
-        Map<String, Double> effectifs = new HashMap<>();
+    public static class SimulationData {
+        private final Map<String, Double> effectifs = new HashMap<>();
+        private double recettesTheoriques = 0;
+        private double coutMoyenReference = 4.42;
+
+        public Map<String, Double> getEffectifs() {
+            return effectifs;
+        }
+
+        public double getRecettesTheoriques() {
+            return recettesTheoriques;
+        }
+
+        public double getCoutMoyenReference() {
+            return coutMoyenReference;
+        }
+    }
+
+    /**
+     * Lit l'onglet Simulation une seule fois pour extraire toutes les donnees.
+     */
+    public SimulationData chargerDonneesSimulation() {
+        SimulationData data = new SimulationData();
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
+                Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
+
+            // 1. Cout de reference (fixe ligne 7, col E)
+            Row refRow = s.getRow(7);
+            if (refRow != null) {
+                data.coutMoyenReference = getValeurNumerique(refRow.getCell(COL_SIMU_COUT_REF));
+            }
+
+            // 2. Parours des tranches
             for (int i = 6; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null){
-                        continue;
-                }
-                     
+                if (row == null)
+                    continue;
 
                 String col0 = getValeurTexte(row.getCell(0));
                 String col1 = getValeurTexte(row.getCell(COL_SIMU_CODE_TRANCHE));
 
-                // Arret sur la ligne Total
-                if (col0.equalsIgnoreCase("Total")){
+                if (col0.equalsIgnoreCase("Total"))
                     break;
-                } 
 
-                // Determination du code de tranche
                 String codeTranche = "";
                 if (col0.equalsIgnoreCase("EXT")) {
                     codeTranche = "EXT";
@@ -83,88 +94,28 @@ public class Calculateur {
                     codeTranche = col1;
                 }
 
-                if (codeTranche.isEmpty()) {
+                if (codeTranche.isEmpty())
                     continue;
-                }
 
+                double prixReel = getValeurNumerique(row.getCell(COL_SIMU_PRIX_REEL));
                 double nbEnfants = getValeurNumerique(row.getCell(COL_SIMU_NB_ENFANTS));
+
                 if (nbEnfants > 0) {
-                    effectifs.put(codeTranche, nbEnfants);
+                    data.effectifs.put(codeTranche, nbEnfants);
+                    data.recettesTheoriques += prixReel * nbEnfants * 140;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur lecture Simulation : " + e.getMessage());
+            System.err.println("Erreur chargement Simulation : " + e.getMessage());
         }
-        return effectifs;
+        return data;
     }
 
     /**
-     * Lit l onglet Simulation et calcule les recettes theoriques.
-     * La recette par tranche est : Prix reel facture (col C) x Nb enfants (col D) x 140 jours.
-     *
-     * @return Total des recettes theoriques annuelles.
+     * Calcule le total des depenses reelles accueil loisirs (somme de tous les
+     * segments).
      */
-    public double calculerRecettesDepuisSimulation() {
-        double total = 0;
-        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
-
-            Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
-            for (int i = 6; i <= s.getLastRowNum(); i++) {
-                Row row = s.getRow(i);
-                if (row == null) {
-                    continue;
-                }
-
-                String col0 = getValeurTexte(row.getCell(0));
-                String col1 = getValeurTexte(row.getCell(COL_SIMU_CODE_TRANCHE));
-
-                if (col0.equalsIgnoreCase("Total")) {
-                    break;
-                }
-
-                boolean estTranche = col0.equalsIgnoreCase("EXT") || !col1.isEmpty();
-                if (!estTranche) {
-                    continue;
-                }
-
-                double prixReel  = getValeurNumerique(row.getCell(COL_SIMU_PRIX_REEL));
-                double nbEnfants = getValeurNumerique(row.getCell(COL_SIMU_NB_ENFANTS));
-
-                total += prixReel * nbEnfants * 140;
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur calcul recettes : " + e.getMessage());
-        }
-        return total;
-    }
-
-    /**
-     * Retourne le cout de reference de la mairie (4.42 euros) depuis la colonne E.
-     * Ce chiffre est fixe dans le fichier et valide par le pole financier.
-     *
-     * @return Cout moyen de reference par repas.
-     */
-    public double getCoutMoyenReference() {
-        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
-
-            Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
-            Row row = s.getRow(7); // Premiere ligne de donnees (tranche A)
-            if (row != null) {
-                return getValeurNumerique(row.getCell(COL_SIMU_COUT_REF));
-            }
-        } catch (Exception e) {}
-        return 4.42; // Valeur de secours
-    }
-
-    /**
-     * Calcule les depenses reelles d accueil loisirs depuis l onglet Simulation.
-     * Les lignes cibles sont celles qui contiennent MDJ, CLGAV, CLJP1, CLLMICH ou P'TIT PRINCE.
-     *
-     * @return Somme des depenses reelles accueil loisirs dans la colonne R.
-     */
-    public double calculerDepensesReellesAccueilLoisirs() {
+    public double calculerTotalDepensesLoisirs() {
         double total = 0;
         Map<String, Double> details = calculerDepensesReellesAccueilLoisirsParSegment();
         for (Double montant : details.values()) {
@@ -176,39 +127,40 @@ public class Calculateur {
     public Map<String, Double> calculerDepensesReellesAccueilLoisirsParSegment() {
         Map<String, Double> totaux = new HashMap<>();
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
+                Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) {
+                if (row == null)
                     continue;
-                }
 
                 String ligne = getRowTexte(row).toUpperCase();
                 String segment = determinerSegmentAccueilLoisirs(ligne);
-                if (segment == null) {
-                    continue;
-                }
-
-                double montant = Math.abs(getValeurNumerique(row.getCell(COL_SIMU_DEPENSES_REELLES)));
-                if (montant > 0) {
-                    totaux.put(segment, totaux.getOrDefault(segment, 0.0) + montant);
+                if (segment != null) {
+                    double montant = Math.abs(getValeurNumerique(row.getCell(COL_SIMU_DEPENSES_REELLES)));
+                    if (montant > 0) {
+                        totaux.put(segment, totaux.getOrDefault(segment, 0.0) + montant);
+                    }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur lecture accueil loisirs Simulation : " + e.getMessage());
+            System.err.println("Erreur lecture segments Loisirs : " + e.getMessage());
         }
         return totaux;
     }
 
     private String determinerSegmentAccueilLoisirs(String ligne) {
-        if (ligne.contains("MDJ")) return "MDJ";
-        if (ligne.contains("CLGAV")) return "CLGAV";
-        if (ligne.contains("CLJP1")) return "CLJP1";
-        if (ligne.contains("CLLMICH")) return "CLLMICH";
-        if (ligne.contains("P'TIT") || ligne.contains("PTIT") || ligne.contains("PRINCE")) return "P'TIT PRINCE";
-        if (ligne.contains("ACCUEIL") && ligne.contains("LOISIR")) return "ACCUEIL LOISIRS";
+        if (ligne.contains("MDJ"))
+            return "MDJ";
+        if (ligne.contains("CLGAV"))
+            return "CLGAV";
+        if (ligne.contains("CLJP1"))
+            return "CLJP1";
+        if (ligne.contains("CLLMICH"))
+            return "CLLMICH";
+        if (ligne.contains("P'TIT") || ligne.contains("PTIT") || ligne.contains("PRINCE"))
+            return "P'TIT PRINCE";
         return null;
     }
 
@@ -226,46 +178,44 @@ public class Calculateur {
     }
 
     /**
-     * Calcule les depenses reelles pour un pole donne.
+     * Calcule les depenses reelles pour un pole donne de maniere universelle.
      *
-     * @param antennaPrecise Code de l antenne (ex : RESTMICH, RESTCA).
-     * @param serviceType    Code du service (ex : 2-RE) ou null.
-     * @param motCleLibelle  Mot-cle obligatoire dans le libelle (ex : ADOS) ou null.
-     * @param exclusions     Mots-cles a exclure du libelle ou null.
+     * @param antenne   Code de l antenne (ex : RESTMICH) ou null.
+     * @param service   Code du service (ex : 2-RE) ou null.
+     * @param inclusion Mot-cle obligatoire dans le libelle ou null.
+     * @param exclusions Mots-cles a exclure du libelle ou null.
      * @return Total des depenses TTC.
      */
-    public double calculerDepensesPole(String antennaPrecise, String serviceType, String motCleLibelle, String[] exclusions) {
+    public double calculerDepenses(String antenne, String service, String inclusion, String[] exclusions) {
         double total = 0;
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-             Workbook wb = WorkbookFactory.create(fis)) {
+                Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheetAt(0); // Onglet principal des depenses
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) {
+                if (row == null)
                     continue;
-                }
 
                 String ant = getValeurTexte(row.getCell(COL_DEP_ANTENNE));
                 String ser = getValeurTexte(row.getCell(COL_DEP_SERVICE));
                 String lib = getValeurTexte(row.getCell(COL_DEP_LIBELLE)).toUpperCase();
 
-                boolean matchBase = false;
-                if (antennaPrecise != null && ant.equalsIgnoreCase(antennaPrecise)) {
-                    matchBase = true;
-                }
-                if (serviceType != null && ser.contains(serviceType)) {
-                    matchBase = true;
-                }
+                // Filtrage Antenne/Service
+                boolean match = false;
+                if (antenne != null && ant.equalsIgnoreCase(antenne))
+                    match = true;
+                if (service != null && ser.contains(service))
+                    match = true;
 
-                if (!matchBase) {
+                if (!match)
                     continue;
-                }
 
-                if (motCleLibelle != null && !lib.contains(motCleLibelle.toUpperCase())) {
+                // Filtrage Inclusion
+                if (inclusion != null && !lib.contains(inclusion.toUpperCase()))
                     continue;
-                }
 
+                // Filtrage Exclusions
                 boolean exclu = false;
                 if (exclusions != null) {
                     for (String ex : exclusions) {
@@ -280,34 +230,42 @@ public class Calculateur {
                     total += Math.abs(getValeurNumerique(row.getCell(COL_DEP_MONTANT_TTC)));
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.err.println("Erreur calcul depenses generique : " + e.getMessage());
+        }
         return total;
     }
 
     /**
-     * Retourne la valeur texte d une cellule, ou une chaine vide si la cellule est nulle.
+     * Retourne la valeur texte d une cellule, ou une chaine vide si la cellule est
+     * nulle.
      */
     private String getValeurTexte(Cell c) {
-        if (c == null) return "";
+        if (c == null)
+            return "";
         return c.toString().trim();
     }
 
     /**
-     * Retourne la valeur numerique d une cellule, ou 0 si la cellule est nulle ou non numerique.
+     * Retourne la valeur numerique d une cellule, ou 0 si la cellule est nulle ou
+     * non numerique.
      */
     private double getValeurNumerique(Cell c) {
-        if (c == null) return 0;
+        if (c == null)
+            return 0;
         try {
-            if (c.getCellType() == CellType.NUMERIC) return c.getNumericCellValue();
+            if (c.getCellType() == CellType.NUMERIC)
+                return c.getNumericCellValue();
             if (c.getCellType() == CellType.FORMULA) {
-                 try {
-                     return c.getNumericCellValue(); // Rcupre le rsultat calcul mis en cache
-                 } catch (Exception e) {
-                     // Si pas numérique, on tombe dans le toString
-                 }
+                try {
+                    return c.getNumericCellValue(); // Rcupre le rsultat calcul mis en cache
+                } catch (Exception e) {
+                    // Si pas numérique, on tombe dans le toString
+                }
             }
             String s = c.toString().trim().replace(",", ".");
-            if (s.isEmpty()) return 0;
+            if (s.isEmpty())
+                return 0;
             return Double.parseDouble(s);
         } catch (Exception e) {
             return 0;

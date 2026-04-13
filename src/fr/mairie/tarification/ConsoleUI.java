@@ -65,62 +65,58 @@ public class ConsoleUI {
 
     /**
      * Dashboard scolaire : utilise l onglet Simulation de CALC DEP.xlsx.
-     * Les effectifs et prix factures viennent directement de ce fichier.
      */
     public static void afficherDashboardScolaire(Calculateur calc, Scanner sc) {
         printHeader("TABLEAU DE BORD : SCOLAIRE (source : onglet Simulation)");
 
-        // Lecture des effectifs et prix depuis l onglet Simulation
-        Map<String, Double> effectifs = calc.chargerEffectifsDepuisSimulation();
-        double recettes              = calc.calculerRecettesDepuisSimulation();
-        double coutRef               = calc.getCoutMoyenReference();
+        // Lecture unifiee des donnees depuis l onglet Simulation
+        Calculateur.SimulationData sim = calc.chargerDonneesSimulation();
+        Map<String, Double> effectifs = sim.getEffectifs();
+        double recettes              = sim.getRecettesTheoriques();
+        double coutRef               = sim.getCoutMoyenReference();
 
         double totalEnfants = 0;
-        for (double v : effectifs.values()) {
-            totalEnfants += v;
-        }
+        for (double v : effectifs.values()) totalEnfants += v;
 
-        double totalRepas        = totalEnfants * 140;
-        double depensesRef       = totalRepas * coutRef;
+        double totalRepas  = totalEnfants * 140;
+        double depensesRef = totalRepas * coutRef;
 
-        // Depenses reelles depuis les factures comptables (onglet 0)
+        // Depenses reelles (onglet 0) via la methode universelle
         String[] exclusions = {"ADOS", "LOISIRS", "COMMUNAL"};
-        double depensesReelles = calc.calculerDepensesPole("RESTMICH", "2-RE", null, exclusions);
+        double depensesReelles = calc.calculerDepenses("RESTMICH", "2-RE", null, exclusions);
 
         double coutReel = (totalRepas > 0) ? (depensesReelles / totalRepas) : 0;
         double tauxCouverture = (depensesRef > 0) ? (recettes / depensesRef * 100) : 0;
         double ecart = recettes - depensesRef;
 
-        System.out.printf("\n   Effectifs totaux (Simulation)    : %.0f enfants%n", totalEnfants);
-        System.out.printf("   Total repas annuels (x140j)      : %.0f repas%n", totalRepas);
-        System.out.println("   " + repeat("-", 48));
-        System.out.printf("   Cout moyen de reference (mairie) : %.2f euros%n", coutRef);
-        System.out.printf("   Cout reel constate (comptabilite): %.2f euros%n", coutReel);
-        System.out.println("   " + repeat("-", 48));
-        System.out.printf("   Depenses (base ref. 4.42)        : %.2f euros%n", depensesRef);
-        System.out.printf("   Recettes theoriques (Simulation) : %.2f euros%n", recettes);
-        System.out.printf("   Taux de couverture               : %.2f %%%n", tauxCouverture);
-        System.out.printf("   Ecart (Recettes - Depenses ref.) : %.2f euros%n", ecart);
+        printLine("Effectifs totaux (Simulation)", String.format("%.0f enfants", totalEnfants));
+        printLine("Total repas annuels (x140j)", String.format("%.0f repas", totalRepas));
+        printSeparator();
+        printLine("Cout moyen de reference (mairie)", String.format("%.2f euros", coutRef));
+        printLine("Cout reel constate (compta)", String.format("%.2f euros", coutReel));
+        printSeparator();
+        printLine("Depenses (base ref. 4.42)", String.format("%.2f euros", depensesRef));
+        printLine("Recettes theoriques (Simulation)", String.format("%.2f euros", recettes));
+        printLine("Taux de couverture", String.format("%.2f %%", tauxCouverture));
+        printLine("Ecart (Recettes - Depenses ref.)", String.format("%.2f euros", ecart));
 
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         sc.nextLine();
     }
 
     /**
-     * Dashboard generique pour les poles sans tableau de Simulation dedie.
-     * Affiche les depenses reelles uniquement.
+     * Dashboard generique pour les poles sans Simulation dediee.
      */
     public static void afficherPoleSimple(Calculateur calc, String nom, String antenna,
             String service, String include, String[] exclude, Scanner sc) {
         printHeader("TABLEAU DE BORD : " + nom);
 
-        double depenses = calc.calculerDepensesPole(antenna, service, include, exclude);
+        double depenses = calc.calculerDepenses(antenna, service, include, exclude);
 
-        System.out.printf("\n   Pole          : %s%n", nom);
-        System.out.printf("   Depenses      : %.2f euros%n", depenses);
-        System.out.println("\n   [NOTE] Recettes non calculees : pas de tableau de Simulation");
-        System.out.println("   pour ce pole dans CALC DEP.xlsx.");
-
+        printLine("Pole", nom);
+        printLine("Depenses reelles", String.format("%.2f euros", depenses));
+        
+        System.out.println("\n   [NOTE] Recettes non calculees (pas d onglet Simulation).");
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         sc.nextLine();
     }
@@ -151,6 +147,13 @@ public class ConsoleUI {
 
         System.out.println("\n   Appuyez sur Entree.");
         scanner.nextLine();
+    }
+
+    /**
+     * Affiche une ligne de donnees alignee.
+     */
+    public static void printLine(String label, String value) {
+        System.out.printf("   %-32s : %s%n", label, value);
     }
 
     private static String repeat(String s, int n) {

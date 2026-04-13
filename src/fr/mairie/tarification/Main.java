@@ -59,16 +59,15 @@ public class Main {
     private static void afficherDashboardLoisirs(Calculateur calc, Scanner sc) {
         ConsoleUI.printHeader("TABLEAU DE BORD : LOISIRS (Accueil loisirs)");
 
+        double depensesReelles = calc.calculerTotalDepensesLoisirs();
         Map<String, Double> details = calc.calculerDepensesReellesAccueilLoisirsParSegment();
-        double depensesReelles = 0;
-        for (double montant : details.values()) {
-            depensesReelles += montant;
-        }
 
-        System.out.printf("\n   Depenses reelles Accueil Loisirs : %.2f euros%n", depensesReelles);
+        ConsoleUI.printLine("Depenses reelles totales", String.format("%.2f euros", depensesReelles));
+        ConsoleUI.printSeparator();
         for (Map.Entry<String, Double> entry : details.entrySet()) {
-            System.out.printf("      - %s : %.2f euros%n", entry.getKey(), entry.getValue());
+            ConsoleUI.printLine("   - " + entry.getKey(), String.format("%.2f euros", entry.getValue()));
         }
+        
         System.out.println("\n   [SOURCE] onglet Simulation de CALC DEP.xlsx, colonne R");
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         sc.nextLine();

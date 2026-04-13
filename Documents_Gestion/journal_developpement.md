@@ -161,3 +161,35 @@ Le dashboard LOISIRS est desormais certifie avec les indicateurs suivants :
     - P'TIT PRINCE : 20 502,04 euros.
 
 Cette etape marque la fiabilisation du pilotage financier pour l'ensemble des poles enfance.
+
+---
+
+## Etape 9 : Refactorisation Universelle et Tracabilite des Donnees (13/04/2026 11h23)
+
+Afin de garantir la maintenance a long terme du projet, une refonte structurelle a ete menee, accompagnee d'un audit de tracabilite des donnees sources.
+
+### Refactorisation "Clean Code"
+- **Unification de la Lecture Simulation** : Creation de la classe `SimulationData` pour lire l'onglet Simulation une seule fois au lieu de deux. Cela optimise les ressources et assure la coherence des donnees entre les effectifs et les recettes.
+- **Calculateur Generique** : Remplacement des methodes specifiques par une methode universelle `calculerDepenses(antenne, service, inclusion, exclusions)`. Cette approche permet d'integrer de nouveaux poles (ex: Ados, Etudes) sans modifier le moteur de calcul.
+- **Standardisation UI** : L'affichage des tableaux de bord a ete harmonise via une methode `printLine` assurant un alignement parfait du texte et des valeurs.
+
+### Audit de Tracabilite (Verification au 13/04/2026)
+L'outil de diagnostic `VerificateurValeurs.java` a ete developpe pour confirmer l'origine exacte de chaque chiffre affiche dans les tableaux de bord.
+
+#### Pôle SCOLAIRE (Cantine)
+| Indicateur | Onglet Excel | Coordonnees (Lignes/Colonnes) |
+| :--- | :--- | :--- |
+| **Effectifs** | `Simulation` (8) | Lignes 8 a 16 / Colonne **D** |
+| **Tarifs unitaires** | `Simulation` (8) | Lignes 8 a 16 / Colonne **C** |
+| **Depenses reelles** | `Depenses restau 2025` (0) | Filtre RESTMICH sur Colonne **H** |
+
+#### Pôle LOISIRS (Accueil Loisirs)
+Toutes les depenses reelles proviennent de la colonne **R** de l'onglet **Simulation** (index 8).
+- **MDJ** : Ligne 42, Colonne R.
+- **P'TIT PRINCE** : Ligne 43, Colonne R.
+- **CLGAV** (Gavroche) : Ligne 44, Colonne R.
+- **CLJP1** (Jean-Pierre) : Ligne 45, Colonne R.
+- **CLLMICH** (L. Michel) : Ligne 46, Colonne R.
+
+### Resultat Final
+L'application est maintenant certifiee "Production-Ready" avec une tracabilite documentee et une architecture universelle.

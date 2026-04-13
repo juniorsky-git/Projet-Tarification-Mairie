@@ -8,3 +8,4 @@
 - [x] Intégration de la synthèse dans l'interface console
 - [x] Vérification de la cohérence avec les données manuelles
 - [x] Correction et finalisation du Dashboard LOISIRS (Dépenses réelles)
+- [x] Refactorisation universelle et audit de traçabilité des données
