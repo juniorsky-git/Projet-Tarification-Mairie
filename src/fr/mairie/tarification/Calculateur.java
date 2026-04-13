@@ -94,9 +94,6 @@ public class Calculateur {
                     codeTranche = col1;
                 }
 
-                if (codeTranche.isEmpty())
-                    continue;
-
                 double prixReel = getValeurNumerique(row.getCell(COL_SIMU_PRIX_REEL));
                 double nbEnfants = getValeurNumerique(row.getCell(COL_SIMU_NB_ENFANTS));
 
@@ -151,16 +148,21 @@ public class Calculateur {
     }
 
     private String determinerSegmentAccueilLoisirs(String ligne) {
-        if (ligne.contains("MDJ"))
+        if (ligne.contains("MDJ")) {
             return "MDJ";
-        if (ligne.contains("CLGAV"))
+        }
+        if (ligne.contains("CLGAV")) {
             return "CLGAV";
-        if (ligne.contains("CLJP1"))
+        }
+        if (ligne.contains("CLJP1")) {
             return "CLJP1";
-        if (ligne.contains("CLLMICH"))
+        }
+        if (ligne.contains("CLLMICH")) {
             return "CLLMICH";
-        if (ligne.contains("P'TIT") || ligne.contains("PTIT") || ligne.contains("PRINCE"))
+        }
+        if (ligne.contains("P'TIT") || ligne.contains("PTIT") || ligne.contains("PRINCE")) {
             return "P'TIT PRINCE";
+        }
         return null;
     }
 
@@ -203,13 +205,16 @@ public class Calculateur {
 
                 // Filtrage Antenne/Service
                 boolean match = false;
-                if (antenne != null && ant.equalsIgnoreCase(antenne))
+                if (antenne != null && ant.equalsIgnoreCase(antenne)) {
                     match = true;
-                if (service != null && ser.contains(service))
+                }
+                if (service != null && ser.contains(service)) {
                     match = true;
+                }
 
-                if (!match)
+                if (!match) {
                     continue;
+                }
 
                 // Filtrage Inclusion
                 if (inclusion != null && !lib.contains(inclusion.toUpperCase()))

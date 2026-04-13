@@ -76,7 +76,9 @@ public class ConsoleUI {
         double coutRef               = sim.getCoutMoyenReference();
 
         double totalEnfants = 0;
-        for (double v : effectifs.values()) totalEnfants += v;
+        for (double v : effectifs.values()) {
+            totalEnfants += v;
+        }
 
         double totalRepas  = totalEnfants * 140;
         double depensesRef = totalRepas * coutRef;
@@ -85,8 +87,15 @@ public class ConsoleUI {
         String[] exclusions = {"ADOS", "LOISIRS", "COMMUNAL"};
         double depensesReelles = calc.calculerDepenses("RESTMICH", "2-RE", null, exclusions);
 
-        double coutReel = (totalRepas > 0) ? (depensesReelles / totalRepas) : 0;
-        double tauxCouverture = (depensesRef > 0) ? (recettes / depensesRef * 100) : 0;
+        double coutReel = 0;
+        if (totalRepas > 0) {
+            coutReel = depensesReelles / totalRepas;
+        }
+
+        double tauxCouverture = 0;
+        if (depensesRef > 0) {
+            tauxCouverture = recettes / depensesRef * 100;
+        }
         double ecart = recettes - depensesRef;
 
         printLine("Effectifs totaux (Simulation)", String.format("%.0f enfants", totalEnfants));
@@ -158,7 +167,9 @@ public class ConsoleUI {
 
     private static String repeat(String s, int n) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++) sb.append(s);
+        for (int i = 0; i < n; i++) {
+            sb.append(s);
+        }
         return sb.toString();
     }
 }

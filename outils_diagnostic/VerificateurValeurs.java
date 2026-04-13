@@ -28,9 +28,13 @@ public class VerificateurValeurs {
             Sheet sSim = wb.getSheetAt(8);
             for (int i = 7; i <= 15; i++) { // Tranches A  EXT
                 Row row = sSim.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
                 String tranche = getCellString(row.getCell(1)); // Col B
-                if (tranche.isEmpty()) tranche = getCellString(row.getCell(0)); // Col A pour EXT
+                if (tranche.isEmpty()) {
+                    tranche = getCellString(row.getCell(0)); // Col A pour EXT
+                }
                 
                 double nbEnfants = getCellDouble(row.getCell(3)); // Col D
                 double prixReel = getCellDouble(row.getCell(2));  // Col C
@@ -47,7 +51,9 @@ public class VerificateurValeurs {
             int countScol = 0;
             for (int i = 1; i <= sDep.getLastRowNum(); i++) {
                 Row row = sDep.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
                 String antenna = getCellString(row.getCell(19)); // Col T
                 String service = getCellString(row.getCell(18)); // Col S
                 String libelle = getCellString(row.getCell(3)).toUpperCase();
@@ -74,12 +80,17 @@ public class VerificateurValeurs {
             double totalLoi = 0;
             for (int i = 1; i <= sSim.getLastRowNum(); i++) {
                 Row row = sSim.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
                 String text = getRowText(row).toUpperCase();
                 
                 String matchingSegment = null;
                 for (String seg : segments) {
-                    if (text.contains(seg)) { matchingSegment = seg; break; }
+                    if (text.contains(seg)) {
+                        matchingSegment = seg;
+                        break;
+                    }
                 }
                 
                 if (matchingSegment != null) {
@@ -99,23 +110,35 @@ public class VerificateurValeurs {
     }
 
     private static String getCellString(Cell c) {
-        if (c == null) return "";
+        if (c == null) {
+            return "";
+        }
         return c.toString().trim();
     }
 
     private static double getCellDouble(Cell c) {
-        if (c == null) return 0;
+        if (c == null) {
+            return 0;
+        }
         try {
-            if (c.getCellType() == CellType.NUMERIC) return c.getNumericCellValue();
-            if (c.getCellType() == CellType.FORMULA) return c.getNumericCellValue();
+            if (c.getCellType() == CellType.NUMERIC) {
+                return c.getNumericCellValue();
+            }
+            if (c.getCellType() == CellType.FORMULA) {
+                return c.getNumericCellValue();
+            }
             String s = c.toString().replace(",", ".");
             return Double.parseDouble(s);
-        } catch (Exception e) { return 0; }
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     private static String getRowText(Row row) {
         StringBuilder sb = new StringBuilder();
-        for (Cell c : row) sb.append(getCellString(c)).append(" ");
+        for (Cell c : row) {
+            sb.append(getCellString(c)).append(" ");
+        }
         return sb.toString();
     }
 }
