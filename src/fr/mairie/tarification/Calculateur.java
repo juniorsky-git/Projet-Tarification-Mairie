@@ -65,9 +65,13 @@ public class Calculateur {
     public SimulationData chargerDonneesSimulation() {
         SimulationData data = new SimulationData();
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-                Workbook wb = WorkbookFactory.create(fis)) {
+             Workbook wb = WorkbookFactory.create(fis)) {
 
-            Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
+            Sheet s = wb.getSheet("Simulation");
+            if (s == null) {
+                LogService.log("Onglet 'Simulation' introuvable dans " + FICHIER_DEPENSES);
+                return data;
+            }
 
             // 1. Cout de reference (fixe ligne 7, col E)
             Row refRow = s.getRow(7);
@@ -78,20 +82,26 @@ public class Calculateur {
             // 2. Parours des tranches
             for (int i = 6; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null)
+                if (row == null) {
                     continue;
+                }
 
                 String col0 = getValeurTexte(row.getCell(0));
                 String col1 = getValeurTexte(row.getCell(COL_SIMU_CODE_TRANCHE));
 
-                if (col0.equalsIgnoreCase("Total"))
+                if (col0.equalsIgnoreCase("Total")) {
                     break;
+                }
 
                 String codeTranche = "";
                 if (col0.equalsIgnoreCase("EXT")) {
                     codeTranche = "EXT";
                 } else if (!col1.isEmpty()) {
                     codeTranche = col1;
+                }
+
+                if (codeTranche.isEmpty()) {
+                    continue;
                 }
 
                 double prixReel = getValeurNumerique(row.getCell(COL_SIMU_PRIX_REEL));
@@ -103,7 +113,7 @@ public class Calculateur {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur chargement Simulation : " + e.getMessage());
+            LogService.error("Erreur critique lors du chargement de la Simulation", e);
         }
         return data;
     }
@@ -124,13 +134,19 @@ public class Calculateur {
     public Map<String, Double> calculerDepensesReellesAccueilLoisirsParSegment() {
         Map<String, Double> totaux = new HashMap<>();
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
-                Workbook wb = WorkbookFactory.create(fis)) {
+             Workbook wb = WorkbookFactory.create(fis)) {
 
-            Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
+            Sheet s = wb.getSheet("Simulation");
+            if (s == null) {
+                LogService.log("Onglet 'Simulation' introuvable");
+                return totaux;
+            }
+
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null)
+                if (row == null) {
                     continue;
+                }
 
                 String ligne = getRowTexte(row).toUpperCase();
                 String segment = determinerSegmentAccueilLoisirs(ligne);
@@ -142,7 +158,7 @@ public class Calculateur {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur lecture segments Loisirs : " + e.getMessage());
+            LogService.error("Erreur lecture segments Loisirs", e);
         }
         return totaux;
     }
@@ -194,6 +210,11 @@ public class Calculateur {
                 Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheetAt(0); // Onglet principal des depenses
+            if (s == null) {
+                LogService.log("Onglet 'Depenses restau 2025' introuvable");
+                return 0;
+            }
+
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
                 if (row == null)
@@ -217,8 +238,9 @@ public class Calculateur {
                 }
 
                 // Filtrage Inclusion
-                if (inclusion != null && !lib.contains(inclusion.toUpperCase()))
+                if (inclusion != null && !lib.contains(inclusion.toUpperCase())) {
                     continue;
+                }
 
                 // Filtrage Exclusions
                 boolean exclu = false;
@@ -236,7 +258,7 @@ public class Calculateur {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur calcul depenses generique : " + e.getMessage());
+            LogService.error("Erreur calcul depenses generique", e);
         }
         return total;
     }
