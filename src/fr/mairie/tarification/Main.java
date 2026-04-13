@@ -24,8 +24,9 @@ public class Main {
             System.out.println("\n   [1] Dashboard SCOLAIRE (Cantine)");
             System.out.println("   [2] Dashboard LOISIRS (Centre de loisirs)");
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
-            System.out.println("   [4] Consulter un tarif individuel");
-            System.out.println("   [5] Quitter");
+            System.out.println("   [4] Dashboard SÉJOURS (Vacances)");
+            System.out.println("   [5] Consulter un tarif individuel");
+            System.out.println("   [6] Quitter");
             System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
@@ -41,9 +42,12 @@ public class Main {
                     ConsoleUI.afficherDashboardAdos(calculateur, scanner);
                     break;
                 case "4":
-                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    ConsoleUI.afficherDashboardSejours(calculateur, scanner);
                     break;
                 case "5":
+                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    break;
+                case "6":
                     continuer = false;
                     System.out.println("\n   Au revoir !");
                     break;

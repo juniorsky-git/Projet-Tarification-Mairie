@@ -188,6 +188,35 @@ public class ConsoleUI {
     }
 
     /**
+     * Affiche le dashboard pour les Sejours de vacances.
+     */
+    public static void afficherDashboardSejours(Calculateur calc, Scanner scanner) {
+        System.out.println("\n" + repeat("=", 50));
+        System.out.println("   DASHBOARD : SEJOURS DE VACANCES");
+        System.out.println(repeat("=", 50));
+
+        Map<String, Double> sejours = calc.getDepensesParSejour();
+        double totalGénéral = 0;
+
+        System.out.println("\n   DETAIL DES DEPENSES PAR DESTINATION :");
+        if (sejours.isEmpty()) {
+            System.out.println("   Aucune donnee de sejour trouvee.");
+        } else {
+            for (Map.Entry<String, Double> entry : sejours.entrySet()) {
+                printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
+                totalGénéral += entry.getValue();
+            }
+        }
+
+        System.out.println(repeat("-", 50));
+        printLine("TOTAL GENERAL DES SEJOURS", String.format("%.2f EUR", totalGénéral));
+        System.out.println(repeat("-", 50));
+
+        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+        scanner.nextLine();
+    }
+
+    /**
      * Affiche une ligne de donnees alignee.
      */
     public static void printLine(String label, String value) {

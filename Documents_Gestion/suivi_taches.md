@@ -12,3 +12,4 @@
 - [x] Audit de robustesse et de sécurité (LogService, Stress-test)
 - [x] Module complet d'extraction Eau (Bi-semestre, Consos, Montants)
 - [x] Standardisation du style de code (Accolades {}, if/else explicites)
+- [x] Module Séjours de vacances (Détail par destination, Curie, Brassens)

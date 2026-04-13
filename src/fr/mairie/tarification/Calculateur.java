@@ -303,6 +303,43 @@ public class Calculateur {
     }
 
     /**
+     * Retourne le detail des depenses par destination (Sejours).
+     * Source : Onglet Simulation, Lignes 92 a 95.
+     * @return Map (Nom du sejour -> Total)
+     */
+    public Map<String, Double> getDepensesParSejour() {
+        Map<String, Double> sejours = new LinkedHashMap<>();
+        try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
+                Workbook wb = WorkbookFactory.create(fis)) {
+            Sheet s = wb.getSheet("Simulation");
+            if (s == null) return sejours;
+
+            // On parcourt les lignes de sejours : 92 a 95 (index 91 a 94)
+            for (int i = 91; i <= 94; i++) {
+                Row row = s.getRow(i);
+                if (row == null) continue;
+
+                String nom = getValeurTexte(row.getCell(1)); // Colonne B
+                if (nom.isEmpty() || nom.equals("0")) continue;
+
+                // On calcule le total de la ligne en additionnant les colonnes C a K (2 a 10)
+                // car la colonne L (Total) contient souvent des formules externes non cachees.
+                double totalLigne = 0;
+                for (int j = 2; j <= 10; j++) {
+                    totalLigne += Math.abs(getValeurNumerique(row.getCell(j)));
+                }
+
+                if (totalLigne > 0) {
+                    sejours.put(nom, totalLigne);
+                }
+            }
+        } catch (Exception e) {
+            LogService.error("Erreur lecture detail sejours", e);
+        }
+        return sejours;
+    }
+
+    /**
      * Retourne la valeur texte d une cellule, ou une chaine vide si la cellule est
      * nulle.
      */

@@ -212,3 +212,13 @@ Toutes les depenses reelles proviennent de la colonne **R** de l'onglet **Simula
 
 ### Résultat Final
 L'application est maintenant certifiée "Production-Ready" avec une traçabilité documentée, une architecture universelle et un moteur d'audit de données robuste.
+
+### Étape 12 : Intégration du pôle Séjours (Vacances)
+- **Objectif** : Créer un dashboard pour les séjours de vacances (Curie, Brassens, Espace Ados).
+- **Structure des Données** :
+    - Localisation : Onglet "Simulation", lignes 89 à 96.
+    - Destinations : Espace ADO, Curie, Bressens.
+- **Logique d'Extraction** :
+    - Calcul dynamique par séjour en sommant les colonnes C à K (Transport, Hébergement, Restauration).
+    - Cette approche garantit l'exactitude des chiffres même si les liens vers des fichiers Excel externes ne sont pas accessibles.
+- **Résultat** : Nouveau Dashboard [4] fonctionnel affichant un budget total de **107 127,71 €**, détaillé par destination.
