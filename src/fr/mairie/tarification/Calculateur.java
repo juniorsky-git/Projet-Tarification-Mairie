@@ -57,13 +57,18 @@ public class Calculateur {
             Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
             for (int i = 6; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) continue;
+                if (row == null){
+                        continue;
+                }
+                     
 
                 String col0 = getValeurTexte(row.getCell(0));
                 String col1 = getValeurTexte(row.getCell(COL_SIMU_CODE_TRANCHE));
 
                 // Arret sur la ligne Total
-                if (col0.equalsIgnoreCase("Total")) break;
+                if (col0.equalsIgnoreCase("Total")){
+                    break;
+                } 
 
                 // Determination du code de tranche
                 String codeTranche = "";
@@ -100,15 +105,21 @@ public class Calculateur {
             Sheet s = wb.getSheetAt(ONGLET_SIMULATION);
             for (int i = 6; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
 
                 String col0 = getValeurTexte(row.getCell(0));
                 String col1 = getValeurTexte(row.getCell(COL_SIMU_CODE_TRANCHE));
 
-                if (col0.equalsIgnoreCase("Total")) break;
+                if (col0.equalsIgnoreCase("Total")) {
+                    break;
+                }
 
                 boolean estTranche = col0.equalsIgnoreCase("EXT") || !col1.isEmpty();
-                if (!estTranche) continue;
+                if (!estTranche) {
+                    continue;
+                }
 
                 double prixReel  = getValeurNumerique(row.getCell(COL_SIMU_PRIX_REEL));
                 double nbEnfants = getValeurNumerique(row.getCell(COL_SIMU_NB_ENFANTS));
@@ -157,19 +168,29 @@ public class Calculateur {
             Sheet s = wb.getSheetAt(0); // Onglet principal des depenses
             for (int i = 1; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
-                if (row == null) continue;
+                if (row == null) {
+                    continue;
+                }
 
                 String ant = getValeurTexte(row.getCell(COL_DEP_ANTENNE));
                 String ser = getValeurTexte(row.getCell(COL_DEP_SERVICE));
                 String lib = getValeurTexte(row.getCell(COL_DEP_LIBELLE)).toUpperCase();
 
                 boolean matchBase = false;
-                if (antennaPrecise != null && ant.equalsIgnoreCase(antennaPrecise)) matchBase = true;
-                if (serviceType != null && ser.contains(serviceType)) matchBase = true;
+                if (antennaPrecise != null && ant.equalsIgnoreCase(antennaPrecise)) {
+                    matchBase = true;
+                }
+                if (serviceType != null && ser.contains(serviceType)) {
+                    matchBase = true;
+                }
 
-                if (!matchBase) continue;
+                if (!matchBase) {
+                    continue;
+                }
 
-                if (motCleLibelle != null && !lib.contains(motCleLibelle.toUpperCase())) continue;
+                if (motCleLibelle != null && !lib.contains(motCleLibelle.toUpperCase())) {
+                    continue;
+                }
 
                 boolean exclu = false;
                 if (exclusions != null) {
