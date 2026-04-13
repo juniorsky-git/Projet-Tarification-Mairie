@@ -194,5 +194,21 @@ Toutes les depenses reelles proviennent de la colonne **R** de l'onglet **Simula
 - **CLJP1** (Jean-Pierre) : Ligne 45, Colonne R.
 - **CLLMICH** (L. Michel) : Ligne 46, Colonne R.
 
-### Resultat Final
-L'application est maintenant certifiee "Production-Ready" avec une tracabilite documentee et une architecture universelle.
+### Étape 10 : Audit de Robustesse et Sécurisation (13/04/2026 à 12h00)
+- **Objectif** : Sécuriser l'application contre les pannes et les données corrompues.
+- **Réalisations** :
+    - Création de `LogService.java` : Journalisation des erreurs dans `logs/erreur.log`.
+    - Optimisation de `Calculateur.java` : Détection automatique des onglets et gestion des ressources Excel.
+    - Outil `AuditStressTest.java` : Simulation de fichiers manquants et de données invalides pour tester la stabilité.
+- **Résultat** : L'application ne crash plus en cas d'erreur de lecture et trace précisément l'origine du problème.
+
+### Étape 11 : Module Eau et Exportation Totale (13/04/2026 à 14h10)
+- **Objectif** : Extraire et analyser les données de consommation d'eau (onglet 'Conso eau').
+- **Réalisations** :
+    - Extraction bi-semestrielle détaillée (Colonnes 7/8 et 17/18) : montants TTC et m3.
+    - Exportation brute vers TXT (`ExportCompletSimulation`, `ExportCompletEau`) avec traitement des formules Excel pour récupérer les **valeurs calculées**.
+    - Démo multi-langage : script Python `analyse_conso_eau.py` pour vérification rapide.
+- **Traceabilité** : Les données du 1er semestre (Col 8) et 2nd semestre (Col 18) sont consolidées pour un total annuel par PDL.
+
+### Résultat Final
+L'application est maintenant certifiée "Production-Ready" avec une traçabilité documentée, une architecture universelle et un moteur d'audit de données robuste.

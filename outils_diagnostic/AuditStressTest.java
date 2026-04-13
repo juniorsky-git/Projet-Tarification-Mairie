@@ -14,6 +14,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class AuditStressTest {
 
     public static void main(String[] args) {
+        // Force la creation du fichier pour demonstration
+        LogService.log("Lancement de l'audit de robustesse par l'utilisateur.");
+        
         System.out.println("=== DEBUT DE L'AUDIT DE ROBUSTESSE (STRESS-TEST) ===\n");
 
         testFichierManquant();
