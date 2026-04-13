@@ -3,6 +3,7 @@ package fr.mairie.tarification;
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -264,25 +265,41 @@ public class Calculateur {
     }
 
     /**
-     * Retourne le total des depenses reelles pour le pole Ados.
-     * Source : Onglet Simulation, Ligne 75, Colonne T.
+     * Retourne le detail des depenses reelles pour le pole Ados.
+     * Source : Onglet Simulation, Ligne 74 (Titres) et 75 (Valeurs).
+     * @return Map ordonnee (Libelle -> Montant)
      */
-    public double getDepensesReellesAdos() {
+    public Map<String, Double> getDepensesAdosDetaillees() {
+        Map<String, Double> details = new LinkedHashMap<>();
         try (FileInputStream fis = new FileInputStream(FICHIER_DEPENSES);
                 Workbook wb = WorkbookFactory.create(fis)) {
             Sheet s = wb.getSheet("Simulation");
             if (s == null) {
-                return 0;
+                return details;
             }
-            Row r = s.getRow(74); // Ligne 75
-            if (r == null) {
-                return 0;
+            Row rowHeaders = s.getRow(73); // Ligne 74
+            Row rowValues = s.getRow(74);  // Ligne 75
+
+            if (rowHeaders == null || rowValues == null) {
+                return details;
             }
-            return getValeurNumerique(r.getCell(19)); // Colonne T
+
+            int nbCols = Math.min(rowHeaders.getLastCellNum(), rowValues.getLastCellNum());
+            for (int j = 2; j < nbCols; j++) {
+                Cell cHeader = rowHeaders.getCell(j);
+                Cell cValue = rowValues.getCell(j);
+                
+                String label = (cHeader == null) ? "Inconnu" : cHeader.toString().replace("\n", " ").trim();
+                double montant = Math.abs(getValeurNumerique(cValue));
+
+                if (!label.isEmpty() && montant > 0 && !label.equalsIgnoreCase("TOTAL")) {
+                    details.put(label, montant);
+                }
+            }
         } catch (Exception e) {
-            LogService.error("Erreur lecture depenses Ados", e);
-            return 0;
+            LogService.error("Erreur lecture detail depenses Ados", e);
         }
+        return details;
     }
 
     /**

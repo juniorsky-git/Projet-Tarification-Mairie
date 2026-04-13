@@ -163,17 +163,25 @@ public class ConsoleUI {
      */
     public static void afficherDashboardAdos(Calculateur calc, Scanner scanner) {
         System.out.println("\n" + repeat("=", 50));
-        System.out.println("   DASHBOARD : ESPACE ADOS (Diagnostic)");
+        System.out.println("   DASHBOARD : ESPACE ADOS (Detaille)");
         System.out.println(repeat("=", 50));
 
-        double depenses = calc.getDepensesReellesAdos();
+        Map<String, Double> details = calc.getDepensesAdosDetaillees();
+        double total = 0;
 
-        System.out.println("\n   CADRAGE FINANCIER :");
-        printLine("Depenses Reelles Totales", String.format("%.2f EUR", depenses));
-        System.out.println("   (Source: Simulation - Ligne 75)");
+        System.out.println("\n   DETAIL DES CHARGES REELLES :");
+        if (details.isEmpty()) {
+            System.out.println("   Aucune donnee de depense trouvee.");
+        } else {
+            for (Map.Entry<String, Double> entry : details.entrySet()) {
+                printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
+                total += entry.getValue();
+            }
+        }
 
-        System.out.println("\n   Note : Les volumes et recettes ne sont pas encore");
-        System.out.println("          disponibles pour ce pole.");
+        System.out.println(repeat("-", 50));
+        printLine("TOTAL GENERAL CALCULE", String.format("%.2f EUR", total));
+        System.out.println(repeat("-", 50));
 
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         scanner.nextLine();
