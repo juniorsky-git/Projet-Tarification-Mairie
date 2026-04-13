@@ -1,43 +1,37 @@
 # Outil de Tarification Municipale - Ville de Crosne
 
-Ce projet Java a ete developpe par un stagiaire (BUT 2 Informatique) pour automatiser l'analyse financiere des differents services municipaux.
+Ce projet Java automatise l'analyse financière des services municipaux en croisant les dépenses réelles et les recettes théoriques.
 
-## 1. Fonctionnalites de l'Application
+## 1. Fonctionnalités de l'Application
 
-### Dashboard Financier Multi-Poles
-L'outil permet de generer des tableaux de bord pour trois services distincts :
-- Restauration Scolaire (Louise Michel).
-- Centre de Loisirs (Gaveriaux).
-- Espace Ados.
+### Dashboard Financier Multi-Pôles
+L'application propose désormais 5 tableaux de bord distincts :
+1. **Scolaire** : Cantine Louise Michel.
+2. **Loisirs** : Centres de loisirs Gaviériaux.
+3. **Espace Ados** : Diagnostic des charges réelles (17k€).
+4. **Séjours** : Détail par destination (Curie, Brassens, Ados - 107k€).
+5. **Audit Eau** : Suivi des consommations et facturations fluides (via scripts de diagnostic).
 
-Pour chaque pole, l'application calcule automatiquement :
-- Le total des depenses TTC a partir des factures comptables de l'exercice 2025.
-- Les recettes theoriques previsionnelles basees sur les effectifs par tranche tarifaire.
-- Le taux de couverture economique (Recettes / Depenses).
-
-### Grille Tarifaire Dynamique
-L'application integre une grille de prix multi-services (Repas, Garde, Ados, Loisirs, Etudes) bassee sur les quotients familiaux (CAF). L'utilisateur peut consulter les tarifs individuels en saisissant simplement un Quotient Familial.
+### Consultation Tarifaire
+Un moteur de recherche permet de trouver instantanément le tarif applicable à une famille pour tous les services à partir de son **Quotient Familial (QF)**.
 
 ## 2. Structure Technique
 
-### Dossiers du Projet
-- src : Fichiers sources Java (Calculateur, Main, Modeles).
-- lib : Bibliatheques externes (Apache POI pour la lecture Excel).
-- Donnees : Fichiers sources de travail (Extractions Ciril et Dataviz).
-- Documents_Gestion : Rapports de calculs, journal de developpement et walkthrough.
-- outils_diagnostic : Scripts d'inspection utilises pour auditer les fichiers Excel.
+### Dossiers Clés
+- `src` : Source Java (Calculateur, UI).
+- `outils_diagnostic` : **CRITIQUE**. Contient les outils d'audit (Java et Python) permettant de vérifier les données Excel avant intégration.
+- `Donnees/Autres/CALC DEP.xlsx` : **Source Unique de Vérité**. L'application lit principalement l'onglet **Simulation**.
 
-### Bibliothèques Utilisées
-- Apache POI v5.3.0 : Manipulation des fichiers .xlsx.
-- Log4j2 : Gestion des logs (optionnel).
+### Logique d'Extraction (Maintenance)
+Pour les pôles complexes (Ados, Séjours), l'application ne se contente pas de lire la cellule "Total" d'Excel (souvent erronée car liée à des fichiers externes absents). 
+**Elle recalcule manuellement la somme des colonnes C à K** dans le code Java (`Calculateur.java`) pour garantir l'exactitude des chiffres affichés.
 
-## 3. Guide de Lancement
-Pour compiler et executer l'application, l'utilisateur doit disposer de Java (JDK 25 ou superieur) et utiliser le script de build PowerShell :
-./build.ps1 run
+## 3. Guide de Maintenance
+Si vous devez modifier les sources de données :
+1. Consultez le `Documents_Gestion/journal_developpement.md` pour comprendre l'historique des étapes.
+2. Utilisez les outils dans `outils_diagnostic/` (ex: `DiagnosticSejours.java`) pour valider les nouveaux numéros de lignes/colonnes dans Excel.
+3. Recompilez avec `./build.ps1 run` ou via la commande `javac` standard.
 
-## 4. Analyse des Donnees
-Le projet repose sur l'exploitation croisee de deux fichiers Excel :
-- CALC DEP.xlsx (Synthese des engagements et reservations).
-- Feuille_dataviz.xlsx (Volumes d'usagers suivis par le pole enfance).
-
-L'outil permet de determiner avec precision si les tarifs municipaux permettent l'autofinancement des depenses directes de chaque service.
+## 4. Prérequis
+- Java 8 ou supérieur.
+- Bibliothèques Apache POI (incluses dans `lib/`).
