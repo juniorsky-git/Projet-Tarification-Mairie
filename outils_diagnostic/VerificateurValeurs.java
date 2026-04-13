@@ -52,7 +52,7 @@ public class VerificateurValeurs {
                 String service = getCellString(row.getCell(18)); // Col S
                 String libelle = getCellString(row.getCell(3)).toUpperCase();
                 
-                if (antenna.equalsIgnoreCase("RESTMICH") && service.contains("2-RE")) {
+                if (antenna.equalsIgnoreCase("RESTMICH") || service.contains("2-RE")) {
                    // Exclusions (ados, loisirs)
                    if (!libelle.contains("ADOS") && !libelle.contains("LOISIRS") && !libelle.contains("COMMUNAL")) {
                        double montant = Math.abs(getCellDouble(row.getCell(7))); // Col H

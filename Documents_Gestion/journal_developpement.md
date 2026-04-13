@@ -181,7 +181,10 @@ L'outil de diagnostic `VerificateurValeurs.java` a ete developpe pour confirmer 
 | :--- | :--- | :--- |
 | **Effectifs** | `Simulation` (8) | Lignes 8 a 16 / Colonne **D** |
 | **Tarifs unitaires** | `Simulation` (8) | Lignes 8 a 16 / Colonne **C** |
-| **Depenses reelles** | `Depenses restau 2025` (0) | Filtre RESTMICH sur Colonne **H** |
+| **Depenses reelles** | `Depenses restau 2025` (0) | Filtre **OU** (RESTMICH ou 2-RE) sur Colonne **H** |
+
+> [!IMPORTANT]
+> **Note sur le filtrage SCOLAIRE** : L'utilisation d'une logique **OU** (Antenne OU Service) est indispensable pour capturer l'integralite des factures (37 lignes pour 626 861,31 €). Une logique **ET** restreindrait le perimetre a 12 lignes seulement, faussant le cout de revient du repas (0,39 € au lieu de 3,97 €).
 
 #### Pôle LOISIRS (Accueil Loisirs)
 Toutes les depenses reelles proviennent de la colonne **R** de l'onglet **Simulation** (index 8).
