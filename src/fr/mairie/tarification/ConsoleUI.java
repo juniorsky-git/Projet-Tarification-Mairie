@@ -64,73 +64,6 @@ public class ConsoleUI {
     }
 
     /**
-     * Dashboard scolaire : utilise l onglet Simulation de CALC DEP.xlsx.
-     */
-    public static void afficherDashboardScolaire(Calculateur calc, Scanner sc) {
-        printHeader("TABLEAU DE BORD : SCOLAIRE (source : onglet Simulation)");
-
-        // Lecture unifiee des donnees depuis l onglet Simulation
-        Calculateur.SimulationData sim = calc.chargerDonneesSimulation();
-        Map<String, Double> effectifs = sim.getEffectifs();
-        double recettes              = sim.getRecettesTheoriques();
-        double coutRef               = sim.getCoutMoyenReference();
-
-        double totalEnfants = 0;
-        for (double v : effectifs.values()) {
-            totalEnfants += v;
-        }
-
-        double totalRepas  = totalEnfants * 140;
-        double depensesRef = totalRepas * coutRef;
-
-        // Depenses reelles (onglet 0) via la methode universelle
-        String[] exclusions = {"ADOS", "LOISIRS", "COMMUNAL"};
-        double depensesReelles = calc.calculerDepenses("RESTMICH", "2-RE", null, exclusions);
-
-        double coutReel = 0;
-        if (totalRepas > 0) {
-            coutReel = depensesReelles / totalRepas;
-        }
-
-        double tauxCouverture = 0;
-        if (depensesRef > 0) {
-            tauxCouverture = recettes / depensesRef * 100;
-        }
-        double ecart = recettes - depensesRef;
-
-        printLine("Effectifs totaux (Simulation)", String.format("%.0f enfants", totalEnfants));
-        printLine("Total repas annuels (x140j)", String.format("%.0f repas", totalRepas));
-        printSeparator();
-        printLine("Cout moyen de reference (mairie)", String.format("%.2f euros", coutRef));
-        printLine("Cout reel constate (compta)", String.format("%.2f euros", coutReel));
-        printSeparator();
-        printLine("Depenses (base ref. 4.42)", String.format("%.2f euros", depensesRef));
-        printLine("Recettes theoriques (Simulation)", String.format("%.2f euros", recettes));
-        printLine("Taux de couverture", String.format("%.2f %%", tauxCouverture));
-        printLine("Ecart (Recettes - Depenses ref.)", String.format("%.2f euros", ecart));
-
-        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
-        sc.nextLine();
-    }
-
-    /**
-     * Dashboard generique pour les poles sans Simulation dediee.
-     */
-    public static void afficherPoleSimple(Calculateur calc, String nom, String antenna,
-            String service, String include, String[] exclude, Scanner sc) {
-        printHeader("TABLEAU DE BORD : " + nom);
-
-        double depenses = calc.calculerDepenses(antenna, service, include, exclude);
-
-        printLine("Pole", nom);
-        printLine("Depenses reelles", String.format("%.2f euros", depenses));
-        
-        System.out.println("\n   [NOTE] Recettes non calculees (pas d onglet Simulation).");
-        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
-        sc.nextLine();
-    }
-
-    /**
      * Consultation individuelle du tarif selon le Quotient Familial saisi.
      */
     public static void consulterTarif(TarificationService service, List<Tarif> grille, Scanner scanner) {
@@ -159,89 +92,60 @@ public class ConsoleUI {
     }
 
     /**
-     * Affiche le dashboard simplifie pour l'Espace Ados (Depenses uniquement).
+     * Dashboard générique utilisé pour tous les pôles.
+     * Affiche les dépenses par nature, les recettes et le taux de couverture.
      */
-    public static void afficherDashboardAdos(Calculateur calc, Scanner scanner) {
-        System.out.println("\n" + repeat("=", 50));
-        System.out.println("   DASHBOARD : ESPACE ADOS (Detaille)");
-        System.out.println(repeat("=", 50));
+    public static void afficherDashboardPole(Calculateur calc, Scanner scanner, String pole, double multiplicateur) {
+        printHeader("TABLEAU DE BORD : " + pole.toUpperCase());
+        
+        double depensesTotales = calc.calculerTotalDepenses(pole);
+        double recettesTotales = calc.calculerRecettesAnnuelles(pole, multiplicateur);
+        Map<String, Double> details = calc.getDepensesDetaillees(pole);
 
-        Map<String, Double> details = calc.getDepensesAdosDetaillees();
-        double total = 0;
-
-        System.out.println("\n   DETAIL DES CHARGES REELLES :");
+        System.out.println("\n   DETAIL DES CHARGES REELLES (PAR NATURE) :");
         if (details.isEmpty()) {
             System.out.println("   Aucune donnee de depense trouvee.");
         } else {
             for (Map.Entry<String, Double> entry : details.entrySet()) {
                 printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
-                total += entry.getValue();
             }
         }
 
-        System.out.println(repeat("-", 50));
-        printLine("TOTAL GENERAL CALCULE", String.format("%.2f EUR", total));
-        System.out.println(repeat("-", 50));
+        printSeparator();
+        printLine("TOTAL DEPENSES REELLES", String.format("%.2f EUR", depensesTotales));
+        printLine("TOTAL RECETTES CALCULEES", String.format("%.2f EUR", recettesTotales));
+        
+        double taux = (depensesTotales > 0) ? (recettesTotales / depensesTotales * 100) : 0;
+        printLine("TAUX DE COUVERTURE", String.format("%.2f %%", taux));
+        printSeparator();
 
+        System.out.println("\n   [PARAMETRE] Recettes calculees sur " + (multiplicateur > 1 ? (int)multiplicateur + " unites annuelles" : "base forfaitaire"));
         System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
         scanner.nextLine();
     }
 
-    /**
-     * Affiche le dashboard pour les Sejours de vacances.
-     */
-    public static void afficherDashboardSejours(Calculateur calc, Scanner scanner) {
-        System.out.println("\n" + repeat("=", 50));
-        System.out.println("   DASHBOARD : SEJOURS DE VACANCES");
-        System.out.println(repeat("=", 50));
-
-        Map<String, Double> sejours = calc.getDepensesParSejour();
-        double totalGénéral = 0;
-
-        System.out.println("\n   DETAIL DES DEPENSES PAR DESTINATION :");
-        if (sejours.isEmpty()) {
-            System.out.println("   Aucune donnee de sejour trouvee.");
-        } else {
-            for (Map.Entry<String, Double> entry : sejours.entrySet()) {
-                printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
-                totalGénéral += entry.getValue();
-            }
-        }
-
-        System.out.println(repeat("-", 50));
-        printLine("TOTAL GENERAL DES SEJOURS", String.format("%.2f EUR", totalGénéral));
-        System.out.println(repeat("-", 50));
-
-        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
-        scanner.nextLine();
+    public static void afficherDashboardScolaire(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Restauration", 140);
     }
-    /**
-     * Affiche le dashboard pour les Etudes surveillees.
-     */
-    public static void afficherDashboardEtudes(Calculateur calc, Scanner scanner) {
-        System.out.println("\n" + repeat("=", 50));
-        System.out.println("   DASHBOARD : ETUDES SURVEILLEES");
-        System.out.println(repeat("=", 50));
 
-        Map<String, Double> details = calc.getDepensesEtudesDetaillees();
-        double total = 0;
+    public static void afficherDashboardLoisirs(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Accueil de Loisirs", 1);
+    }
 
-        System.out.println("\n   DETAIL DES CHARGES REELLES :");
-        if (details.isEmpty()) {
-            System.out.println("   Aucune donnee trouvee.");
-        } else {
-            for (Map.Entry<String, Double> entry : details.entrySet()) {
-                printLine(entry.getKey(), String.format("%.2f EUR", entry.getValue()));
-                total += entry.getValue();
-            }
-        }
+    public static void afficherDashboardAdos(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Espace Ados", 1);
+    }
 
-        System.out.println(repeat("-", 50));
-        printLine("TOTAL BUDGET ETUDES", String.format("%.2f EUR", total));
-        System.out.println(repeat("-", 50));
+    public static void afficherDashboardSejours(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Sejours", 1);
+    }
 
-        System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
-        scanner.nextLine();
+    public static void afficherDashboardEtudes(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Etudes surveillees", 10);
+    }
+
+    public static void afficherDashboardPeriscolaire(Calculateur calc, Scanner sc) {
+        afficherDashboardPole(calc, sc, "Accueil periscolaire", 10);
     }
 
 
