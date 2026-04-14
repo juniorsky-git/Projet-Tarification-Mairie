@@ -3,11 +3,11 @@
 $Action = $args[0]
 if ($null -eq $Action) { $Action = "jar" }
 
-# Chemins
-$JavaHome = "C:\Users\Junior\Desktop\sqldeveloper\jdk\jre\bin"
-$Javac = "$JavaHome\javac.exe"
-$Java = "$JavaHome\java.exe"
-$Jar = "$JavaHome\jar.exe"
+# Chemins (Forçage vers Java 21 pour compatibilité PDF)
+$JavaBin = "C:\Users\stagedg2\.antigravity\extensions\redhat.java-1.53.0-win32-x64\jre\21.0.10-win32-x86_64\bin"
+$Javac = "$JavaBin\javac.exe"
+$Java  = "$JavaBin\java.exe"
+$Jar   = "$JavaBin\jar.exe"
 
 $SrcPath = "src/fr/mairie/tarification/"
 $BuildPath = "build"

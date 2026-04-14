@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -121,6 +122,20 @@ public class PdfExportService {
             cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 75);
             cs.showText("VILLE DE CROSNE");
             cs.endText();
+
+            // Ajout du logo en haut à droite (si le fichier existe)
+            try {
+                File logoFile = new File("Crosne-LOGO.png");
+                if (logoFile.exists()) {
+                    PDImageXObject logo = PDImageXObject.createFromFile("Crosne-LOGO.png", doc);
+                    // Dimensions : largeur 100, hauteur calculée proportionnellement
+                    float scale = 100f / logo.getWidth();
+                    cs.drawImage(logo, PAGE_WIDTH - MARGIN - 100, PAGE_HEIGHT - 120, 100, logo.getHeight() * scale);
+                }
+            } catch (Exception e) {
+                // On continue sans le logo si une erreur survient
+                LogService.error("Logo introuvable ou illisible, passage outre.", e);
+            }
 
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA, 13);

@@ -40,7 +40,7 @@ L'application intègre un moteur d'exportation professionnel (`PdfExportService`
 
 Pour un détail exhaustif des méthodes de dessin PDF et de la logique algorithmique retenue, consultez mes guides techniques :
 - [PDF_EXPORT_GUIDE.md](file:///c:/Users/stagedg2/Projet_mairie_outil_tarification/PDF_EXPORT_GUIDE.md) : Guide d'utilisation et structure.
-- [PDF_EXPORT_METHODOLOGY.md](file:///c:/Users/stagedg2/Projet_mairie_outil_tarification/PDF_EXPORT_METHODOLOGY.md) : Analyse approfondie des algorithmes de rendu.
+- [PDF_EXPORT_METHODOLOGY.md](file:///c:/Users/stagedg2/Projet_mairie_outil_tarification/PDF_EXPORT_METHODOLOGY.md) : Analyse approfondie des algorithmes de rendu et de la gestion des images.
 
 ## 5. Maintenance et Standards
 - **Auteur principal** : Séri-khane YOLOU.

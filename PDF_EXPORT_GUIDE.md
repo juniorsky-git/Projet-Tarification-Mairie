@@ -1,10 +1,8 @@
-# Guide Technique : Système d'Exportation PDF (v1.2)
+# Guide Technique : Système d'Exportation PDF
 
-Ce document détaille de manière exhaustive l'architecture et la logique d'implémentation du service d'exportation PDF conçu pour la mairie de Crosne.
+Ce document détaille l'architecture et la logique d'implémentation du service d'exportation PDF conçu pour la mairie de Crosne.
 
 **Auteur :** Séri-khane YOLOU
-**Date :** 14 Avril 2026
-**Librairie :** Apache PDFBox 2.0.31
 
 ---
 
@@ -60,8 +58,14 @@ Pour garantir un rendu "Premium", le service utilise un système de couleurs et 
 
 ---
 
-## 5. Maintenance et Évolutivité
+## 5. Gestion des Images et Maintenance
 
+### Intégration du Logo (Crosne-LOGO.png)
+J'ai implémenté l'insertion d'images via `PDImageXObject`. 
+- **Aspect Ratio** : Un calcul de mise à l'échelle automatique garantit que le logo n'est jamais déformé, peu importe sa taille d'origine.
+- **Robustesse** : Le code teste l'existence du fichier avant de tenter de l'importer. Si le logo est supprimé par erreur, le rapport est quand même généré, ce qui évite de bloquer l'application.
+
+### Évolutivité
 Pour ajouter un nouveau pôle, il suffit de modifier la constante `POLES_CONFIG`. Le système s'adaptera automatiquement :
 - Ajout automatique d'une nouvelle page.
 - Calcul automatique des recettes via le `Calculateur`.
