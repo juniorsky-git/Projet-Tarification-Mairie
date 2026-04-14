@@ -4,7 +4,7 @@ $Action = $args[0]
 if ($null -eq $Action) { $Action = "jar" }
 
 # Chemins
-$JavaHome = "C:\Users\stagedg2\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.2.10-hotspot\bin"
+$JavaHome = "C:\Users\Junior\Desktop\sqldeveloper\jdk\jre\bin"
 $Javac = "$JavaHome\javac.exe"
 $Java = "$JavaHome\java.exe"
 $Jar = "$JavaHome\jar.exe"

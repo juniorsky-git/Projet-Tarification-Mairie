@@ -24,11 +24,12 @@ public class Main {
             System.out.println("   [1] Dashboard SCOLAIRE (Cantine)");
             System.out.println("   [2] Dashboard LOISIRS (Centre de loisirs)");
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
-            System.out.println("   [4] Dashboard SÉJOURS (Vacances)");
-            System.out.println("   [5] Dashboard ÉTUDES (Surveillées)");
-            System.out.println("   [6] Dashboard PÉRISCOLAIRE");
+            System.out.println("   [4] Dashboard SEJOURS (Vacances)");
+            System.out.println("   [5] Dashboard ETUDES (Surveillees)");
+            System.out.println("   [6] Dashboard PERISCOLAIRE");
             System.out.println("   [7] Consulter un tarif individuel");
-            System.out.println("   [8] Quitter");
+            System.out.println("   [9] Exporter le rapport PDF complet");
+            System.out.println("   [0] Quitter");
             System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
@@ -55,7 +56,20 @@ public class Main {
                 case "7":
                     ConsoleUI.consulterTarif(service, grilleRef, scanner);
                     break;
-                case "8":
+                case "9":
+                    System.out.println("\n   Generation du rapport PDF en cours...");
+                    try {
+                        PdfExportService pdfService = new PdfExportService();
+                        String chemin = pdfService.genererRapport(calculateur, grilleRef);
+                        System.out.println("   Rapport genere avec succes !");
+                        System.out.println("   Fichier : " + chemin);
+                    } catch (Exception e) {
+                        System.out.println("   Erreur lors de la generation PDF : " + e.getMessage());
+                    }
+                    System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
+                    scanner.nextLine();
+                    break;
+                case "0":
                     continuer = false;
                     System.out.println("\n   Au revoir !");
                     break;

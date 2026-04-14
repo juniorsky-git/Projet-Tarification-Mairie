@@ -23,8 +23,8 @@ DIST_PATH  = dist/
 PACKAGE_NAME = fr.mairie.tarification
 MAIN_CLASS   = fr.mairie.tarification.Main
 
-# Librairies Apache POI (tous les JARs dans lib/)
-LIB_JARS = lib/poi-5.3.0.jar$(SEP)lib/poi-ooxml-5.3.0.jar$(SEP)lib/poi-ooxml-lite-5.3.0.jar$(SEP)lib/commons-collections4-4.4.jar$(SEP)lib/commons-compress-1.26.1.jar$(SEP)lib/commons-io-2.16.1.jar$(SEP)lib/log4j-api-2.23.1.jar$(SEP)lib/SparseBitSet-1.3.jar$(SEP)lib/xmlbeans-5.2.1.jar
+# Librairies Apache POI + PDFBox (tous les JARs dans lib/)
+LIB_JARS = lib/pdfbox.jar$(SEP)lib/poi.jar$(SEP)lib/poi-ooxml.jar$(SEP)lib/poi-ooxml-lite.jar$(SEP)lib/commons-collections4.jar$(SEP)lib/commons-compress.jar$(SEP)lib/commons-io.jar$(SEP)lib/log4j-api.jar$(SEP)lib/log4j-core.jar$(SEP)lib/slf4j-api.jar$(SEP)lib/SparseBitSet.jar$(SEP)lib/xmlbeans.jar
 
 # Flags
 JCFLAGS  = -encoding UTF-8 -d build -cp "build$(SEP)$(LIB_JARS)" -sourcepath src
@@ -36,6 +36,7 @@ SOURCES = $(SRC_PATH)Tarif.java \
           $(SRC_PATH)TarificationService.java \
           $(SRC_PATH)ExcelReader.java \
           $(SRC_PATH)Calculateur.java \
+          $(SRC_PATH)PdfExportService.java \
           $(SRC_PATH)ConsoleUI.java \
           $(SRC_PATH)Main.java
 
@@ -44,6 +45,7 @@ CLASSES = $(BUILD_PATH)Tarif.class \
           $(BUILD_PATH)TarificationService.class \
           $(BUILD_PATH)ExcelReader.class \
           $(BUILD_PATH)Calculateur.class \
+          $(BUILD_PATH)PdfExportService.class \
           $(BUILD_PATH)ConsoleUI.class \
           $(BUILD_PATH)Main.class
 
@@ -95,17 +97,25 @@ $(BUILD_PATH)ExcelReader.class: $(SRC_PATH)ExcelReader.java $(BUILD_PATH)Tarif.c
 $(BUILD_PATH)Calculateur.class: $(SRC_PATH)Calculateur.java $(BUILD_PATH)DonneesTarifs.class
 	$(JC) $(JCFLAGS) $(SRC_PATH)Calculateur.java
 
-# Interface Console Épurée
+# Interface Console Epuree
 $(BUILD_PATH)ConsoleUI.class: $(SRC_PATH)ConsoleUI.java
 	$(JC) $(JCFLAGS) $(SRC_PATH)ConsoleUI.java
 
-# Point d'entrée (dépend de tout)
+# Export PDF (Apache PDFBox)
+$(BUILD_PATH)PdfExportService.class: $(SRC_PATH)PdfExportService.java \
+	$(BUILD_PATH)Calculateur.class \
+	$(BUILD_PATH)DonneesTarifs.class \
+	$(BUILD_PATH)Tarif.class
+	$(JC) $(JCFLAGS) $(SRC_PATH)PdfExportService.java
+
+# Point d'entree (depend de tout)
 $(BUILD_PATH)Main.class: $(SRC_PATH)Main.java \
 	$(BUILD_PATH)Tarif.class \
 	$(BUILD_PATH)DonneesTarifs.class \
 	$(BUILD_PATH)TarificationService.class \
 	$(BUILD_PATH)ExcelReader.class \
 	$(BUILD_PATH)Calculateur.class \
+	$(BUILD_PATH)PdfExportService.class \
 	$(BUILD_PATH)ConsoleUI.class
 	$(JC) $(JCFLAGS) $(SRC_PATH)Main.java
 
