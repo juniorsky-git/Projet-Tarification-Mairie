@@ -168,7 +168,8 @@ public class PdfExportService {
      * Dessine le texte informatif sur la page de garde.
      */
     private void dessinerContenuGarde(PDPageContentStream cs) throws IOException {
-        float y = PAGE_HEIGHT - 270;
+        // On descend y de 300 points (au lieu de 270) pour laisser plus d'espace avec le bandeau bleu
+        float y = PAGE_HEIGHT - 300;
         cs.setNonStrokingColor(BLEU_MAIRIE);
         cs.beginText();
         cs.setFont(PDType1Font.HELVETICA_BOLD, 13);
