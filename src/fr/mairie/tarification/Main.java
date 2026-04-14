@@ -1,26 +1,46 @@
 package fr.mairie.tarification;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Point d entree de l application de tarification municipale.
- * Gere le menu interactif et la navigation entre les tableaux de bord.
+ * Point d'entree principal de l'application de tarification municipale.
+ * 
+ * Cette classe initialise les services de calcul et de tarification, 
+ * charge la grille de reference, et gere la boucle principale du menu 
+ * interactif.
+ * 
+ * Elle permet a l'utilisateur de naviguer entre les 6 pôles de dashboards 
+ * (Scolaire, Loisirs, Ados, Sejours, Etudes, Periscolaire) et l'outil de 
+ * consultation tarifaire.
+ * 
+ * @author Séri-khane YOLOU (Crosne 2025)
+ * @version 1.2
  */
 public class Main {
 
+    /**
+     * Methode principale executee au lancement de l'application.
+     * 
+     * @param args Arguments de la ligne de commande (non utilises).
+     */
     public static void main(String[] args) {
+        // Initialisation des composants core
         Calculateur calculateur = new Calculateur();
         TarificationService service = new TarificationService();
         Scanner scanner = new Scanner(System.in);
+        
+        // Chargement des tarifs de reference depuis DonneesTarifs
         List<Tarif> grilleRef = DonneesTarifs.chargerTarifsReference();
 
         boolean continuer = true;
 
+        // Boucle principale du menu
         while (continuer) {
             ConsoleUI.clearConsole();
             ConsoleUI.printLogo();
+            
+            // Affichage des options numerotees
             System.out.println("   [1] Dashboard SCOLAIRE (Cantine)");
             System.out.println("   [2] Dashboard LOISIRS (Centre de loisirs)");
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
@@ -34,6 +54,7 @@ public class Main {
 
             String choix = scanner.nextLine();
 
+            // Gestion des choix utilisateur selon une structure switch/case
             switch (choix) {
                 case "1":
                     ConsoleUI.afficherDashboardScolaire(calculateur, scanner);
@@ -74,10 +95,14 @@ public class Main {
                     System.out.println("\n   Au revoir !");
                     break;
                 default:
-                    System.out.println("\n   Choix invalide.");
+                    System.out.println("\n   Choix invalide. Veuillez saisir un chiffre entre 1 et 8.");
+                    System.out.println("   Appuyez sur Entree pour continuer.");
                     scanner.nextLine();
+                    break;
             }
         }
+        
+        // Fermeture propre des ressources
         scanner.close();
     }
 }
