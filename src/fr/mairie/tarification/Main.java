@@ -11,8 +11,8 @@ import java.util.Scanner;
  * interactif.
  * 
  * Elle permet a l'utilisateur de naviguer entre les 6 pôles de dashboards 
- * (Scolaire, Loisirs, Ados, Sejours, Etudes, Periscolaire) et l'outil de 
- * consultation tarifaire.
+ * (Scolaire, Loisirs, Ados, Sejours, Etudes, Periscolaire), l'outil de 
+ * consultation tarifaire et l'exportation PDF.
  * 
  * @author Séri-khane YOLOU (Crosne 2025)
  * @version 1.2
@@ -44,12 +44,12 @@ public class Main {
             System.out.println("   [1] Dashboard SCOLAIRE (Cantine)");
             System.out.println("   [2] Dashboard LOISIRS (Centre de loisirs)");
             System.out.println("   [3] Dashboard ADOS (Espace Ados)");
-            System.out.println("   [4] Dashboard SEJOURS (Vacances)");
-            System.out.println("   [5] Dashboard ETUDES (Surveillees)");
-            System.out.println("   [6] Dashboard PERISCOLAIRE");
+            System.out.println("   [4] Dashboard SÉJOURS (Vacances)");
+            System.out.println("   [5] Dashboard ÉTUDES (Surveillées)");
+            System.out.println("   [6] Dashboard PÉRISCOLAIRE");
             System.out.println("   [7] Consulter un tarif individuel");
-            System.out.println("   [9] Exporter le rapport PDF complet");
-            System.out.println("   [0] Quitter");
+            System.out.println("   [8] Générer le rapport PDF complet");
+            System.out.println("   [9] Quitter");
             System.out.print("\n   Votre choix : ");
 
             String choix = scanner.nextLine();
@@ -77,25 +77,15 @@ public class Main {
                 case "7":
                     ConsoleUI.consulterTarif(service, grilleRef, scanner);
                     break;
-                case "9":
-                    System.out.println("\n   Generation du rapport PDF en cours...");
-                    try {
-                        PdfExportService pdfService = new PdfExportService();
-                        String chemin = pdfService.genererRapport(calculateur, grilleRef);
-                        System.out.println("   Rapport genere avec succes !");
-                        System.out.println("   Fichier : " + chemin);
-                    } catch (Exception e) {
-                        System.out.println("   Erreur lors de la generation PDF : " + e.getMessage());
-                    }
-                    System.out.println("\n   Appuyez sur Entree pour revenir au menu.");
-                    scanner.nextLine();
+                case "8":
+                    ConsoleUI.gererExportPDF(calculateur, grilleRef, scanner);
                     break;
-                case "0":
+                case "9":
                     continuer = false;
                     System.out.println("\n   Au revoir !");
                     break;
                 default:
-                    System.out.println("\n   Choix invalide. Veuillez saisir un chiffre entre 1 et 8.");
+                    System.out.println("\n   Choix invalide. Veuillez saisir un chiffre entre 1 et 9.");
                     System.out.println("   Appuyez sur Entree pour continuer.");
                     scanner.nextLine();
                     break;

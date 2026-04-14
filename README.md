@@ -31,5 +31,10 @@ Si vous devez modifier les sources de données :
 3. Recompilez et lancez via `./build.ps1` ou `Main.java`.
 
 ## 4. Prérequis
-- Java 8 ou supérieur.
-- Bibliothèques Apache POI (incluses dans `lib/`).
+- Java 21 ou supérieur (pour la génération PDF).
+- Bibliothèques Apache POI et PDFBox (incluses dans `lib/`).
+
+---
+**Auteur** : Séri-khane YOLOU (Crosne 2025)  
+**Version** : 1.3.0  
+**Statut** : Version finale stable incluant l'exportation PDF automatisée.

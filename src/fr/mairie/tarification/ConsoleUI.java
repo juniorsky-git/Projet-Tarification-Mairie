@@ -199,6 +199,42 @@ public class ConsoleUI {
     }
 
     /**
+     * Gère le processus d'exportation du rapport financier au format PDF.
+     * 
+     * Cette méthode instancie le service d'exportation, génère le fichier
+     * et informe l'utilisateur du succès ou de l'échec de l'opération.
+     * 
+     * @param calc    L'instance du calculateur pour les données financières.
+     * @param grille  La grille tarifaire de référence.
+     * @param scanner Le scanner pour les entrées utilisateur.
+     */
+    public static void gererExportPDF(Calculateur calc, List<Tarif> grille, Scanner scanner) {
+        printHeader("Génération du Rapport PDF");
+        System.out.println("\n   Veuillez patienter pendant la génération du document...");
+
+        PdfExportService pdfService = new PdfExportService();
+        try {
+            String cheminAbsolu = pdfService.genererRapport(calc, grille);
+            System.out.println("\n   " + VERT_TEXT + "SUCCÈS :" + RESET);
+            System.out.println("   Le rapport a été généré avec succès.");
+            System.out.println("   Emplacement : " + cheminAbsolu);
+        } catch (Exception e) {
+            System.out.println("\n   " + ROUGE_TEXT + "ERREUR :" + RESET);
+            System.out.println("   Impossible de générer le rapport PDF.");
+            System.out.println("   Détail : " + e.getMessage());
+            LogService.error("Erreur lors de l'export PDF", e);
+        }
+
+        System.out.println("\n   Appuyez sur Entrée pour continuer.");
+        scanner.nextLine();
+    }
+
+    /** Code ANSI pour le texte Vert. */
+    private static final String VERT_TEXT = "\u001B[32m";
+    /** Code ANSI pour le texte Rouge. */
+    private static final String ROUGE_TEXT = "\u001B[31m";
+
+    /**
      * Utilitaire pour repeter une chaine plusieurs fois.
      * 
      * @param s Chaine a repeter.

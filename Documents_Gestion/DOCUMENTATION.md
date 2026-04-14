@@ -28,10 +28,21 @@ La méthode `afficherDashboardPole` est désormais générique. Elle affiche sys
 - Le **Total des recettes théoriques** calculées.
 - Le **Taux de couverture** (Recettes / Dépenses).
 
-## 4. Maintenance Évolutive
-L'application est conçue pour être "Data-Driven" :
-- Pour ajouter une nouvelle catégorie de dépense (ex: "Entretien"), il suffit de l'ajouter dans l'onglet Excel entre les lignes 4 et 21. L'application l'affichera automatiquement dans le dashboard concerné.
-- Pour modifier les tarifs, changez simplement les valeurs dans les tranches correspondantes de l'Excel.
+## 4. Exportation et Rapports PDF
+L'application intègre un moteur d'exportation professionnel (`PdfExportService`) utilisant la librairie Apache PDFBox. Ce service automatise la création d'un rapport financier complet.
 
-## 5. Compilation et Exécution
-Utilisez le script `build.ps1` ou la commande manuelle incluant les bibliothèques Apache POI dans le classpath.
+### Contenu du rapport :
+- **Identification** : Page de garde avec bandeau institutionnel Ville de Crosne.
+- **Détails Financiers** : Une page par pôle municipal incluant le détail des charges directes.
+- **Indicateurs de Performance** : Le taux de couverture est illustré par une barre de progression colorée dynamiquement (Vert ≥ 80%, Orange ≥ 50%, Rouge < 50%).
+- **Synthèse Consolidée** : Tableau comparatif global des 6 pôles montrant les dépenses et recettes totales.
+- **Grilles Tarifaire** : Intégration des grilles de référence 2025 pour consultation directe.
+
+Pour un détail exhaustif des méthodes de dessin PDF et de la logique algorithmique retenue, consultez mes guides techniques :
+- [PDF_EXPORT_GUIDE.md](file:///c:/Users/stagedg2/Projet_mairie_outil_tarification/PDF_EXPORT_GUIDE.md) : Guide d'utilisation et structure.
+- [PDF_EXPORT_METHODOLOGY.md](file:///c:/Users/stagedg2/Projet_mairie_outil_tarification/PDF_EXPORT_METHODOLOGY.md) : Analyse approfondie des algorithmes de rendu.
+
+## 5. Maintenance et Standards
+- **Auteur principal** : Séri-khane YOLOU.
+- **Style de Code** : Le code source suit des règles de lisibilité strictes (100% d'accolades, interdiction des ternaires, Javadoc exhaustive).
+- **Compilation** : Utilisez Java 21+ avec les bibliothèques Apache POI et PDFBox incluses dans le dossier `lib/`.
