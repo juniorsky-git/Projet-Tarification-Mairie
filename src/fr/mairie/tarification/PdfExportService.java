@@ -109,50 +109,53 @@ public class PdfExportService {
         doc.addPage(page);
 
         try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
-            // Bandeau superieur
-            cs.setNonStrokingColor(BLEU_MAIRIE);
-            cs.addRect(0, PAGE_HEIGHT - 210, PAGE_WIDTH, 210);
-            cs.fill();
-
-            // Titres et Identification
-            cs.setNonStrokingColor(Color.WHITE);
-            
-            cs.beginText();
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 28);
-            cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 75);
-            cs.showText("VILLE DE CROSNE");
-            cs.endText();
-
-            // Ajout du logo en haut à droite (si le fichier existe)
+            // Ajout du logo en haut à gauche sur fond blanc (si le fichier existe)
+            float logoHeight = 0;
             try {
                 File logoFile = new File("Crosne-LOGO.png");
                 if (logoFile.exists()) {
                     PDImageXObject logo = PDImageXObject.createFromFile("Crosne-LOGO.png", doc);
-                    // Dimensions : largeur 100, hauteur calculée proportionnellement
-                    float scale = 100f / logo.getWidth();
-                    cs.drawImage(logo, PAGE_WIDTH - MARGIN - 100, PAGE_HEIGHT - 120, 100, logo.getHeight() * scale);
+                    float scale = 80f / logo.getWidth();
+                    logoHeight = logo.getHeight() * scale;
+                    // Positionnement en haut à gauche
+                    cs.drawImage(logo, MARGIN, PAGE_HEIGHT - MARGIN - logoHeight, 80, logoHeight);
                 }
             } catch (Exception e) {
-                // On continue sans le logo si une erreur survient
                 LogService.error("Logo introuvable ou illisible, passage outre.", e);
             }
 
+            // Bandeau bleu décalé vers le bas pour laisser le logo sur fond blanc
+            float bandeauY = PAGE_HEIGHT - 210 - (logoHeight > 0 ? 50 : 0);
+            cs.setNonStrokingColor(BLEU_MAIRIE);
+            cs.addRect(0, bandeauY, PAGE_WIDTH, 160);
+            cs.fill();
+
+            // Titres et Identification (décalés dans le bandeau bleu)
+            cs.setNonStrokingColor(Color.WHITE);
+            
+            float titreY = bandeauY + 110;
+            cs.beginText();
+            cs.setFont(PDType1Font.HELVETICA_BOLD, 26);
+            cs.newLineAtOffset(MARGIN, titreY);
+            cs.showText("VILLE DE CROSNE");
+            cs.endText();
+
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA, 13);
-            cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 105);
+            cs.newLineAtOffset(MARGIN, titreY - 25);
             cs.showText("Direction des Services aux Familles");
             cs.endText();
 
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA_BOLD, 16);
-            cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 150);
+            cs.newLineAtOffset(MARGIN, titreY - 65);
             cs.showText("Rapport Financier - Services Municipaux 2025");
             cs.endText();
 
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA, 11);
-            cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 185);
-            cs.showText("Genere le : " + dateStr);
+            cs.newLineAtOffset(MARGIN, titreY - 95);
+            cs.showText("Généré le : " + dateStr);
             cs.endText();
 
             // Pied de page de garde (Section explicative)

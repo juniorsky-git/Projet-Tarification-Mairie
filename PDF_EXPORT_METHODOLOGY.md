@@ -1,4 +1,4 @@
-# Méthodologie Technique : Moteur de Rendu PDF (v1.3)
+# Méthodologie Technique : Moteur de Rendu PDF
 
 Ce document expose les principes algorithmiques et les choix d'implémentation retenus pour le service d'exportation de la mairie de Crosne.
 
@@ -10,8 +10,8 @@ Contrairement à un document texte classique, un PDF se gère comme un canvas de
 
 ### Repère de Coordonnées
 Le système PDFBox utilise l'origine (0,0) en bas à gauche de la page. Pour dessiner de manière descendante (plus logique pour un rapport), j'ai implémenté une variable de curseur vertical `y`.
-- **En-têtes** : Placés entre `PAGE_HEIGHT - 33` et `PAGE_HEIGHT - 80`.
-- **Corps de page** : Commencent à `PAGE_HEIGHT - 120` et descendent jusqu'à la marge de sécurité de 50 points.
+- **En-têtes** : La page de garde dispose d'une zone supérieure blanche pour le logo (haut-gauche) et d'un bandeau bleu institutionnel décalé pour les titres. Sur les pages de pôles, les en-têtes occupent la bande `PAGE_HEIGHT - 33` à `PAGE_HEIGHT - 80`.
+- **Corps de page** : Commencent généralement à `PAGE_HEIGHT - 120` et descendent jusqu'à la marge de sécurité de 50 points.
 
 ---
 
