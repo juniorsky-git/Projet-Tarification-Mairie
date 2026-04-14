@@ -117,8 +117,8 @@ public class PdfExportService {
                     PDImageXObject logo = PDImageXObject.createFromFile("Crosne-LOGO.png", doc);
                     float scale = 80f / logo.getWidth();
                     logoHeight = logo.getHeight() * scale;
-                    // Positionnement en haut à gauche
-                    cs.drawImage(logo, MARGIN, PAGE_HEIGHT - MARGIN - logoHeight, 80, logoHeight);
+                    // Positionnement en haut à gauche (légèrement remonté pour l'équilibre visuel)
+                    cs.drawImage(logo, MARGIN, PAGE_HEIGHT - 35 - logoHeight, 80, logoHeight);
                 }
             } catch (Exception e) {
                 LogService.error("Logo introuvable ou illisible, passage outre.", e);
