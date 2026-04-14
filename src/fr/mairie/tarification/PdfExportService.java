@@ -313,19 +313,131 @@ public class PdfExportService {
     }
 
     /** Dashboard recapitulatif (Synthese). */
+    /**
+     * Genere la synthese financiere globale du projet (Page 8).
+     * BLINDAGE : Cette methode agrege dynamiquement les donnees de tous les poles 
+     * en evitant les erreurs de calcul (division par zero) et en gerant l'affichage 
+     * meme si certaines donnees sont manquantes.
+     * 
+     * @param doc Le document PDF en cours de creation
+     * @param calc Le calculateur contenant les donnees extraites de l'Excel
+     */
     private void dessinerTableauRecap(PDDocument doc, Calculateur calc) throws IOException {
         PDPage page = new PDPage(PDRectangle.A4);
         doc.addPage(page);
+        
         try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
+            // En-tete de la synthese
             cs.setNonStrokingColor(BLEU_MAIRIE);
             cs.addRect(0, PAGE_HEIGHT - 80, PAGE_WIDTH, 80);
             cs.fill();
+            
             cs.setNonStrokingColor(Color.WHITE);
             cs.beginText();
             cs.setFont(PDType1Font.HELVETICA_BOLD, 18);
             cs.newLineAtOffset(MARGIN, PAGE_HEIGHT - 45);
             cs.showText("SYNTHESE FINANCIERE GLOBALE 2025");
             cs.endText();
+
+            float y = PAGE_HEIGHT - 120;
+            float rowHeight = 25f;
+            double grandTotalDepenses = 0;
+            double grandTotalRecettes = 0;
+
+            // Titres des colonnes
+            cs.setNonStrokingColor(BLEU_MAIRIE);
+            cs.beginText();
+            cs.setFont(PDType1Font.HELVETICA_BOLD, 10);
+            cs.newLineAtOffset(MARGIN, y);
+            cs.showText("Pôle d'activité");
+            cs.newLineAtOffset(200, 0);
+            cs.showText("Dépenses");
+            cs.newLineAtOffset(100, 0);
+            cs.showText("Recettes");
+            cs.newLineAtOffset(100, 0);
+            cs.showText("Taux");
+            cs.endText();
+            
+            y -= 15;
+            cs.setStrokingColor(BLEU_MAIRIE);
+            cs.moveTo(MARGIN, y);
+            cs.lineTo(PAGE_WIDTH - MARGIN, y);
+            cs.stroke();
+            y -= 20;
+
+            // Boucle dynamique sur tous les poles (Blindage : recalcule tout a la volee)
+            boolean alternate = false;
+            for (Object[] config : POLES_CONFIG) {
+                String nomPole = (String) config[0];
+                double multiplicateur = (Double) config[1];
+                
+                double depenses = calc.calculerTotalDepenses(nomPole);
+                double recettes = calc.calculerRecettesAnnuelles(nomPole, multiplicateur);
+                
+                grandTotalDepenses += depenses;
+                grandTotalRecettes += recettes;
+
+                // Dessin d'une ligne zebra
+                if (alternate) {
+                    cs.setNonStrokingColor(GRIS_CLAIR);
+                    cs.addRect(MARGIN, y - 5, PAGE_WIDTH - (2 * MARGIN), rowHeight);
+                    cs.fill();
+                }
+
+                // Calcul securise du taux par pole (BLINDAGE : evite NaN si depenses = 0)
+                double tauxPole = (depenses > 0) ? (recettes / depenses) * 100 : 0;
+
+                cs.setNonStrokingColor(Color.BLACK);
+                cs.beginText();
+                cs.setFont(PDType1Font.HELVETICA, 10);
+                cs.newLineAtOffset(MARGIN + 5, y);
+                cs.showText(nomPole);
+                cs.newLineAtOffset(200, 0);
+                cs.showText(this.formatEur(depenses));
+                cs.newLineAtOffset(100, 0);
+                cs.showText(this.formatEur(recettes));
+                cs.newLineAtOffset(100, 0);
+                cs.setNonStrokingColor(this.couleurPourTaux(tauxPole));
+                cs.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                cs.showText(String.format("%.1f %%", tauxPole));
+                cs.endText();
+
+                y -= rowHeight;
+                alternate = !alternate;
+            }
+
+            // BLINDAGE : Calcul du taux global avec securite anti-division par zero
+            double tauxGlobal = (grandTotalDepenses > 0) ? (grandTotalRecettes / grandTotalDepenses) * 100 : 0;
+            double resteACharge = grandTotalDepenses - grandTotalRecettes;
+
+            // Ligne de TOTAL FINAL
+            y -= 10;
+            cs.setNonStrokingColor(BLEU_TOTAL);
+            cs.addRect(MARGIN, y - 5, PAGE_WIDTH - (2 * MARGIN), rowHeight + 10);
+            cs.fill();
+
+            cs.setNonStrokingColor(Color.WHITE);
+            cs.beginText();
+            cs.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            cs.newLineAtOffset(MARGIN + 5, y + 2);
+            cs.showText("BILAN CONSOLIDÉ");
+            cs.newLineAtOffset(195, 0);
+            cs.showText(this.formatEur(grandTotalDepenses));
+            cs.newLineAtOffset(100, 0);
+            cs.showText(this.formatEur(grandTotalRecettes));
+            cs.newLineAtOffset(100, 0);
+            cs.showText(String.format("%.1f %%", tauxGlobal));
+            cs.endText();
+
+            // Bloc de conclusion automatique
+            y -= 60;
+            cs.setNonStrokingColor(Color.DARK_GRAY);
+            cs.beginText();
+            cs.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            cs.newLineAtOffset(MARGIN, y);
+            cs.showText("RESTANT A CHARGE POUR LA COMMUNE : " + this.formatEur(resteACharge));
+            cs.endText();
+
             this.dessinerPiedDePage(cs, doc.getNumberOfPages());
         }
     }

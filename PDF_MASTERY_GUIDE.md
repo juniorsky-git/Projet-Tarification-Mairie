@@ -68,4 +68,22 @@ J'ai ajouté un calcul automatique appelé `scale`. Il détecte la largeur d'ori
 
 ---
 
-Ce guide est maintenant ta référence technique. Si un professeur te demande "Comment as-tu fait pour que le texte ne dépasse pas ?", tu pourras lui parler du **système de coordonnées cartésiennes** et de la gestion de la variable **Y**.
+## Pilier 5 : Le "Blindage" (Programmation Défensive)
+
+C'est ce qui différencie un code d'étudiant d'un code professionnel. "Blinder" un programme, c'est anticiper tout ce qui pourrait faire "crasher" l'application (données manquantes, divisions impossibles, etc.).
+
+### Ma stratégie de sécurité sur la Page 8 :
+Dans la méthode `dessinerTableauRecap`, on calcule des pourcentages globaux. Mathématiquement, diviser par zéro est impossible. J'ai donc inséré une **barrière de sécurité** :
+```java
+// BLINDAGE : on ne calcule le taux que si les depenses sont superieures a zero
+double tauxGlobal = (grandTotalDepenses > 0) ? (grandTotalRecettes / grandTotalDepenses) * 100 : 0;
+```
+- **Si les données sont là** : Le calcul se fait normalement.
+- **Si les données manquent (zéro)** : Le programme ne plante pas, il affiche `0.0%` et continue son travail. C'est ce qu'on appelle la robustesse.
+
+### Gestion propre des ressources
+À chaque création de page, j'utilise la structure `try (PDPageContentStream cs = ...)`. Elle garantit que le "stylo" numérique est bien libéré et que la mémoire de l'ordinateur est nettoyée dès que la page est finie. C'est une sécurité contre les ralentissements du système.
+
+---
+
+Ce guide est maintenant ta référence technique complète. Si un professeur te demande "Comment as-tu fait pour que le projet soit robuste ?", tu pourras lui parler de ta stratégie de **Programmation Défensive** et de ta gestion rigoureuse des ressources mémoire.
