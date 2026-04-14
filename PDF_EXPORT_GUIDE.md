@@ -50,11 +50,10 @@ Un point crucial du système est l'application des volumes annuels validés :
 
 Pour garantir un rendu "Premium", le service utilise un système de couleurs et de polices strict :
 - **Bleu Institutionnel** : `Color(30, 80, 150)` utilisé pour les bandeaux d'en-tête.
-- **Feedback Visuel** : Le taux de couverture change de couleur selon sa valeur :
+- **Feedback Visuel** : Le texte du taux de couverture change de couleur selon sa valeur :
     - **Vert** : ≥ 80% (Équilibre satisfaisant)
     - **Orange** : ≥ 50% (Co-financement modéré)
-    - **Rouge** : < 50% (Subvention municipale majoritaire)
-- **Barre de progression** : Une barre graphique calculée dynamiquement illustre visuellement ce taux en bas de chaque page de pôle.
+    - **Rouge** : < 50% (Subvention municipale critique)
 
 ---
 

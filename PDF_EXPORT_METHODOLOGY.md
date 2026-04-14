@@ -39,15 +39,11 @@ Les natures de dépenses (comptabilité M14) sont souvent très longues. Pour é
 
 Le rapport ne se contente pas d'afficher des chiffres ; il les interprète visuellement via les Taux de Couverture des charges.
 
-### Barre de Progression
-La largeur de la barre de progression est calculée en temps réel en fonction du ratio Recettes/Dépenses :
-`float fillWidth = (taux / 100.0) * marge_utile;`
-
 ### Code Couleur Sémantique
 J'ai défini une logique de feedback visuel pour alerter les décideurs :
-- **Vert** : ≥ 80% de couverture. Le pôle est proche de l'équilibre ou dégage des recettes significatives.
+- **Vert** : ≥ 80% de couverture. Le pôle est proche d'un équilibre satisfaisant.
 - **Orange** : ≥ 50%. Les recettes couvrent au moins la moitié des charges directes.
-- **Rouge** : < 50%. Le pôle nécessite une subvention municipale majoritaire (Vigilance budgétaire).
+- **Rouge** : < 50%. Le pôle nécessite une subvention municipale majoritaire.
 
 ---
 

@@ -239,29 +239,11 @@ public class PdfExportService {
      * Dessine les indicateurs financiers et la barre de progression.
      */
     private void dessinerIndicateurs(PDPageContentStream cs, double recettes, double taux, Color couleurTaux) throws IOException {
-        float y = 250.0f; // Position arbitraire basse pour les indicateurs
+        float y = 250.0f; // Position pour les indicateurs
         
-        this.dessinerLigneIndicateur(cs, y, "Total Recettes calculees", this.formatEur(recettes), BLEU_MAIRIE);
+        this.dessinerLigneIndicateur(cs, y, "Total Recettes calculées", this.formatEur(recettes), BLEU_MAIRIE);
         y -= 25.0f;
         this.dessinerLigneIndicateur(cs, y, "Taux de couverture des charges", String.format("%.1f %%", taux), couleurTaux);
-        
-        // Barre de progression
-        y -= 30.0f;
-        float barWidth = PAGE_WIDTH - (2 * MARGIN);
-        float fillWidth = (float)(taux / 100.0) * barWidth;
-        if (fillWidth > barWidth) {
-            fillWidth = barWidth;
-        }
-
-        cs.setNonStrokingColor(new Color(230, 230, 230));
-        cs.addRect(MARGIN, y, barWidth, 15);
-        cs.fill();
-        
-        if (fillWidth > 0) {
-            cs.setNonStrokingColor(couleurTaux);
-            cs.addRect(MARGIN, y, fillWidth, 15);
-            cs.fill();
-        }
     }
 
     /**
