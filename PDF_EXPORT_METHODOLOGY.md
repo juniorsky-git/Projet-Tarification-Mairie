@@ -13,6 +13,11 @@ Le système PDFBox utilise l'origine (0,0) en bas à gauche de la page. Pour des
 - **En-têtes** : La page de garde dispose d'une zone supérieure blanche pour le logo (haut-gauche) et d'un bandeau bleu institutionnel décalé pour les titres. Sur les pages de pôles, les en-têtes occupent la bande `PAGE_HEIGHT - 33` à `PAGE_HEIGHT - 80`.
 - **Corps de page** : Commencent généralement à `PAGE_HEIGHT - 120` et descendent jusqu'à la marge de sécurité de 50 points.
 
+### Logique des Multiplicateurs Annuels
+Le calculateur utilise des coefficients pour aligner les recettes sur les dépenses annuelles :
+- **Restauration scolaire (x140)** : On multiplie le tarif unitaire par 140 jours, ce qui correspond à la moyenne des jours d'école sur une année complète (zone B).
+- **Périscolaire & Études (x10)** : On multiplie les recettes par 10 mois. En effet, ces services s'arrêtent durant les vacances d'été (juillet/août), mais les dépenses de fonctionnement sont calculées sur l'année budgétaire globale. Cet alignement est crucial pour obtenir un taux de couverture honnête.
+
 ---
 
 ## 2. Logique de Dessin des Tableaux (`dessinerTableauDepenses`)
@@ -40,10 +45,10 @@ Les natures de dépenses (comptabilité M14) sont souvent très longues. Pour é
 Le rapport ne se contente pas d'afficher des chiffres ; il les interprète visuellement via les Taux de Couverture des charges.
 
 ### Code Couleur Sémantique
-J'ai défini une logique de feedback visuel pour alerter les décideurs :
-- **Vert** : ≥ 80% de couverture. Le pôle est proche d'un équilibre satisfaisant.
-- **Orange** : ≥ 50%. Les recettes couvrent au moins la moitié des charges directes.
-- **Rouge** : < 50%. Le pôle nécessite une subvention municipale majoritaire.
+Le taux de couverture (`Recettes / Dépenses * 100`) est interprété visuellement pour faciliter la prise de décision politique :
+- **Vert (≥ 80%)** : Équilibre financier satisfaisant. Les tarifs couvrent la quasi-totalité des charges.
+- **Orange (≥ 50%)** : Co-financement modéré. La ville subventionne environ la moitié du service.
+- **Rouge (< 50%)** : Subvention municipale majoritaire. Le service est socialement très soutenu par le budget de la commune.
 
 ---
 

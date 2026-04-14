@@ -26,13 +26,13 @@ C'est le concept le plus important : **L'axe Y est inversé.**
 - Sur un écran classique ou dans Word, (0,0) est en haut à gauche.
 - Dans un PDF (norme Adobe), **(0,0) est en bas à gauche de la feuille.**
 
-### Ma technique de "descente"
-Pour écrire comme dans un livre (du haut vers le bas), je commence tout en haut de la page (`PAGE_HEIGHT`, soit environ 842 points) et je soustrais des points à chaque ligne :
+### Ma technique de "descente" (Vertical Padding)
+Pour écrire comme dans un livre (du haut vers le bas), je commence tout en haut de la page (`PAGE_HEIGHT`, soit environ 842 points) et je soustrais des points à chaque ligne.
 ```java
-float y = PAGE_HEIGHT - 50; // On commence 50 points sous le bord haut
-// ... après avoir écrit une ligne ...
-y -= 20.0f; // On descend de 20 points pour la ligne suivante
+float y = PAGE_HEIGHT - 50; // Point de départ en haut
+y -= 20.0f; // On "descend" manuellement le curseur pour la ligne suivante
 ```
+**Pourquoi Y est inversé ?** C'est une norme PDF (Adobe) : le point (0,0) est en bas à gauche. Gérer la mise en page revient donc à faire des soustractions constantes pour créer du "blanc" entre les paragraphes et les tableaux.
 
 ---
 
