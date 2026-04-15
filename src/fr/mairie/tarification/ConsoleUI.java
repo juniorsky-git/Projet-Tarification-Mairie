@@ -164,14 +164,35 @@ public class ConsoleUI {
 
     /**
      * Gère la consultation individuelle du tarif selon le Quotient Familial saisi.
+     * Permet desormais de choisir entre la grille 2025 ou un fichier externe.
      * 
      * @param service Le service de tarification.
-     * @param grille La grille de tarifs chargee.
      * @param scanner Le scanner pour les entrees utilisateur.
      */
-    public static void consulterTarif(TarificationService service, List<Tarif> grille, Scanner scanner) {
-        printHeader("Consultation de la grille multi-services");
-        System.out.print("\n   Entrez le Quotient Familial : ");
+    public static void consulterTarif(TarificationService service, Scanner scanner) {
+        printHeader("Consultation des tarifs (Simulation)");
+        
+        System.out.println("\n   Quelle grille voulez-vous utiliser ?");
+        System.out.println("   [1] Grille 2025 par defaut (interne)");
+        System.out.println("   [2] Charger une autre grille (Excel externe)");
+        System.out.print("\n   Votre choix : ");
+        
+        List<Tarif> grille;
+        String choixGrille = scanner.nextLine();
+        
+        if ("2".equals(choixGrille)) {
+            System.out.print("   Entrez le chemin du fichier (ex: Donnees/grille_2024.xlsx) : ");
+            String chemin = scanner.nextLine();
+            grille = DonneesTarifs.chargerTarifsDepuisExcel(chemin);
+            if (grille.isEmpty()) {
+                System.out.println("   " + ROUGE_TEXT + "ERREUR : Impossible de charger la grille externe." + RESET);
+                return;
+            }
+        } else {
+            grille = DonneesTarifs.chargerTarifsReference();
+        }
+
+        System.out.print("\n   Entrez le Quotient Familial (QF) : ");
         String qfStr = scanner.nextLine();
 
         try {
@@ -179,13 +200,15 @@ public class ConsoleUI {
             Tarif t = service.trouverTarif(qf, grille);
 
             if (t != null) {
-                System.out.println("\n   Tranche : " + t.getTranche());
+                System.out.println("\n   " + VERT_TEXT + "Tranche detectee : " + t.getTranche() + RESET);
+                System.out.println("   --------------------------------------");
                 System.out.printf("   Repas scolaire    : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
                 System.out.printf("   Loisirs journee   : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
                 System.out.printf("   Ados vacances     : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
                 System.out.printf("   Etudes mensuel    : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
+                System.out.println("   --------------------------------------");
             } else {
-                System.out.println("   Aucun tarif trouve pour ce QF.");
+                System.out.println("   " + ROUGE_TEXT + "Aucun tarif trouve pour ce QF." + RESET);
             }
 
         } catch (NumberFormatException e) {

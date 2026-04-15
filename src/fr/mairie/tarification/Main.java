@@ -75,7 +75,7 @@ public class Main {
                     ConsoleUI.afficherDashboardPeriscolaire(calculateur, scanner);
                     break;
                 case "7":
-                    ConsoleUI.consulterTarif(service, grilleRef, scanner);
+                    ConsoleUI.consulterTarif(service, scanner);
                     break;
                 case "8":
                     ConsoleUI.gererExportPDF(calculateur, grilleRef, scanner);

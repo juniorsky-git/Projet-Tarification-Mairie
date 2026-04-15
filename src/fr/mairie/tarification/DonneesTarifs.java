@@ -1,18 +1,20 @@
 package fr.mairie.tarification;
 
+import org.apache.poi.ss.usermodel.*;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Entrepot de donnees statiques pour les tarifs de reference.
+ * Entrepot de donnees statiques et moteur de chargement pour les tarifs.
  * 
- * Cette classe contient l'integralite de la grille tarifaire pour 2025 detaillee 
- * par Quotient Familial (QF) pour tous les services municipaux.
+ * Cette classe permet de gérer soit la grille de référence 2025 "en dur",
+ * soit de charger dynamiquement n'importe quelle grille annuelle via Excel.
  * 
  * @author Séri-khane YOLOU
- * @version 1.2
+ * @version 2.0
  */
 public class DonneesTarifs {
 
@@ -32,8 +34,54 @@ public class DonneesTarifs {
     public static final String ADOS_SORTIE_JOURNEE = "ADOS_SORTIE_JOURNEE";
 
     /**
-     * Charge l'integralite des tarifs de reference pour 2025.
-     * Cette grille est basee sur le document officiel de tarification de la mairie.
+     * Charge une grille tarifaire depuis un fichier Excel externe.
+     * Le fichier doit comporter les colonnes suivantes :
+     * Col 0: Nom Tranche, Col 1: QF Min, Col 2: QF Max, Col 3+: Tarifs
+     * 
+     * @param cheminFichier Chemin vers le fichier Excel (ex: Donnees/grille_2026.xlsx)
+     * @return Liste de Tarifs charges, ou liste vide en cas d'erreur.
+     */
+    public static List<Tarif> chargerTarifsDepuisExcel(String cheminFichier) {
+        List<Tarif> tarifs = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(cheminFichier);
+             Workbook wb = WorkbookFactory.create(fis)) {
+            
+            Sheet s = wb.getSheetAt(0); // On prend la premiere feuille
+            for (int i = 1; i <= s.getLastRowNum(); i++) { // On saute l'entete
+                Row row = s.getRow(i);
+                if (row == null) continue;
+
+                String tranche = getValeurTexte(row.getCell(0));
+                double qfMin = getValeurNumerique(row.getCell(1));
+                double qfMax = getValeurNumerique(row.getCell(2));
+
+                if (tranche.isEmpty()) continue;
+
+                Map<String, Double> prix = new HashMap<>();
+                prix.put(REPAS, getValeurNumerique(row.getCell(3)));
+                prix.put(ACCUEIL_JOURNEE, getValeurNumerique(row.getCell(4)));
+                prix.put(ACCUEIL_DEMI_REPAS, getValeurNumerique(row.getCell(5)));
+                prix.put(PERISCOLAIRE_MATIN_SOIR, getValeurNumerique(row.getCell(6)));
+                prix.put(PERISCOLAIRE_MATIN_OU_SOIR, getValeurNumerique(row.getCell(7)));
+                prix.put(ETUDES_FORFAIT_MENSUEL, getValeurNumerique(row.getCell(8)));
+                prix.put(ETUDES_DEMI_FORFAIT, getValeurNumerique(row.getCell(9)));
+                prix.put(ADOS_VAC_JOURNEE_REPAS, getValeurNumerique(row.getCell(10)));
+                prix.put(ADOS_VAC_JOURNEE_SANS, getValeurNumerique(row.getCell(11)));
+                prix.put(ADOS_VAC_DEMI_REPAS, getValeurNumerique(row.getCell(12)));
+                prix.put(ADOS_VAC_DEMI_SANS, getValeurNumerique(row.getCell(13)));
+                prix.put(ADOS_SORTIE_DEMI, getValeurNumerique(row.getCell(14)));
+                prix.put(ADOS_SORTIE_JOURNEE, getValeurNumerique(row.getCell(15)));
+
+                tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
+            }
+        } catch (Exception e) {
+            System.err.println("Le blindage a detecte une erreur de lecture : " + e.getMessage());
+        }
+        return tarifs;
+    }
+
+    /**
+     * Charge l'integralite des tarifs de reference pour 2025 (Modele interne).
      * 
      * @return Une liste d'objets Tarif initialises avec leurs bornes QF.
      */
@@ -133,12 +181,19 @@ public class DonneesTarifs {
         return tarifs;
     }
 
-    /**
-     * Methode utilitaire interne pour creer une Map de prix rapidement.
-     * 
-     * @param kv Suite d'objets alternant les noms de services (String) et les prix (Double).
-     * @return Une Map contenant tous les tarifs declares pour une tranche donnee.
-     */
+    private static String getValeurTexte(Cell cell) {
+        if (cell == null) return "";
+        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
+        return "";
+    }
+
+    private static double getValeurNumerique(Cell cell) {
+        if (cell == null) return 0.0;
+        if (cell.getCellType() == CellType.NUMERIC) return cell.getNumericCellValue();
+        if (cell.getCellType() == CellType.FORMULA) return cell.getNumericCellValue();
+        return 0.0;
+    }
+
     private static Map<String, Double> map(Object... kv) {
         Map<String, Double> m = new HashMap<>();
         for (int i = 0; i < kv.length; i += 2) {
