@@ -50,12 +50,12 @@ public class PdfExportService {
 
     /** Configuration des poles avec leurs noms Excel et multiplicateurs annuels. */
     private static final Object[][] POLES_CONFIG = {
-        {"Restauration", 140.0},
-        {"Accueil de Loisirs", 1.0},
-        {"Espace Ados", 1.0},
-        {"Sejours", 1.0},
-        {"Etudes surveillees", 10.0},
-        {"Accueil periscolaire", 10.0}
+        {"Restauration", 140.0},        // 140 jours d'ecole
+        {"Accueil de Loisirs", 12.0},   // 12 mois (toute l'annee)
+        {"Espace Ados", 12.0},          // 12 mois (toute l'annee)
+        {"Sejours", 1.0},               // Forfait (a determiner)
+        {"Etudes surveillees", 36.0},   // 36 semaines scolaires
+        {"Accueil periscolaire", 10.0}  // 10 mois scolaires (en attente)
     };
 
     /**

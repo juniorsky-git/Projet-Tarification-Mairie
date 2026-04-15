@@ -16,7 +16,9 @@ Le système PDFBox utilise l'origine (0,0) en bas à gauche de la page. Pour des
 ### Logique des Multiplicateurs Annuels
 Le calculateur utilise des coefficients pour aligner les recettes sur les dépenses annuelles :
 - **Restauration scolaire (x140)** : On multiplie le tarif unitaire par 140 jours, ce qui correspond à la moyenne des jours d'école sur une année complète (zone B).
-- **Périscolaire & Études (x10)** : On multiplie les recettes par 10 mois. En effet, ces services s'arrêtent durant les vacances d'été (juillet/août), mais les dépenses de fonctionnement sont calculées sur l'année budgétaire globale. Cet alignement est crucial pour obtenir un taux de couverture honnête.
+- **Loisirs & Ados (x12)** : Ces services fonctionnant toute l'année, nous multiplions les recettes mensuelles par 12 mois.
+- **Études surveillées (x36)** : Pour plus de précision, nous utilisons ici le nombre de semaines scolaires réelles (36 semaines).
+- **Périscolaire (x10)** : En attente de validation, nous conservons une base de 10 mois scolaires.
 
 ---
 
