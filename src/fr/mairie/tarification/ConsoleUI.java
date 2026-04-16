@@ -201,25 +201,39 @@ public class ConsoleUI {
 
             if (t != null) {
                 System.out.println("\n   " + VERT_TEXT + "Tranche detectee : " + t.getTranche() + RESET);
-                System.out.println("   " + repeat("-", 50));
+                System.out.println("   " + repeat("=", 50));
                 
-                // Restauration
-                System.out.printf("   [RESTAURATION]   Repas scolaire           : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
+                // 1. SCOLAIRE & PERISCOLAIRE
+                System.out.println("   [SCOLAIRE & PERISCOLAIRE]");
+                System.out.printf("   - Repas scolaire             : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
+                System.out.printf("   - Matin ET Soir              : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_SOIR));
+                System.out.printf("   - Matin OU Soir              : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_OU_SOIR));
+                System.out.printf("   - Etudes (Forfait mensuel)   : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
+                System.out.printf("   - Tarif Post-Etudes          : %.2f euros%n", t.getPrix(DonneesTarifs.TARIF_POST_ETUDES));
                 
-                // Loisirs
-                System.out.printf("   [COL / LOISIRS]  Journee complete         : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
-                System.out.printf("   [COL / LOISIRS]  1/2 Journee (+ repas)    : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_DEMI_REPAS));
+                // 2. LOISIRS & CLASSE DECOUVERTE
+                System.out.println("\n   [COL / LOISIRS & JEUNESSE]");
+                System.out.printf("   - Journee complète           : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
+                System.out.printf("   - 1/2 Journee (+ repas)      : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_DEMI_REPAS));
+                System.out.printf("   - Classe decouverte (jour)   : %.2f euros%n", t.getPrix(DonneesTarifs.CLASSE_DECOUVERTE));
                 
-                // Periscolaire
-                System.out.printf("   [PERISCOLAIRE]   Matin ET Soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_SOIR));
-                System.out.printf("   [PERISCOLAIRE]   Matin OU Soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_OU_SOIR));
+                // 3. ESPACE ADOS
+                if (t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS) > 0) {
+                    System.out.println("\n   [ESPACE ADOS]");
+                    System.out.printf("   - Vacances (Journee + Repas) : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
+                    System.out.printf("   - Vacances (Journee SANS)    : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_SANS));
+                    System.out.printf("   - Sortie (Journee)           : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_JOURNEE));
+                    System.out.printf("   - Sortie (Demi-journee)      : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_DEMI));
+                }
                 
-                // Etudes
-                System.out.printf("   [ETUDES]         Forfait mensuel          : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
-                System.out.printf("   [ETUDES]         1/2 Forfait              : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_DEMI_FORFAIT));
-                System.out.printf("   [POST ETUDES]    Sans gouter              : %.2f euros%n", t.getPrix(DonneesTarifs.TARIF_POST_ETUDES));
+                // 4. SEJOURS VACANCES
+                if (t.getPrix(DonneesTarifs.SEJOUR_5_JOURS) > 0) {
+                    System.out.println("\n   [SEJOURS VACANCES]");
+                    System.out.printf("   - Sejour 5 jours             : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_5_JOURS));
+                    System.out.printf("   - Sejour 6 jours             : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_6_JOURS));
+                }
                 
-                System.out.println("   " + repeat("-", 50));
+                System.out.println("\n   " + repeat("=", 50));
             } else {
                 System.out.println("   " + ROUGE_TEXT + "Aucun tarif trouve pour ce QF." + RESET);
             }

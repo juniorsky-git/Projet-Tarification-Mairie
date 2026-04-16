@@ -33,6 +33,9 @@ public class DonneesTarifs {
     public static final String ADOS_SORTIE_DEMI = "ADOS_SORTIE_DEMI";
     public static final String ADOS_SORTIE_JOURNEE = "ADOS_SORTIE_JOURNEE";
     public static final String TARIF_POST_ETUDES = "TARIF_POST_ETUDES";
+    public static final String CLASSE_DECOUVERTE = "CLASSE_DECOUVERTE";
+    public static final String SEJOUR_5_JOURS = "SEJOUR_5_JOURS";
+    public static final String SEJOUR_6_JOURS = "SEJOUR_6_JOURS";
 
     /**
      * Charge une grille tarifaire depuis un fichier Excel de format "Standard" (ex: Grille 2024).
@@ -47,7 +50,11 @@ public class DonneesTarifs {
              Workbook wb = WorkbookFactory.create(fis)) {
             
             Sheet s = wb.getSheetAt(0); 
-            // On commence a la ligne 6 (index 5) jusqu'a la fin (ou jusqu'a une ligne vide)
+            
+            // --- DETECTION DYNAMIQUE DES COLONNES ---
+            Map<String, Integer> mapping = scannerEntetes(s);
+            
+            // On commence a la ligne 6 (index 5) jusqu'a la fin
             for (int i = 5; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
                 if (row == null) continue;
@@ -57,23 +64,33 @@ public class DonneesTarifs {
                 
                 if (tranche.isEmpty()) continue;
 
-                // Extraction des bornes QF depuis le texte
                 double[] bornes = extraireBornesQF(texteQF, tranche);
                 double qfMin = bornes[0];
                 double qfMax = bornes[1];
 
                 Map<String, Double> prix = new HashMap<>();
-                // Mapping des colonnes fixes du format Standalone
-                prix.put(REPAS, getValeurNumerique(row.getCell(2)));
-                prix.put(ACCUEIL_JOURNEE, getValeurNumerique(row.getCell(3)));
-                prix.put(ACCUEIL_DEMI_REPAS, getValeurNumerique(row.getCell(4)));
-                prix.put(PERISCOLAIRE_MATIN_SOIR, getValeurNumerique(row.getCell(5)));
-                prix.put(PERISCOLAIRE_MATIN_OU_SOIR, getValeurNumerique(row.getCell(6)));
-                prix.put(ETUDES_FORFAIT_MENSUEL, getValeurNumerique(row.getCell(7)));
-                prix.put(ETUDES_DEMI_FORFAIT, getValeurNumerique(row.getCell(8)));
-                prix.put(TARIF_POST_ETUDES, getValeurNumerique(row.getCell(9)));
-                // On peut ajouter le post-etudes si besoin, ici on se limite aux poles principaux
-                prix.put(ADOS_VAC_JOURNEE_REPAS, getValeurNumerique(row.getCell(3))); // Par defaut ados = loisirs si non specifie dans ce format
+                
+                // On utilise la detection dynamique, avec les colonnes 2024 en fallback par securite
+                prix.put(REPAS, getValeurDeColonne(row, mapping, REPAS, 2));
+                prix.put(ACCUEIL_JOURNEE, getValeurDeColonne(row, mapping, ACCUEIL_JOURNEE, 3));
+                prix.put(ACCUEIL_DEMI_REPAS, getValeurDeColonne(row, mapping, ACCUEIL_DEMI_REPAS, 4));
+                prix.put(PERISCOLAIRE_MATIN_SOIR, getValeurDeColonne(row, mapping, PERISCOLAIRE_MATIN_SOIR, 5));
+                prix.put(PERISCOLAIRE_MATIN_OU_SOIR, getValeurDeColonne(row, mapping, PERISCOLAIRE_MATIN_OU_SOIR, 6));
+                prix.put(ETUDES_FORFAIT_MENSUEL, getValeurDeColonne(row, mapping, ETUDES_FORFAIT_MENSUEL, 7));
+                prix.put(ETUDES_DEMI_FORFAIT, getValeurDeColonne(row, mapping, ETUDES_DEMI_FORFAIT, 8));
+                prix.put(TARIF_POST_ETUDES, getValeurDeColonne(row, mapping, TARIF_POST_ETUDES, 9));
+                prix.put(CLASSE_DECOUVERTE, getValeurDeColonne(row, mapping, CLASSE_DECOUVERTE, 10));
+                
+                // Ados & Sejours
+                prix.put(ADOS_VAC_JOURNEE_REPAS, getValeurDeColonne(row, mapping, ADOS_VAC_JOURNEE_REPAS, 11));
+                prix.put(ADOS_VAC_JOURNEE_SANS, getValeurDeColonne(row, mapping, ADOS_VAC_JOURNEE_SANS, 12));
+                prix.put(ADOS_VAC_DEMI_REPAS, getValeurDeColonne(row, mapping, ADOS_VAC_DEMI_REPAS, 13));
+                prix.put(ADOS_VAC_DEMI_SANS, getValeurDeColonne(row, mapping, ADOS_VAC_DEMI_SANS, 14));
+                prix.put(ADOS_SORTIE_DEMI, getValeurDeColonne(row, mapping, ADOS_SORTIE_DEMI, 15));
+                prix.put(ADOS_SORTIE_JOURNEE, getValeurDeColonne(row, mapping, ADOS_SORTIE_JOURNEE, 16));
+                
+                prix.put(SEJOUR_5_JOURS, getValeurDeColonne(row, mapping, SEJOUR_5_JOURS, 17));
+                prix.put(SEJOUR_6_JOURS, getValeurDeColonne(row, mapping, SEJOUR_6_JOURS, 19));
 
                 tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
             }
@@ -81,6 +98,66 @@ public class DonneesTarifs {
             System.err.println("Erreur de lecture Grille Standard : " + e.getMessage());
         }
         return tarifs;
+    }
+
+    /**
+     * Analyse les premieres lignes de la feuille pour detecter dynamiquement les colonnes des services.
+     */
+    private static Map<String, Integer> scannerEntetes(Sheet s) {
+        Map<String, Integer> mapping = new HashMap<>();
+        
+        // On examine les 5 premieres lignes (0 a 4) pour trouver les mots-cles
+        for (int i = 0; i < 5; i++) {
+            Row row = s.getRow(i);
+            if (row == null) continue;
+            
+            for (int c = 0; c < 30; c++) {
+                Cell cell = row.getCell(c);
+                if (cell == null) continue;
+                
+                String label = cell.toString().toLowerCase();
+                
+                if (label.contains("repas") && !label.contains("ados")) mapping.put(REPAS, c);
+                
+                if (label.contains("loisir")) {
+                    if (label.contains("journee") || label.contains("journée")) mapping.put(ACCUEIL_JOURNEE, c);
+                    if (label.contains("1/2")) mapping.put(ACCUEIL_DEMI_REPAS, c);
+                }
+                
+                if (label.contains("periscola")) {
+                    if (label.contains("et") || label.contains("matin et soir")) mapping.put(PERISCOLAIRE_MATIN_SOIR, c);
+                    if (label.contains("ou") || label.contains("matin ou soir")) mapping.put(PERISCOLAIRE_MATIN_OU_SOIR, c);
+                }
+                
+                if (label.contains("etude")) {
+                    if (label.contains("mensuel") || label.contains("forfait")) mapping.put(ETUDES_FORFAIT_MENSUEL, c);
+                    if (label.contains("1/2")) mapping.put(ETUDES_DEMI_FORFAIT, c);
+                }
+                
+                if (label.contains("post") && label.contains("etude")) mapping.put(TARIF_POST_ETUDES, c);
+                if (label.contains("decouverte")) mapping.put(CLASSE_DECOUVERTE, c);
+                
+                if (label.contains("ados")) {
+                    if (label.contains("vacances") && label.contains("repas") && !label.contains("sans")) mapping.put(ADOS_VAC_JOURNEE_REPAS, c);
+                    if (label.contains("vacances") && label.contains("sans")) mapping.put(ADOS_VAC_JOURNEE_SANS, c);
+                    if (label.contains("1/2") && label.contains("repas")) mapping.put(ADOS_VAC_DEMI_REPAS, c);
+                    if (label.contains("1/2") && label.contains("sans")) mapping.put(ADOS_VAC_DEMI_SANS, c);
+                    if (label.contains("sortie") && label.contains("1/2")) mapping.put(ADOS_SORTIE_DEMI, c);
+                    if (label.contains("sortie") && label.contains("journee")) mapping.put(ADOS_SORTIE_JOURNEE, c);
+                }
+                
+                if (label.contains("sejour")) {
+                    if (label.contains("5")) mapping.put(SEJOUR_5_JOURS, c);
+                    if (label.contains("6")) mapping.put(SEJOUR_6_JOURS, c);
+                }
+            }
+        }
+        return mapping;
+    }
+
+    private static double getValeurDeColonne(Row row, Map<String, Integer> mapping, String cle, int indexDefaut) {
+        int index = mapping.getOrDefault(cle, indexDefaut);
+        return getValeurNumerique(row.getCell(index));
     }
 
     /**

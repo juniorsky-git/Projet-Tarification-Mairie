@@ -266,3 +266,64 @@ L'objectif était de rendre l'outil "Infatigable" face aux variations de format 
     - Études (Forfait / 1/2 forfait)
     - Tarif Post-Études.
 - **Résultat** : Une vue complète à 360° des tarifs de la ville pour chaque simulation.
+
+---
+
+## Etape 15 : Diagnostic Avancé et Découverte des Colonnes Masquées (16/04/2026)
+
+Lors de l'ajout des pôles Ados et Séjours, un défi technique majeur a été rencontré concernant la visibilité des données.
+
+### 1. Problème : "L'Angle Mort" de l'Inspecteur
+- **Symptôme** : L'outil de diagnostic `InspecteurExcel` ne renvoyait que 10 colonnes, occultant totalement les données Jeunesse, Ados et Séjours situées plus à droite de la feuille.
+- **Cause** : Le code de l'inspecteur comportait une limite codée en dur (`Math.min(10, ...)`) et un chemin de fichier fixe, empêchant l'analyse de sources alternatives.
+
+### 2. Solution : Refonte de l'Outillage de Diagnostic
+- **Action** : Modification de `InspecteurExcel.java` pour accepter des arguments en ligne de commande et élargissement du scan à 30 colonnes.
+- **Résultat** : Découverte des colonnes 10 à 19 contenant l'intégralité des nouveaux tarifs demandés (Séjours 5j/6j, Classe découverte, Ados avec/sans repas).
+
+### 3. Leçon de Programmation Défensive
+Cet incident a souligné l'importance de ne pas faire d'hypothèses sur la structure des fichiers Excel fournis par les services (souvent très larges) et de maintenir des outils de diagnostic flexibles.
+
+---
+
+## Etape 16 : Conception du Moteur de Parsing Universel (16/04/2026)
+
+Pour garantir que l'application fonctionne sans intervention humaine dans les années à venir, j'ai conçu un algorithme de **détection dynamique des colonnes**.
+
+### 1. Pourquoi cette approche ?
+Auparavant, le programme lisait la colonne 3 pour le "Repas". Si la mairie ajoute une colonne "Assurance" en colonne 3 l'an prochain, le programme lirait l'assurance au lieu du repas. 
+**L'approche universelle** consiste à "explorer et comprendre" les étiquettes du tableau comme le ferait un humain, par recherche sémantique.
+
+### 2. L'Algorithme "Context-Aware Mapping"
+L'algorithme repose sur trois phases techniques :
+
+1.  **Synthèse de Contexte (Cross-Row Exploration)** : 
+    *   L'algorithme explore les 5 premières lignes du fichier. 
+    *   Il scanne toutes les cellules pour trouver des mots-clés. Cela permet de distinguer un "repas scolaire" d'un "repas ados" si les mots-clés sont combinés sur plusieurs lignes.
+2.  **Signature Scoring (Mots-Clés)** : 
+    *   Chaque service (Repas, Loisirs, Séjours...) possède une "signature" composée de mots-clés obligatoires.
+    *   *SÉJOUR 5J* : La colonne doit contenir "sejour" ET "5".
+    *   *ADOS VACANCES* : La colonne doit contenir "ados" ET "vacances".
+3.  **Cartographie des Index (Mapping Map)** : 
+    *   Une fois la signature détectée, l'index de la colonne est enregistré dans une table de correspondance (`Map<String, Integer>`).
+    *   Le moteur de calcul utilise ensuite cette table pour extraire les données, peu importe l'emplacement réel de la colonne.
+
+### 3. Exemple de Logique de Code (Squelette Java)
+```java
+// On crée un dictionnaire de correspondance
+Map<String, Integer> mapping = new HashMap<>();
+
+for (int c = 0; c < 30; c++) {
+    String label = cell.toString().toLowerCase();
+    
+    if (label.contains("sejour") && label.contains("5")) 
+        mapping.put("SEJOUR_5J", c);
+    else if (label.contains("repas") && !label.contains("ados")) 
+        mapping.put("REPAS", c);
+}
+```
+
+### 4. Pérennité (Futur-Proof)
+- **Adaptabilité** : Si une nouvelle année, une colonne est insérée au milieu, l'algorithme "re-scannera" les en-têtes et trouvera le nouvel emplacement.
+- **Rétrocompatibilité** : Si la détection automatique échoue (ex: tableau sans en-tête), l'application bascule par sécurité sur la structure standard de 2024.
+- **Maintenance Facilitée** : Pas de code à modifier chaque année, l'outil s'auto-adapte à la source de données Excel.

@@ -5,8 +5,11 @@ import java.io.File;
 
 public class InspecteurExcel {
     public static void main(String[] args) {
-        String path = "Donnees/Grille-tarifaire-2024-(1).xlsx";
-        File file = new File("c:/Users/stagedg2/Projet_mairie_outil_tarification/" + path);
+        String path = (args.length > 0) ? args[0] : "Donnees/Grille-tarifaire-2024-(1).xlsx";
+        File file = new File(path);
+        if (!file.exists()) {
+            file = new File("c:/Users/stagedg2/Projet_mairie_outil_tarification/" + path);
+        }
         if (!file.exists()) {
             System.out.println("Le fichier n'existe pas : " + file.getAbsolutePath());
             return;
@@ -31,7 +34,7 @@ public class InspecteurExcel {
                     continue;
                 }
                 System.out.print("Ligne " + i + " : ");
-                for (int j = 0; j < Math.min(10, row.getLastCellNum()); j++) {
+                for (int j = 0; j < Math.min(30, row.getLastCellNum()); j++) {
                     Cell cell = row.getCell(j);
                     System.out.print("[" + (cell == null ? "" : cell.toString()) + "] ");
                 }
