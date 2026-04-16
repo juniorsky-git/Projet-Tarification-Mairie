@@ -201,39 +201,49 @@ public class ConsoleUI {
 
             if (t != null) {
                 System.out.println("\n   " + VERT_TEXT + "Tranche detectee : " + t.getTranche() + RESET);
-                System.out.println("   " + repeat("=", 50));
+                System.out.println("   " + repeat("=", 60));
                 
-                // 1. SCOLAIRE & PERISCOLAIRE
-                System.out.println("   [SCOLAIRE & PERISCOLAIRE]");
-                System.out.printf("   - Repas scolaire             : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
-                System.out.printf("   - Matin ET Soir              : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_SOIR));
-                System.out.printf("   - Matin OU Soir              : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_OU_SOIR));
-                System.out.printf("   - Etudes (Forfait mensuel)   : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
-                System.out.printf("   - Tarif Post-Etudes          : %.2f euros%n", t.getPrix(DonneesTarifs.TARIF_POST_ETUDES));
+                // REPAS
+                System.out.println("   [REPAS]");
+                System.out.printf("   - Repas                      : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
+
+                // PÉRISCOLAIRE
+                System.out.println("\n   [PÉRISCOLAIRE]");
                 
-                // 2. LOISIRS & CLASSE DECOUVERTE
-                System.out.println("\n   [COL / LOISIRS & JEUNESSE]");
-                System.out.printf("   - Journee complète           : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
-                System.out.printf("   - 1/2 Journee (+ repas)      : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_DEMI_REPAS));
-                System.out.printf("   - Classe decouverte (jour)   : %.2f euros%n", t.getPrix(DonneesTarifs.CLASSE_DECOUVERTE));
+                System.out.println("   * ACCUEILS DE LOISIRS");
+                System.out.printf("     - Journée                  : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
+                System.out.printf("     - 1/2 journée AVEC repas   : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_DEMI_REPAS));
                 
-                // 3. ESPACE ADOS
-                if (t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS) > 0) {
-                    System.out.println("\n   [ESPACE ADOS]");
-                    System.out.printf("   - Vacances (Journee + Repas) : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
-                    System.out.printf("   - Vacances (Journee SANS)    : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_SANS));
-                    System.out.printf("   - Sortie (Journee)           : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_JOURNEE));
-                    System.out.printf("   - Sortie (Demi-journee)      : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_DEMI));
-                }
+                System.out.println("\n   * ACCUEILS PÉRISCOLAIRES");
+                System.out.printf("     - Matin ET soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_SOIR));
+                System.out.printf("     - Matin OU soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_OU_SOIR));
+
+                System.out.println("\n   * ÉTUDES SURVEILLÉES");
+                System.out.printf("     - Forfait mensuel          : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
+                System.out.printf("     - 1/2 forfait              : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_DEMI_FORFAIT));
                 
-                // 4. SEJOURS VACANCES
-                if (t.getPrix(DonneesTarifs.SEJOUR_5_JOURS) > 0) {
-                    System.out.println("\n   [SEJOURS VACANCES]");
-                    System.out.printf("   - Sejour 5 jours             : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_5_JOURS));
-                    System.out.printf("   - Sejour 6 jours             : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_6_JOURS));
-                }
+                System.out.println("\n   * TARIF POST ÉTUDES");
+                System.out.printf("     - Sans goûter              : %.2f euros%n", t.getPrix(DonneesTarifs.TARIF_POST_ETUDES));
+
+                System.out.println("\n   * CLASSE DÉCOUVERTE");
+                System.out.printf("     - Tarif journalier         : %.2f euros%n", t.getPrix(DonneesTarifs.CLASSE_DECOUVERTE));
+
+                // JEUNESSE
+                System.out.println("\n   [JEUNESSE]");
                 
-                System.out.println("\n   " + repeat("=", 50));
+                System.out.println("   * ESPACE ADOS");
+                System.out.printf("     - Vacances: Journée AVEC   : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
+                System.out.printf("     - Vacances: Journée SANS   : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_SANS));
+                System.out.printf("     - Vacances: 1/2 Journ. AVEC: %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_DEMI_REPAS));
+                System.out.printf("     - Vacances: 1/2 Journ. SANS: %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_DEMI_SANS));
+                System.out.printf("     - Sorties: 1/2 journée     : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_DEMI));
+                System.out.printf("     - Sorties: Journée         : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_SORTIE_JOURNEE));
+
+                System.out.println("\n   * SÉJOURS");
+                System.out.printf("     - Séjours 5 jours          : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_5_JOURS));
+                System.out.printf("     - Séjours 6 jours          : %.2f euros%n", t.getPrix(DonneesTarifs.SEJOUR_6_JOURS));
+                
+                System.out.println("\n   " + repeat("=", 60));
             } else {
                 System.out.println("   " + ROUGE_TEXT + "Aucun tarif trouve pour ce QF." + RESET);
             }
