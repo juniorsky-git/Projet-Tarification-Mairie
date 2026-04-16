@@ -94,6 +94,8 @@ public class DonneesTarifs {
 
                 tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
             }
+        } catch (IllegalArgumentException e) {
+            throw e; // Laisser l'UI attraper cette structure pour afficher le message dédié.
         } catch (Exception e) {
             LogService.error("Erreur de lecture Grille Standard", e);
         }
@@ -223,11 +225,15 @@ public class DonneesTarifs {
             }
             
             if (nombres.size() >= 2) {
-                return new double[]{nombres.get(0), nombres.get(1)};
+                // Règle métier de continuité : le tableau Excel affiche [Min - Max inclusif].
+                // Puisque TarificationService fait un contrôle strict (qf < max),
+                // on doit ajouter +1 à la borne numérique supérieure pour inclure les décimales.
+                // Ex: "3 954 - 6 240" devient [3954.0, 6241.0[.
+                return new double[]{nombres.get(0), nombres.get(1) + 1.0};
             } else if (nombres.size() == 1) {
                 if (texte.toLowerCase().contains("plus")) return new double[]{nombres.get(0), Double.MAX_VALUE - 2};
                 if (texte.toLowerCase().contains("moins")) return new double[]{0, nombres.get(0)};
-                return new double[]{nombres.get(0), nombres.get(0)};
+                return new double[]{nombres.get(0), nombres.get(0) + 1.0};
             }
         } catch (Exception e) { }
         
@@ -247,11 +253,27 @@ public class DonneesTarifs {
         try (FileInputStream fis = new FileInputStream(cheminFichier);
              Workbook wb = WorkbookFactory.create(fis)) {
             
+            if (wb.getNumberOfSheets() == 0) {
+                throw new IllegalArgumentException("Le classeur Excel ne contient aucune feuille de calcul.");
+            }
+            
             Sheet s = wb.getSheetAt(0); // On prend la premiere feuille
+            
+            if (s.getLastRowNum() < 5) {
+                throw new IllegalArgumentException("La grille semble vide ou trop courte pour être une grille tarifaire valide.");
+            }
+
+            Map<String, Integer> mapping = scannerEntetes(s);
+            
+            // Validation forte : on s'assure d'avoir trouvé des colonnes structurantes incontournables.
+            if (!mapping.containsKey(REPAS) || !mapping.containsKey(ACCUEIL_JOURNEE)) {
+                throw new IllegalArgumentException("Structure invalide. Impossible de détecter les colonnes essentielles (ex: Repas, Accueil Loisirs).");
+            }
+            
             for (int i = 1; i <= s.getLastRowNum(); i++) { // On saute l'entete
                 Row row = s.getRow(i);
                 if (row == null) continue;
-
+                
                 String tranche = getValeurTexte(row.getCell(0));
                 double qfMin = getValeurNumerique(row.getCell(1));
                 double qfMax = getValeurNumerique(row.getCell(2));

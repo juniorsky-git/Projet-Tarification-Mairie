@@ -13,9 +13,21 @@ public class TestCasReels {
         }
 
         TarificationService service = new TarificationService();
-        double[] qfsATester = { 18000.0, 10000.0, 4500.0, 0.0 };
-        String[] cibles = { "Tranche A (>= 15 389)", "Tranche D (8 527 -> 10 813)", "Tranche F (3 954 -> 6 240)", "Tranche G (< 3 954)" };
-        String[] tranchesPures = { "A", "D", "F", "G" };
+        double[] qfsATester = {
+            18000.0, 10000.0, 4500.0, 0.0,
+            3953.99, 3954.0, 3954.01,
+            6240.0, 6240.99, 6241.0, 6241.01
+        };
+        String[] cibles = {
+            "Tranche A (>= 15 389)", "Tranche D (8 527 -> 10 813)", "Tranche F (3 954 -> 6 240)", "Tranche G (< 3 954)",
+            "Tranche G (juste avant F)", "Tranche F (pile au seuil)", "Tranche F (juste au-dessus)",
+            "Ancien max de F", "Trou decimal", "Tranche E (pile au seuil)", "Tranche E (juste au-dessus)"
+        };
+        String[] tranchesPures = {
+            "A", "D", "F", "G",
+            "G", "F", "F",
+            "F", "F", "E", "E"
+        };
 
         int succesCount = 0;
 

@@ -198,9 +198,17 @@ public class ConsoleUI {
                 return;
             }
             
-            grille = DonneesTarifs.chargerGrilleStandard(chemin);
-            if (grille.isEmpty()) {
-                System.out.println("   " + ROUGE_TEXT + "ERREUR : Le fichier est vide ou n'a pas pu etre lu." + RESET);
+            try {
+                grille = DonneesTarifs.chargerGrilleStandard(chemin);
+                if (grille.isEmpty()) {
+                    System.out.println("   " + ROUGE_TEXT + "ERREUR : Le fichier a été lu mais aucune donnée tarifaire valide n'a été extraite." + RESET);
+                    System.out.println("\n   Appuyez sur Entree.");
+                    scanner.nextLine();
+                    return;
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("   " + ROUGE_TEXT + "ERREUR : Grille invalide. " + e.getMessage() + RESET);
+                LogService.log("Fichier refusé par la validation métier : " + e.getMessage());
                 System.out.println("\n   Appuyez sur Entree.");
                 scanner.nextLine();
                 return;

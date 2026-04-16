@@ -430,3 +430,34 @@ La classe `DonneesTarifs.java` a été purgée de l'ensemble de ses appels à `S
 ### 3. Résultat Obtenu
 1.  **L'interface Console est immaculée** : L'utilisateur navigue et lance des simulations sans jamais être assailli par des textes rouges indéchiffrables en anglais.
 2.  **L'audit est persistent** : Toutes ces informations précieuses mais techniques sont centralisées dans le dossier `logs/erreur.log`. Si un utilisateur signale un problème de calcul sur sa session, n'importe quel développeur ou administrateur pourra ouvrir ce fichier texte local et pister l'anomalie grâce à l'horodatage.
+
+---
+
+## Etape 21 : Colmatage Mathématique et Validation Finale de Structure (16/04/2026 17h20)
+
+Dernière phase de fiabilisation de l'outil "Simulation / Tarification" visant à parer toutes les mauvaises manipulations de l'administration et les failles purement décimales concernant les tranches familiales.
+
+### 1. Le "Trou Décimal" des Quotients Familiaux (Bornes)
+**Problème** : Dans la documentation officielle, les tranches sont définies sur des nombres entiers, par exemple :
+- Tranche F : `3954 à 6240`
+- Tranche E : `6241 à 8526`
+
+Si un Quotient Familial vaut **6240.5**, il ne tombait ni dans F (car supérieur à la limite affichée 6240), ni dans E (car inférieur à 6241). Le programme levait une `Exception` car il se trouvait dans un vide mathématique.
+
+**Solution (Continuité Stricte)** : 
+La lecture de la borne supérieure a été modifiée dans `DonneesTarifs.java`. 
+Le code extrait le max affiché et lui ajoute `+1.0`. Ainsi, la tranche F devient `[3954.0, 6241.0[`.
+La condition d'appartenance `qf < qfMax` permet de refermer totalement l'écart. Les tests de validation poussés sur `3953.99`, `3954.01`, etc., garantissent à 100% que chaque contribuable atterrira dans une et une seule tranche.
+
+### 2. Le Blindage Structurel du Fichier Excel
+**Problème** : Si un agent chargeait une grille Excel vide ou une page non liée à la mairie, l'application tentait de parser malgré tout, entraînant des erreurs fatales ou des valeurs nulles.
+
+**Solution : Les Garde-Fous Métier** :
+Immédiatement après le chargement, le fichier subit une inspection :
+1.  `wb.getNumberOfSheets() == 0` : Rejette un Excel sans page (Fantôme).
+2.  `s.getLastRowNum() < 5` : Rejette une grille trop courte qui ne descend pas jusqu'aux données requises.
+3.  `mapping.containsKey(REPAS)` : Recherche impérative des colonnes vitales. Si le fichier chargé ne parle pas de "Repas" ou d'"Accueil Loisirs", l'application déduit que l'on n'a pas chargé la bonne annexe fiscale et jette (Throw) une erreur `IllegalArgumentException`.
+
+### 3. Encapsulation Ultime dans la Console
+Cette exception `IllegalArgumentException` est désormais attrapée tout en haut de la chaîne de l'Interface Utilisateur (ConsoleUI). 
+Lorsqu'elle survient, l'utilisateur d'accueil se voit afficher un message propre en français, ex: *"ERREUR : Grille invalide. Impossible de détecter les colonnes essentielles."*, sans que le logiciel ne plante ou ne délivre une ligne en jargon anglophone. L'administration gagne en totale autonomie !
