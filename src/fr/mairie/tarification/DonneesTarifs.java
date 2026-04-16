@@ -34,6 +34,99 @@ public class DonneesTarifs {
     public static final String ADOS_SORTIE_JOURNEE = "ADOS_SORTIE_JOURNEE";
 
     /**
+     * Charge une grille tarifaire depuis un fichier Excel de format "Standard" (ex: Grille 2024).
+     * Ce format possede les tranches en colonnes 1 et les prix de 2 a 9.
+     * 
+     * @param cheminFichier Chemin vers le fichier Excel.
+     * @return Liste de Tarifs charges.
+     */
+    public static List<Tarif> chargerGrilleStandard(String cheminFichier) {
+        List<Tarif> tarifs = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(cheminFichier);
+             Workbook wb = WorkbookFactory.create(fis)) {
+            
+            Sheet s = wb.getSheetAt(0); 
+            // On commence a la ligne 6 (index 5) jusqu'a la fin (ou jusqu'a une ligne vide)
+            for (int i = 5; i <= s.getLastRowNum(); i++) {
+                Row row = s.getRow(i);
+                if (row == null) continue;
+
+                String texteQF = getValeurTexte(row.getCell(0));
+                String tranche = getValeurTexte(row.getCell(1));
+                
+                if (tranche.isEmpty()) continue;
+
+                // Extraction des bornes QF depuis le texte
+                double[] bornes = extraireBornesQF(texteQF, tranche);
+                double qfMin = bornes[0];
+                double qfMax = bornes[1];
+
+                Map<String, Double> prix = new HashMap<>();
+                // Mapping des colonnes fixes du format Standalone
+                prix.put(REPAS, getValeurNumerique(row.getCell(2)));
+                prix.put(ACCUEIL_JOURNEE, getValeurNumerique(row.getCell(3)));
+                prix.put(ACCUEIL_DEMI_REPAS, getValeurNumerique(row.getCell(4)));
+                prix.put(PERISCOLAIRE_MATIN_SOIR, getValeurNumerique(row.getCell(5)));
+                prix.put(PERISCOLAIRE_MATIN_OU_SOIR, getValeurNumerique(row.getCell(6)));
+                prix.put(ETUDES_FORFAIT_MENSUEL, getValeurNumerique(row.getCell(7)));
+                prix.put(ETUDES_DEMI_FORFAIT, getValeurNumerique(row.getCell(8)));
+                // On peut ajouter le post-etudes si besoin, ici on se limite aux poles principaux
+                prix.put(ADOS_VAC_JOURNEE_REPAS, getValeurNumerique(row.getCell(3))); // Par defaut ados = loisirs si non specifie dans ce format
+
+                tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur de lecture Grille Standard : " + e.getMessage());
+        }
+        return tarifs;
+    }
+
+    /**
+     * Analyse le texte pour en extraire les bornes numeriques du Quotient Familial.
+     * 
+     * @param texte Le texte de la cellule (ex: "13 101e a 15 388e")
+     * @param tranche Le code tranche (pour identifier EXT)
+     * @return Un tableau [Min, Max]
+     */
+    private static double[] extraireBornesQF(String texte, String tranche) {
+        if (tranche.contains("EXT")) return new double[]{18000, Double.MAX_VALUE};
+        
+        try {
+            // Nettoyage prealable des accents courants et separateurs
+            String prep = texte.toLowerCase()
+                               .replace("\u00E0", "|") // à
+                               .replace("à", "|")
+                               .replace(" a ", "|")
+                               .replace("-", "|")
+                               .replace("\u2013", "|")
+                               .replace("\u2014", "|");
+            
+            String[] segments = prep.split("\\|");
+            List<Double> nombres = new ArrayList<>();
+            
+            for (String s : segments) {
+                // Pour chaque segment, on ne garde QUE les chiffres
+                String digits = s.replaceAll("[^0-9]", "");
+                if (!digits.isEmpty()) {
+                    try {
+                        nombres.add(Double.parseDouble(digits));
+                    } catch (NumberFormatException e) { /* Ignorer les segments non numeriques */ }
+                }
+            }
+            
+            if (nombres.size() >= 2) {
+                return new double[]{nombres.get(0), nombres.get(1)};
+            } else if (nombres.size() == 1) {
+                if (texte.toLowerCase().contains("plus")) return new double[]{nombres.get(0), Double.MAX_VALUE};
+                if (texte.toLowerCase().contains("moins")) return new double[]{0, nombres.get(0)};
+                return new double[]{nombres.get(0), nombres.get(0)};
+            }
+        } catch (Exception e) { }
+        
+        return new double[]{-1, -1};
+    }
+
+    /**
      * Charge une grille tarifaire depuis un fichier Excel externe.
      * Le fichier doit comporter les colonnes suivantes :
      * Col 0: Nom Tranche, Col 1: QF Min, Col 2: QF Max, Col 3+: Tarifs
@@ -189,8 +282,25 @@ public class DonneesTarifs {
 
     private static double getValeurNumerique(Cell cell) {
         if (cell == null) return 0.0;
+        
+        // Si c'est un nombre pur
         if (cell.getCellType() == CellType.NUMERIC) return cell.getNumericCellValue();
-        if (cell.getCellType() == CellType.FORMULA) return cell.getNumericCellValue();
+        
+        // Si c'est une formule
+        if (cell.getCellType() == CellType.FORMULA) {
+            try { return cell.getNumericCellValue(); } catch (Exception e) { return 0.0; }
+        }
+
+        // Si c'est du texte (cas frequent avec les symboles monetaires ou virgules)
+        if (cell.getCellType() == CellType.STRING) {
+            String val = cell.getStringCellValue().replace("\u00A0", "").replace(",", ".").replaceAll("[^0-9.]", "").trim();
+            try {
+                if (!val.isEmpty()) return Double.parseDouble(val);
+            } catch (Exception e) {
+                return 0.0;
+            }
+        }
+        
         return 0.0;
     }
 

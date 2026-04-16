@@ -13,3 +13,4 @@
 - [x] Module complet d'extraction Eau (Bi-semestre, Consos, Montants)
 - [x] Standardisation du style de code (Accolades {}, if/else explicites)
 - [x] Module Séjours de vacances (Détail par destination, Curie, Brassens)
+- [x] Module de consultation multi-grilles (Interne 2025 + Import Excel personnalisé)

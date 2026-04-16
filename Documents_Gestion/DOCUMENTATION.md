@@ -21,12 +21,10 @@ Les recettes sont calculées annuellement sur la base de multiplicateurs validé
 - **Études / Périscolaire** : Tarif × Enfants × **10 mois**.
 - **Autres (Loisirs, Ados, Séjours)** : Tarif × Enfants × **1** (base forfaitaire annuelle).
 
-## 3. Logique d'Affichage (`ConsoleUI.java`)
-La méthode `afficherDashboardPole` est désormais générique. Elle affiche systématiquement :
-- Le détail des charges par **Nature** (ex: Personnel, Électricité).
-- Le **Total des dépenses réelles**.
-- Le **Total des recettes théoriques** calculées.
-- Le **Taux de couverture** (Recettes / Dépenses).
+### Consultation Interactive
+La méthode `consulterTarif` permet une simulation en temps réel :
+- **Mode 2025** : Utilise les données de référence intégrées au code.
+- **Mode Import Excel** : Permet de charger n'importe quelle grille tarifaire indépendante (au format Table) pour tester des simulations historiques ou des scénarios futurs. Le moteur de parsing extrait automatiquement les tranches depuis le texte descriptif du Quotient Familial.
 
 ## 4. Exportation et Rapports PDF
 L'application intègre un moteur d'exportation professionnel (`PdfExportService`) utilisant la librairie Apache PDFBox. Ce service automatise la création d'un rapport financier complet.

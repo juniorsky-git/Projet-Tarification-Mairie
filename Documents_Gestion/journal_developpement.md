@@ -222,3 +222,21 @@ L'application est maintenant certifiée "Production-Ready" avec une traçabilit�
     - Calcul dynamique par séjour en sommant les colonnes C à K (Transport, Hébergement, Restauration).
     - Cette approche garantit l'exactitude des chiffres même si les liens vers des fichiers Excel externes ne sont pas accessibles.
 - **Résultat** : Nouveau Dashboard [4] fonctionnel affichant un budget total de **107 127,71 €**, détaillé par destination.
+168: 
+169: ---
+170: 
+171: ## Etape 13 : Consultation Multi-Grilles et Parsing Dynamique (16/04/2026)
+172: 
+173: L'objectif était d'offrir une flexibilité totale dans la consultation des tarifs en permettant de charger des grilles historiques (2024) ou futures sans modifier le code source.
+174: 
+175: ### Défis Techniques
+176: - **Analyse de texte (QF)** : Les grilles "Standalone" (ex: 2024) stockent les plages de Quotient Familial (QF) sous forme de texte ("10 814€ à 13 100€"). Un extracteur par segments a été développé pour retrouver les bornes numériques malgré les symboles et les espaces.
+177: - **Robustesse Monétaire** : Les cellules Excel contenant des symboles "€" ou des virgules sont désormais converties proprement en valeurs numériques traitables par le moteur Java.
+178: 
+179: ### Améliorations de l'Interface (ConsoleUI)
+180: - Ajout d'un menu de sélection de grille :
+181:     1. **Grille 2025 Interne** : Basée sur les constantes codées en dur pour une rapidité maximale.
+182:     2. **Grille Personnalisée** : Permet l'importation de n'importe quel fichier Excel structuré en colonnes de services (Repas, Loisirs, etc.).
+183: 
+184: ### Résultats
+185: Le module a été validé avec le fichier `Grille-tarifaire-2024-(1).xlsx`, confirmant l'identification correcte de la tranche C pour un QF de 12 000€ et l'affichage des prix exacts de l'époque.

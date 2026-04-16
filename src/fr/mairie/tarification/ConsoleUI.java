@@ -181,9 +181,9 @@ public class ConsoleUI {
         String choixGrille = scanner.nextLine();
         
         if ("2".equals(choixGrille)) {
-            System.out.print("   Entrez le chemin du fichier (ex: Donnees/grille_2024.xlsx) : ");
+            System.out.print("   Entrez le chemin du fichier (ex: Donnees/Grille-tarifaire-2024-(1).xlsx) : ");
             String chemin = scanner.nextLine();
-            grille = DonneesTarifs.chargerTarifsDepuisExcel(chemin);
+            grille = DonneesTarifs.chargerGrilleStandard(chemin);
             if (grille.isEmpty()) {
                 System.out.println("   " + ROUGE_TEXT + "ERREUR : Impossible de charger la grille externe." + RESET);
                 return;
