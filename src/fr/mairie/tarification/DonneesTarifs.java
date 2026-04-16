@@ -32,6 +32,7 @@ public class DonneesTarifs {
     public static final String ADOS_VAC_DEMI_SANS = "ADOS_VAC_DEMI_SANS";
     public static final String ADOS_SORTIE_DEMI = "ADOS_SORTIE_DEMI";
     public static final String ADOS_SORTIE_JOURNEE = "ADOS_SORTIE_JOURNEE";
+    public static final String TARIF_POST_ETUDES = "TARIF_POST_ETUDES";
 
     /**
      * Charge une grille tarifaire depuis un fichier Excel de format "Standard" (ex: Grille 2024).
@@ -70,6 +71,7 @@ public class DonneesTarifs {
                 prix.put(PERISCOLAIRE_MATIN_OU_SOIR, getValeurNumerique(row.getCell(6)));
                 prix.put(ETUDES_FORFAIT_MENSUEL, getValeurNumerique(row.getCell(7)));
                 prix.put(ETUDES_DEMI_FORFAIT, getValeurNumerique(row.getCell(8)));
+                prix.put(TARIF_POST_ETUDES, getValeurNumerique(row.getCell(9)));
                 // On peut ajouter le post-etudes si besoin, ici on se limite aux poles principaux
                 prix.put(ADOS_VAC_JOURNEE_REPAS, getValeurNumerique(row.getCell(3))); // Par defaut ados = loisirs si non specifie dans ce format
 

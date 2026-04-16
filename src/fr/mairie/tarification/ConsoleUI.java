@@ -201,12 +201,25 @@ public class ConsoleUI {
 
             if (t != null) {
                 System.out.println("\n   " + VERT_TEXT + "Tranche detectee : " + t.getTranche() + RESET);
-                System.out.println("   --------------------------------------");
-                System.out.printf("   Repas scolaire    : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
-                System.out.printf("   Loisirs journee   : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
-                System.out.printf("   Ados vacances     : %.2f euros%n", t.getPrix(DonneesTarifs.ADOS_VAC_JOURNEE_REPAS));
-                System.out.printf("   Etudes mensuel    : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
-                System.out.println("   --------------------------------------");
+                System.out.println("   " + repeat("-", 50));
+                
+                // Restauration
+                System.out.printf("   [RESTAURATION]   Repas scolaire           : %.2f euros%n", t.getPrix(DonneesTarifs.REPAS));
+                
+                // Loisirs
+                System.out.printf("   [COL / LOISIRS]  Journee complete         : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_JOURNEE));
+                System.out.printf("   [COL / LOISIRS]  1/2 Journee (+ repas)    : %.2f euros%n", t.getPrix(DonneesTarifs.ACCUEIL_DEMI_REPAS));
+                
+                // Periscolaire
+                System.out.printf("   [PERISCOLAIRE]   Matin ET Soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_SOIR));
+                System.out.printf("   [PERISCOLAIRE]   Matin OU Soir            : %.2f euros%n", t.getPrix(DonneesTarifs.PERISCOLAIRE_MATIN_OU_SOIR));
+                
+                // Etudes
+                System.out.printf("   [ETUDES]         Forfait mensuel          : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_FORFAIT_MENSUEL));
+                System.out.printf("   [ETUDES]         1/2 Forfait              : %.2f euros%n", t.getPrix(DonneesTarifs.ETUDES_DEMI_FORFAIT));
+                System.out.printf("   [POST ETUDES]    Sans gouter              : %.2f euros%n", t.getPrix(DonneesTarifs.TARIF_POST_ETUDES));
+                
+                System.out.println("   " + repeat("-", 50));
             } else {
                 System.out.println("   " + ROUGE_TEXT + "Aucun tarif trouve pour ce QF." + RESET);
             }

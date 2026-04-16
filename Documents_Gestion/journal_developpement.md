@@ -222,21 +222,47 @@ L'application est maintenant certifiée "Production-Ready" avec une traçabilit�
     - Calcul dynamique par séjour en sommant les colonnes C à K (Transport, Hébergement, Restauration).
     - Cette approche garantit l'exactitude des chiffres même si les liens vers des fichiers Excel externes ne sont pas accessibles.
 - **Résultat** : Nouveau Dashboard [4] fonctionnel affichant un budget total de **107 127,71 €**, détaillé par destination.
-168: 
-169: ---
-170: 
-171: ## Etape 13 : Consultation Multi-Grilles et Parsing Dynamique (16/04/2026)
-172: 
-173: L'objectif était d'offrir une flexibilité totale dans la consultation des tarifs en permettant de charger des grilles historiques (2024) ou futures sans modifier le code source.
-174: 
-175: ### Défis Techniques
-176: - **Analyse de texte (QF)** : Les grilles "Standalone" (ex: 2024) stockent les plages de Quotient Familial (QF) sous forme de texte ("10 814€ à 13 100€"). Un extracteur par segments a été développé pour retrouver les bornes numériques malgré les symboles et les espaces.
-177: - **Robustesse Monétaire** : Les cellules Excel contenant des symboles "€" ou des virgules sont désormais converties proprement en valeurs numériques traitables par le moteur Java.
-178: 
-179: ### Améliorations de l'Interface (ConsoleUI)
-180: - Ajout d'un menu de sélection de grille :
-181:     1. **Grille 2025 Interne** : Basée sur les constantes codées en dur pour une rapidité maximale.
-182:     2. **Grille Personnalisée** : Permet l'importation de n'importe quel fichier Excel structuré en colonnes de services (Repas, Loisirs, etc.).
-183: 
-184: ### Résultats
-185: Le module a été validé avec le fichier `Grille-tarifaire-2024-(1).xlsx`, confirmant l'identification correcte de la tranche C pour un QF de 12 000€ et l'affichage des prix exacts de l'époque.
+
+---
+
+## Etape 13 : Consultation Multi-Grilles et Parsing Dynamique (16/04/2026)
+
+L'objectif était d'offrir une flexibilité totale dans la consultation des tarifs en permettant de charger des grilles historiques (2024) ou futures sans modifier le code source.
+
+### Défis Techniques
+- **Analyse de texte (QF)** : Les grilles "Standalone" (ex: 2024) stockent les plages de Quotient Familial (QF) sous forme de texte ("10 814€ à 13 100€"). Un extracteur par segments a été développé pour retrouver les bornes numériques malgré les symboles et les espaces.
+- **Robustesse Monétaire** : Les cellules Excel contenant des symboles "€" ou des virgules sont désormais converties proprement en valeurs numériques traitables par le moteur Java.
+
+### Améliorations de l'Interface (ConsoleUI)
+- Ajout d'un menu de sélection de grille :
+    1. **Grille 2025 Interne** : Basée sur les constantes codées en dur pour une rapidité maximale.
+    2. **Grille Personnalisée** : Permet l'importation de n'importe quel fichier Excel structuré en colonnes de services (Repas, Loisirs, etc.).
+
+### Résultats
+Le module a été validé avec le fichier `Grille-tarifaire-2024-(1).xlsx`, confirmant l'identification correcte de la tranche C pour un QF de 12 000€ et l'affichage des prix exacts de l'époque.
+
+---
+
+## Etape 14 : Résolution Technique et Extraction Exhaustive (16/04/2026)
+
+L'objectif était de rendre l'outil "Infatigable" face aux variations de format et de corriger les instabilités de l'environnement de build.
+
+### 1. Problème de Classpath (NoClassDefFoundError)
+- **Problème** : Lors du passage à `make`, l'application ne trouvait plus les librairies Apache POI, provoquant un crash immédiat au chargement des fichiers Excel.
+- **Cause** : Le Makefile pointait vers des noms de JAR génériques (ex: `poi.jar`) alors que les fichiers réels incluent des numéros de version (ex: `poi-5.3.0.jar`).
+- **Solution** : Synchronisation complète du Makefile avec les noms de fichiers exacts présents dans le dossier `lib/`.
+
+### 2. Problème d'Extraction des Bornes (QF)
+- **Problème** : Les textes comme "10 814€ à 13 100€" étaient mal lus à cause des espaces de milliers et du caractère accentué "à".
+- **Solution** : Implémentation d'un algorithme de "segmentation par séparateur" :
+    - Remplacement de "à", "-", "a" par un tube `|`.
+    - Nettoyage strict de chaque segment pour ne garder que les chiffres.
+    - Recombinaison en nombres flottants (ex: "10 814" devient `10814.0`).
+
+### 3. Extraction Exhaustive des Services
+- **Problème** : L'utilisateur souhaitait voir TOUTES les colonnes de la grille (8 services) et non pas seulement les 4 principaux.
+- **Réalisation** : Extension du mapping dans `DonneesTarifs.java` pour inclure :
+    - Périscolaire (Matin ET soir / Matin OU soir)
+    - Études (Forfait / 1/2 forfait)
+    - Tarif Post-Études.
+- **Résultat** : Une vue complète à 360° des tarifs de la ville pour chaque simulation.
