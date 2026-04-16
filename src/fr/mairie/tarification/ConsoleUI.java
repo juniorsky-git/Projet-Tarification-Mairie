@@ -183,9 +183,26 @@ public class ConsoleUI {
         if ("2".equals(choixGrille)) {
             System.out.print("   Entrez le chemin du fichier (ex: Donnees/Grille-tarifaire-2024-(1).xlsx) : ");
             String chemin = scanner.nextLine();
+            
+            java.io.File fichier = new java.io.File(chemin);
+            if (!fichier.exists() || !fichier.isFile()) {
+                System.out.println("   " + ROUGE_TEXT + "ERREUR : Le fichier specifie est introuvable." + RESET);
+                System.out.println("\n   Appuyez sur Entree.");
+                scanner.nextLine();
+                return;
+            }
+            if (!chemin.toLowerCase().endsWith(".xlsx") && !chemin.toLowerCase().endsWith(".xls")) {
+                System.out.println("   " + ROUGE_TEXT + "ERREUR : Le fichier doit avoir l'extension Excel (.xls ou .xlsx)." + RESET);
+                System.out.println("\n   Appuyez sur Entree.");
+                scanner.nextLine();
+                return;
+            }
+            
             grille = DonneesTarifs.chargerGrilleStandard(chemin);
             if (grille.isEmpty()) {
-                System.out.println("   " + ROUGE_TEXT + "ERREUR : Impossible de charger la grille externe." + RESET);
+                System.out.println("   " + ROUGE_TEXT + "ERREUR : Le fichier est vide ou n'a pas pu etre lu." + RESET);
+                System.out.println("\n   Appuyez sur Entree.");
+                scanner.nextLine();
                 return;
             }
         } else {

@@ -195,7 +195,9 @@ public class DonneesTarifs {
      * @return Un tableau [Min, Max]
      */
     private static double[] extraireBornesQF(String texte, String tranche) {
-        if (tranche.contains("EXT")) return new double[]{18000, Double.MAX_VALUE};
+        // La tranche EXTétrique (Extérieurs) ne dépend pas du QF.
+        // On la place à une valeur inatteignable pour qu'elle n'écrase pas la Tranche A d'un résident à haut QF.
+        if (tranche.contains("EXT")) return new double[]{ Double.MAX_VALUE - 1, Double.MAX_VALUE };
         
         try {
             // Nettoyage prealable des accents courants et separateurs
@@ -223,7 +225,7 @@ public class DonneesTarifs {
             if (nombres.size() >= 2) {
                 return new double[]{nombres.get(0), nombres.get(1)};
             } else if (nombres.size() == 1) {
-                if (texte.toLowerCase().contains("plus")) return new double[]{nombres.get(0), Double.MAX_VALUE};
+                if (texte.toLowerCase().contains("plus")) return new double[]{nombres.get(0), Double.MAX_VALUE - 2};
                 if (texte.toLowerCase().contains("moins")) return new double[]{0, nombres.get(0)};
                 return new double[]{nombres.get(0), nombres.get(0)};
             }
@@ -399,10 +401,38 @@ public class DonneesTarifs {
 
         // Si c'est du texte (cas frequent avec les symboles monetaires ou virgules)
         if (cell.getCellType() == CellType.STRING) {
-            String val = cell.getStringCellValue().replace("\u00A0", "").replace(",", ".").replaceAll("[^0-9.]", "").trim();
+            String val = cell.getStringCellValue().trim();
+            if (val.isEmpty()) return 0.0;
+            
+            // 1. Nettoyage initial : espaces classiques, espaces insecables, symboles euros potentiels
+            val = val.replaceAll("\\s+", "").replace("\u00A0", "").replace("€", "").replace("e", "");
+            
+            // 2. Gestion des séparateurs (milliers vs decimales)
+            if (val.contains(",") && val.contains(".")) {
+                int lastDot = val.lastIndexOf(".");
+                int lastComma = val.lastIndexOf(",");
+                if (lastComma > lastDot) {
+                    // ex: 1.234,56 -> virgule décimale
+                    val = val.replace(".", "");
+                    val = val.replace(",", ".");
+                } else {
+                    // ex: 1,234.56 -> point décimal
+                    val = val.replace(",", "");
+                }
+            } else if (val.contains(",")) {
+                // Seulement une virgule, on assume que c'est une décimale
+                val = val.replace(",", ".");
+            }
+            
+            // 3. Purge de tous les caracteres restants sauf chiffres, point decimal et signe moins
+            val = val.replaceAll("[^0-9.-]", "");
+            
             try {
-                if (!val.isEmpty()) return Double.parseDouble(val);
+                if (!val.isEmpty() && !val.equals(".") && !val.equals("-")) {
+                    return Double.parseDouble(val);
+                }
             } catch (Exception e) {
+                System.err.println("Avertissement -> Format inattendu ignoré : [" + cell.getStringCellValue() + "]");
                 return 0.0;
             }
         }
