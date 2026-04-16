@@ -390,3 +390,24 @@ Un script de validation (`TestCasReels.java`) a été créé pour simuler des en
 *   **Famille D (QF 0)** -> Tranche G (Tarif solidaire minimal) correctement assignée.
 
 **Bilan : L'outil de Tarification Dynamique est pleinement qualifié.** Le moteur peut ingérer l'Excel de l'année N, extraire les services sans indexation rigide, et surmonter des erreurs d'inattention lors du remplissage par l'administration.
+
+---
+
+## Etape 19 : Automatisation des Assertions de Tests (16/04/2026 16h50)
+
+Suite à une recommandation de bonnes pratiques de développement, l'outil de test `TestCasReels.java` a été amélioré pour intégrer le concept d'**Assertions automatiques** (Test Unitaire).
+
+### 1. Problématique Initiale
+Avant cette étape, le script de test affichait simplement le résultat calculé à l'écran. Il incombait à l'utilisateur humain de lire le log et de comparer mentalement la "Tranche Obtenue" avec la "Cible Attendue". Ce processus manuel est sujet à l'erreur humaine, surtout si le nombre de cas de test vient à augmenter.
+
+### 2. Implémentation des Assertions
+L'algorithme de test a été modifié pour comparer l'objet retourné par le programme directement avec une valeur stricte prédéfinie.
+- Création d'un tableau de référence : `String[] tranchesPures = { "A", "D", "F", "G" };`
+- Au sein de la boucle de test, le script exécute l'évaluation logique : `boolean isValid = t.getTranche().equals(tranchesPures[i]);`
+
+Si l'assertion est VRAIE, le script affiche un badge `[SUCCÈS]` et incrémente un compteur.
+Si l'assertion est FAUSSE, le script lève un drapeau rouge `[ÉCHEC]` en affichant la discordance.
+
+### 3. Apport pour le Projet
+- **Non-Régression** : Si un futur développeur modifie le cœur de l'application (ex: `TarificationService.java`) et casse par inadvertance le calcul des limites de QF, l'exécution du script alertera immédiatement avec un bilan rouge (ex: `3 / 4 réussis`).
+- **Autonomie** : Le programme est désormais capable de **statuer lui-même sur sa propre fiabilité**. L'homme n'a plus qu'à consulter le récapitulatif `BILAN DES TESTS : 4 / 4 réussis.` en fin d'exécution.
