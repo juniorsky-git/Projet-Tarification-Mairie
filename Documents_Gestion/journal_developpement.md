@@ -411,3 +411,22 @@ Si l'assertion est FAUSSE, le script lève un drapeau rouge `[ÉCHEC]` en affich
 ### 3. Apport pour le Projet
 - **Non-Régression** : Si un futur développeur modifie le cœur de l'application (ex: `TarificationService.java`) et casse par inadvertance le calcul des limites de QF, l'exécution du script alertera immédiatement avec un bilan rouge (ex: `3 / 4 réussis`).
 - **Autonomie** : Le programme est désormais capable de **statuer lui-même sur sa propre fiabilité**. L'homme n'a plus qu'à consulter le récapitulatif `BILAN DES TESTS : 4 / 4 réussis.` en fin d'exécution.
+
+---
+
+## Etape 20 : Centralisation des Logs Techniques via LogService (16/04/2026 17h05)
+
+Pour rapprocher l'application des standards professionnels du développement (logiciel métier), une séparation stricte entre l'interface utilisateur (Console UI) et la couche de traçabilité technique (Logs) a été implémentée.
+
+### 1. Le Problème (Pollution de la Console)
+Avant cette étape, lorsque le moteur de chargement Excel rencontrait un problème de format ou une exception grave, il crachait les détails techniques (« Stack Traces » ou avertissements du type `System.err.println`) directement sur l'écran de la secrétaire de mairie. Cela polluait l'expérience utilisateur et générait de l'inquiétude inutile.
+
+### 2. La Solution (Couche de Journalisation Active)
+La classe `DonneesTarifs.java` a été purgée de l'ensemble de ses appels à `System.err.println`. Toutes les erreurs ont été interceptées et redirigées vers la classe `LogService.java` (composant pré-existant du projet).
+
+- **Erreurs Fatales** : Utilisent désormais `LogService.error(message, exception)`, ce qui permet d'horodater la panne, de capter le motif technique, et d'enregistrer la pile d'exécution (la ligne exacte du crash) sans rien afficher à l'utilisateur final.
+- **Avertissements Mineurs** : En cas de cellule Excel contenant une phrase inattendue, le flux passe dans `LogService.log()`. Le programme continue sa lecture de façon transparente pour l'utilisateur, tout en notifiant l'administrateur système de la cellule "sale".
+
+### 3. Résultat Obtenu
+1.  **L'interface Console est immaculée** : L'utilisateur navigue et lance des simulations sans jamais être assailli par des textes rouges indéchiffrables en anglais.
+2.  **L'audit est persistent** : Toutes ces informations précieuses mais techniques sont centralisées dans le dossier `logs/erreur.log`. Si un utilisateur signale un problème de calcul sur sa session, n'importe quel développeur ou administrateur pourra ouvrir ce fichier texte local et pister l'anomalie grâce à l'horodatage.
