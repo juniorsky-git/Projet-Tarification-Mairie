@@ -95,7 +95,7 @@ public class DonneesTarifs {
                 tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
             }
         } catch (Exception e) {
-            System.err.println("Erreur de lecture Grille Standard : " + e.getMessage());
+            LogService.error("Erreur de lecture Grille Standard", e);
         }
         return tarifs;
     }
@@ -276,7 +276,7 @@ public class DonneesTarifs {
                 tarifs.add(new Tarif(tranche, qfMin, qfMax, prix));
             }
         } catch (Exception e) {
-            System.err.println("Le blindage a detecte une erreur de lecture : " + e.getMessage());
+            LogService.error("Le blindage a detecte une erreur de lecture (grille statique)", e);
         }
         return tarifs;
     }
@@ -432,7 +432,7 @@ public class DonneesTarifs {
                     return Double.parseDouble(val);
                 }
             } catch (Exception e) {
-                System.err.println("Avertissement -> Format inattendu ignoré : [" + cell.getStringCellValue() + "]");
+                LogService.log("Avertissement -> Format inattendu ignoré : [" + cell.getStringCellValue() + "]");
                 return 0.0;
             }
         }
