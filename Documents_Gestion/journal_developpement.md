@@ -327,3 +327,44 @@ for (int c = 0; c < 30; c++) {
 - **Adaptabilité** : Si une nouvelle année, une colonne est insérée au milieu, l'algorithme "re-scannera" les en-têtes et trouvera le nouvel emplacement.
 - **Rétrocompatibilité** : Si la détection automatique échoue (ex: tableau sans en-tête), l'application bascule par sécurité sur la structure standard de 2024.
 - **Maintenance Facilitée** : Pas de code à modifier chaque année, l'outil s'auto-adapte à la source de données Excel.
+
+---
+
+## Etape 17 : Débogage Critique et Fiabilisation de la Signature (16/04/2026 16h00)
+
+Suite aux tests de validation sur la Tranche F (QF 4500), une anomalie critique a été détectée et corrigée. Cette étape illustre le passage d'une détection simple à une **intelligence contextuelle**.
+
+### 1. Détection de l'Anomalie
+- **Symptôme** : Pour un QF de 4 500 €, le programme affichait un tarif repas de **0,81 €** au lieu des **2,00 €** attendus.
+- **Analyse de la donnée** : La valeur "0,81" a été tracée dans la grille Excel : elle ne correspondait pas au pôle Restauration, mais au pôle **ESPACE ADOS (1/2 journée sans repas)**.
+
+### 2. Diagnostic Technique : Collision de Mots-Clés
+- **Cause Racine** : L'algorithme de l'Etape 16 cherchait le mot-clé "repas" de manière isolée. Or, ce mot apparaît plusieurs fois dans le tableau (Cantine scolaire, Ados avec repas, Ados sans repas).
+- **Conséquence** : Le premier "repas" trouvé (ou le dernier selon le sens de lecture) écrasait le précédent dans la table de correspondance (Mapping Map), provoquant un faux positif.
+
+### 3. Solution : La Signature Hiérarchique (Concaténation)
+Plutôt que de faire de grosses mathématiques, j'ai utilisé une **logique de filtrage par contexte parental**.
+
+- **Ancien Code** : `si (cellule contient "repas") -> colonne = Repas`
+- **Nouveau Code** : 
+    1.  **Fusion des En-têtes** : On concatène les lignes 1 (Pôle), 2 (Service) et 3 (Précision).
+    2.  **Signature Combinée** : 
+        *   La colonne 2 devient : `"RESTAURATION REPAS"`
+        *   La colonne 14 devient : `"ESPACE ADOS 1/2 JOURNÉE SANS REPAS"`
+    3.  **Filtrage Restrictif** : Pour le service `REPAS SCOLAIRE`, on impose que la signature contienne `"repas"` MAIS qu'elle soit associée au mot `"restauration"` ou qu'elle ne contienne PAS le mot `"ados"`.
+
+### 4. Code Implémenté (Extrait)
+```java
+// On fusionne 3 niveaux de titres pour avoir le contexte
+String fullLabel = (headerPôle + headerService + headerPrecision).toLowerCase();
+
+if (fullLabel.contains("repas")) {
+    // Si c'est du repas mais dans le pole Ados, on l'exclut du repas scolaire
+    if (fullLabel.contains("restauration") || !fullLabel.contains("ados")) {
+         mapping.put(REPAS, columnIndex);
+    }
+}
+```
+
+### 5. Conclusion du Débogage
+Cette correction rend l'outil encore plus "Universel". Il ne se contente pas de chercher des mots, il **comprend la hiérarchie du document Excel**. La vérification finale sur le QF 4500 a confirmé le retour au tarif correct de **2,00 €**.

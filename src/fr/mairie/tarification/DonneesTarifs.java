@@ -106,50 +106,77 @@ public class DonneesTarifs {
     private static Map<String, Integer> scannerEntetes(Sheet s) {
         Map<String, Integer> mapping = new HashMap<>();
         
-        // On examine les 5 premieres lignes (0 a 4) pour trouver les mots-cles
-        for (int i = 0; i < 5; i++) {
+        // On construit une "super-ligne" d'en-tête en concaténant les lignes 1, 2 et 3
+        // Cela permet de garder le contexte du pôle (ex: RESTAURATION vs ADOS)
+        int maxCols = 30;
+        String[] fullHeaders = new String[maxCols];
+        for (int c = 0; c < maxCols; c++) fullHeaders[c] = "";
+
+        for (int i = 1; i <= 3; i++) {
             Row row = s.getRow(i);
             if (row == null) continue;
-            
-            for (int c = 0; c < 30; c++) {
+            for (int c = 0; c < maxCols; c++) {
                 Cell cell = row.getCell(c);
-                if (cell == null) continue;
-                
-                String label = cell.toString().toLowerCase();
-                
-                if (label.contains("repas") && !label.contains("ados")) mapping.put(REPAS, c);
-                
-                if (label.contains("loisir")) {
-                    if (label.contains("journee") || label.contains("journée")) mapping.put(ACCUEIL_JOURNEE, c);
-                    if (label.contains("1/2")) mapping.put(ACCUEIL_DEMI_REPAS, c);
+                if (cell != null) {
+                    fullHeaders[c] += " " + cell.toString().toLowerCase();
                 }
-                
-                if (label.contains("periscola")) {
-                    if (label.contains("et") || label.contains("matin et soir")) mapping.put(PERISCOLAIRE_MATIN_SOIR, c);
-                    if (label.contains("ou") || label.contains("matin ou soir")) mapping.put(PERISCOLAIRE_MATIN_OU_SOIR, c);
+            }
+        }
+
+        // On parcourt les en-têtes consolidés pour le mapping
+        for (int c = 0; c < maxCols; c++) {
+            String label = fullHeaders[c].trim();
+            if (label.isEmpty()) continue;
+
+            // --- REPAS SCOLAIRE (Doit être dans le pôle RESTAURATION ou être seul) ---
+            if (label.contains("repas") && (label.contains("restauration") || (!label.contains("ados") && !label.contains("loisir")))) {
+                if (!mapping.containsKey(REPAS)) mapping.put(REPAS, c);
+            }
+
+            // --- LOISIRS ---
+            if (label.contains("loisir")) {
+                if (label.contains("journée") || label.contains("journee")) mapping.put(ACCUEIL_JOURNEE, c);
+                if (label.contains("1/2")) mapping.put(ACCUEIL_DEMI_REPAS, c);
+            }
+
+            // --- PERISCOLAIRE ---
+            if (label.contains("periscola") || label.contains("périscola")) {
+                if (label.contains("et") || label.contains("matin et soir")) mapping.put(PERISCOLAIRE_MATIN_SOIR, c);
+                if (label.contains("ou") || label.contains("matin ou soir")) mapping.put(PERISCOLAIRE_MATIN_OU_SOIR, c);
+            }
+
+            // --- ETUDES ---
+            if (label.contains("etude") || label.contains("étude")) {
+                if (label.contains("mensuel") || label.contains("forfait")) mapping.put(ETUDES_FORFAIT_MENSUEL, c);
+                if (label.contains("1/2")) mapping.put(ETUDES_DEMI_FORFAIT, c);
+            }
+
+            // --- POST ETUDES & DECOUVERTE ---
+            if (label.contains("post") && (label.contains("etude") || label.contains("étude"))) mapping.put(TARIF_POST_ETUDES, c);
+            if (label.contains("decouverte") || label.contains("découverte")) mapping.put(CLASSE_DECOUVERTE, c);
+
+            // --- ESPACE ADOS ---
+            if (label.contains("ados")) {
+                if (label.contains("vacances")) {
+                    if (label.contains("repas") && !label.contains("sans")) {
+                        if (label.contains("1/2")) mapping.put(ADOS_VAC_DEMI_REPAS, c);
+                        else mapping.put(ADOS_VAC_JOURNEE_REPAS, c);
+                    }
+                    if (label.contains("sans")) {
+                        if (label.contains("1/2")) mapping.put(ADOS_VAC_DEMI_SANS, c);
+                        else mapping.put(ADOS_VAC_JOURNEE_SANS, c);
+                    }
                 }
-                
-                if (label.contains("etude")) {
-                    if (label.contains("mensuel") || label.contains("forfait")) mapping.put(ETUDES_FORFAIT_MENSUEL, c);
-                    if (label.contains("1/2")) mapping.put(ETUDES_DEMI_FORFAIT, c);
+                if (label.contains("sortie")) {
+                    if (label.contains("1/2")) mapping.put(ADOS_SORTIE_DEMI, c);
+                    if (label.contains("journee") || label.contains("journée")) mapping.put(ADOS_SORTIE_JOURNEE, c);
                 }
-                
-                if (label.contains("post") && label.contains("etude")) mapping.put(TARIF_POST_ETUDES, c);
-                if (label.contains("decouverte")) mapping.put(CLASSE_DECOUVERTE, c);
-                
-                if (label.contains("ados")) {
-                    if (label.contains("vacances") && label.contains("repas") && !label.contains("sans")) mapping.put(ADOS_VAC_JOURNEE_REPAS, c);
-                    if (label.contains("vacances") && label.contains("sans")) mapping.put(ADOS_VAC_JOURNEE_SANS, c);
-                    if (label.contains("1/2") && label.contains("repas")) mapping.put(ADOS_VAC_DEMI_REPAS, c);
-                    if (label.contains("1/2") && label.contains("sans")) mapping.put(ADOS_VAC_DEMI_SANS, c);
-                    if (label.contains("sortie") && label.contains("1/2")) mapping.put(ADOS_SORTIE_DEMI, c);
-                    if (label.contains("sortie") && label.contains("journee")) mapping.put(ADOS_SORTIE_JOURNEE, c);
-                }
-                
-                if (label.contains("sejour")) {
-                    if (label.contains("5")) mapping.put(SEJOUR_5_JOURS, c);
-                    if (label.contains("6")) mapping.put(SEJOUR_6_JOURS, c);
-                }
+            }
+
+            // --- SEJOURS ---
+            if (label.contains("sejour") || label.contains("séjour")) {
+                if (label.contains("5")) mapping.put(SEJOUR_5_JOURS, c);
+                if (label.contains("6")) mapping.put(SEJOUR_6_JOURS, c);
             }
         }
         return mapping;
