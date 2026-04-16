@@ -368,3 +368,25 @@ if (fullLabel.contains("repas")) {
 
 ### 5. Conclusion du Débogage
 Cette correction rend l'outil encore plus "Universel". Il ne se contente pas de chercher des mots, il **comprend la hiérarchie du document Excel**. La vérification finale sur le QF 4500 a confirmé le retour au tarif correct de **2,00 €**.
+
+---
+
+## Etape 18 : Validation de Cas Pratiques et Blindage des Formats (16/04/2026 16h45)
+
+L'ultime phase de fiabilisation s'est concentrée sur deux axes : intercepter les erreurs de saisie avant le plantage de l'application (crash), et valider l'assise mathématique et algorithmique sur 4 profils tarifaires de test.
+
+### 1. Blindage de la Saisie (Parser)
+Dans un tableur manipulé par des humains, les prix peuvent contenir : `12 500,00` (Espace insécable), `12,50 €` (Symbole monétaire) ou même du texte inattendu (`A déterminer`). 
+Le moteur d'extraction `getValeurNumerique` a été intégralement repensé avec des expressions régulières et du filtrage pour s'autocorriger :
+- Suppression systématique des espaces cachés et devises.
+- Analyse contextuelle de la virgule décimale (différenciée de la notation Anglo-saxonne des milliers ou vice-versa).
+- En cas de texte irrécupérable, l'algorithme génère un avertissement dans la console sans interrompre la lecture des autres colonnes.
+
+### 2. Tests de Recette sur 4 profils Quotients Familiaux
+Un script de validation (`TestCasReels.java`) a été créé pour simuler des entrées massives sur la grille V1 de 2024.
+*   **Famille A (QF >= 18000)** -> Tranche A. *Anomalie corrigée (Collision EXT) : L'algorithme se bloquait sur la ligne "Extérieur" car celle-ci happait tous les hauts de plafond. La ligne EXT a été isolée virtuellement.*
+*   **Famille B (QF 10000)** -> Tranche D correctement identifiée.
+*   **Famille C (QF 4500)** -> Tranche F correctement identifiée, avec confirmation du tarif Repas à 2.00€.
+*   **Famille D (QF 0)** -> Tranche G (Tarif solidaire minimal) correctement assignée.
+
+**Bilan : L'outil de Tarification Dynamique est pleinement qualifié.** Le moteur peut ingérer l'Excel de l'année N, extraire les services sans indexation rigide, et surmonter des erreurs d'inattention lors du remplissage par l'administration.
