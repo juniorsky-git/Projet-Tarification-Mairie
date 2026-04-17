@@ -74,6 +74,23 @@ public class DonneesTarifs {
             // --- DETECTION DYNAMIQUE DES COLONNES ---
             Map<String, Integer> mapping = scannerEntetes(s);
 
+            // --- BLINDAGE 4 : Verifier que les colonnes metier essentielles sont presentes ---
+            // On choisit REPAS et ACCUEIL_JOURNEE comme colonnes "pivot" indispensables.
+            // Si ces deux colonnes sont absentes du mapping, le fichier n'est pas une grille tarifaire valide.
+            List<String> colonnesManquantes = new ArrayList<>();
+            if (!mapping.containsKey(REPAS)) {
+                colonnesManquantes.add(REPAS);
+            }
+            if (!mapping.containsKey(ACCUEIL_JOURNEE)) {
+                colonnesManquantes.add(ACCUEIL_JOURNEE);
+            }
+            if (!colonnesManquantes.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Colonne(s) metier introuvable(s) dans l'en-tete : " + colonnesManquantes
+                    + ". Verifiez que la ligne d'entete contient bien les noms de services."
+                );
+            }
+
             // On commence a la ligne 6 (index 5) jusqu'a la fin
             for (int i = 5; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);
