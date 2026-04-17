@@ -17,9 +17,18 @@ Nous avons mis en place une stratégie de "Fail-Fast" (Échouer tôt) dans `Donn
 | :--- | :--- | :--- |
 | **Garde Structurelle 1** | Nombre de feuilles = 0 | "Le fichier Excel est vide (aucune feuille detectee)." |
 | **Garde Structurelle 2** | Nombre de lignes < 6 | "Structure invalide : moins de 6 lignes detectees." |
-| **Garde de Contenu 3** | Entête absente/incomplète | "L'en-tete de colonnes est absente ou complète." |
+| **Garde Sémantique 4** | Colonnes REPAS/ACCUEIL absentes | "Colonne(s) metier introuvable(s) dans l'en-tete..." |
 
-## 3. Workflow de Résilience (Script de Build)
+## 3. Workflow de Réflexion : Physique vs Sémantique
+Pourquoi avoir ajouté une 4ème garde ? 
+Le jury appréciera cette distinction :
+- **La validation Physique (G1, G2, G3)** s'assure que le contenant est techniquement lisible (format, nombre de lignes).
+- **La validation Sémantique (G4)** s'assure que le contenu a du sens pour le métier de la mairie. 
+
+**Problème identifié :** Le "trou" venait du fait que l'on pouvait scanner l'en-tête, ne rien trouver, et continuer le calcul avec des valeurs à 0 sans prévenir l'utilisateur.
+**Solution :** Corrélation directe entre le `scannerEntetes` et un vérificateur de présence des colonnes "pivots".
+
+## 4. Workflow de Résilience (Script de Build)
 ### Erreur rencontrée
 Le script `./build.ps1` utilisait un chemin vers le JDK Java 21 codé en dur (`redhat.java-1.53.0`). Suite à une mise à jour mineure de l'environnement, le script est devenu inutilisable.
 
