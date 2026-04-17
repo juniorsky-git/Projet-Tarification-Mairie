@@ -37,8 +37,23 @@ Pour réaliser cette mutation, nous avons retenu trois piliers :
 
 ---
 
+## 🛡 Focus : Blindage & Résilience (Mission de Sécurité)
+*Mise à jour du 17 avril 2026*
+
+### 1. Diagnostic des "Trous de Sécurité"
+Lors des tests de charge, nous avons identifié que le passage au mode dynamique créait une vulnérabilité : l'impossibilité de garantir la structure d'un fichier externe.
+
+**Solution Java implémentée :**
+- Trois verrous de sécurité (Guards) ont été placés dans `DonneesTarifs.java`. Ils vérifient le nombre de feuilles, le nombre de lignes et la cohérence de l'en-tête avant toute tentative de calcul.
+
+### 2. Résilience du Workflow (Auto-Détection JDK)
+Un bug environnemental a été résolu : le script de build ne dépend plus d'une version fixe de l'extension Java de l'IDE.
+- **Workflow** : Détection -> Échec de Compilation -> Audit du script -> Remplacement du Hardcoding par une recherche dynamique de chemin PowerShell.
+
+---
+
 > [!TIP]
 > **Argument de Soutenance** : Cette évolution démontre une compréhension des besoins métier réels. Une mairie doit pouvoir simuler les impacts d'une hausse de tarifs (2026+) par rapport aux années précédentes (2024) sans changer d'outil. C'est le principe de la **pérennité logicielle**.
 
 ---
-*Document consignant la réflexion pré-implémentation.*
+*Document finalisé après blindage complet du système.*
