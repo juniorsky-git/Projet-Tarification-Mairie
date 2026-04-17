@@ -48,12 +48,32 @@ public class DonneesTarifs {
         List<Tarif> tarifs = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream(cheminFichier);
              Workbook wb = WorkbookFactory.create(fis)) {
-            
-            Sheet s = wb.getSheetAt(0); 
-            
+
+            // --- BLINDAGE 1 : Le fichier doit contenir au moins une feuille ---
+            if (wb.getNumberOfSheets() == 0) {
+                throw new IllegalArgumentException("Le fichier Excel est vide (aucune feuille detectee).");
+            }
+
+            Sheet s = wb.getSheetAt(0);
+
+            // --- BLINDAGE 2 : La feuille doit contenir assez de lignes (entete + donnees) ---
+            if (s.getLastRowNum() < 5) {
+                throw new IllegalArgumentException(
+                    "Structure invalide : moins de 6 lignes detectees. Verifiez que l'entete et les tranches QF sont presents."
+                );
+            }
+
+            // --- BLINDAGE 3 : Verifier la presence d'au moins une colonne tarifaire ---
+            Row entete = s.getRow(4); // Ligne d'entete (index 4, soit ligne 5 Excel)
+            if (entete == null || entete.getLastCellNum() < 3) {
+                throw new IllegalArgumentException(
+                    "Structure invalide : l'en-tete de colonnes est absente ou incomplète (minimum 3 colonnes attendues)."
+                );
+            }
+
             // --- DETECTION DYNAMIQUE DES COLONNES ---
             Map<String, Integer> mapping = scannerEntetes(s);
-            
+
             // On commence a la ligne 6 (index 5) jusqu'a la fin
             for (int i = 5; i <= s.getLastRowNum(); i++) {
                 Row row = s.getRow(i);

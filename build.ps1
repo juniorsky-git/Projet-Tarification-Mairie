@@ -3,8 +3,10 @@
 $Action = $args[0]
 if ($null -eq $Action) { $Action = "jar" }
 
-# Chemins (Forçage vers Java 21 pour compatibilité PDF)
-$JavaBin = "C:\Users\stagedg2\.antigravity\extensions\redhat.java-1.53.0-win32-x64\jre\21.0.10-win32-x86_64\bin"
+# Chemins - Detection automatique de la version Java installee (evite le bug lors des MAJ)
+$ExtensionsPath = "C:\Users\stagedg2\.antigravity\extensions"
+$JavaExtension = Get-ChildItem $ExtensionsPath -Filter "redhat.java-*-win32-x64" -Directory | Sort-Object Name -Descending | Select-Object -First 1
+$JavaBin = "$($JavaExtension.FullName)\jre\21.0.10-win32-x86_64\bin"
 $Javac = "$JavaBin\javac.exe"
 $Java  = "$JavaBin\java.exe"
 $Jar   = "$JavaBin\jar.exe"
