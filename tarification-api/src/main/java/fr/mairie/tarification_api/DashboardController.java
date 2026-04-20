@@ -5,22 +5,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Contrôleur REST du tableau de bord financier.
  *
- * Expose l'endpoint GET /api/dashboard?pole={nom} qui agrège les données
- * de simulation budgétaire (dépenses, recettes, taux de couverture, etc.)
- * pour un pôle de service donné.
+ * Expose l'endpoint GET /api/dashboard?pole={nom} qui retourne les dépenses
+ * réelles ventilées par nature pour un pôle de service donné.
  *
- * Actuellement seul le pôle "Restauration" est alimenté par les données
- * de l'onglet Simulation de CALC DEP(4).xlsx. Les autres pôles retournent
- * des valeurs vides en attendant leur implémentation.
+ * Actuellement seul le pôle "Restauration" est implémenté (données CALC DEP(4).csv).
+ * Les recettes ne sont pas encore calculées (valeur 0).
  *
  * @author Séri-khane YOLOU
- * @version 1.0
+ * @version 1.1
  */
 @RestController
 @RequestMapping("/api")
@@ -65,51 +61,50 @@ public class DashboardController {
     }
 
     /**
-     * Calcule les indicateurs financiers de la Restauration à partir des
-     * lignes de simulation lues dans CALC DEP(4).xlsx.
+     * Calcule le tableau de bord financier de la Restauration.
      *
-     * @return Un {@link DashboardResponse} renseigné avec les totaux et détails.
+     * Données extraites du CSV CALC DEP(4) :
+     * - Nombre d'enfants total : ligne 16, col 3 (ex: 1 128)
+     * - Coût moyen réel d'un repas : 11,39 € (noté dans le fichier, ligne 25)
+     * - Dépenses réelles ventilées : ligne 33 "Total général", section 2
+     *   · Scolarest (prestations) : 713 752,47 €
+     *   · Personnel               : 1 051 019,64 €
+     *   · Alimentation            : 1 451,91 €
+     *   · Eau                     : 8 159,00 €
+     *   · Électricité             : 30 563,49 €
+     *   · Gaz                     : 8 159,00 €
+     *   · TOTAL                   : 1 813 105,51 €
+     *
+     * Les recettes ne sont pas calculées pour l'instant (valeur 0).
+     *
+     * @return Un {@link DashboardResponse} renseigné avec les dépenses réelles.
      */
     private DashboardResponse calculerDashboardRestauration() {
-        List<SimulationLigne> lignes = simulationCalculateur.lireSimulationRestauration();
-
         DashboardResponse r = new DashboardResponse();
         r.pole = "Restauration";
-        r.detailsCharges = new LinkedHashMap<>();
 
-        double totalDepenses = 0;
-        double totalRecettes = 0;
-        double sommePrixFacture = 0;
-        double sommeCoutMoyen = 0;
-        int nbLignes = 0;
+        // --- Nombre d'enfants total (section 1 - ligne Total) ---
+        r.nombreEnfants = simulationCalculateur.lireNombreEnfantsTotal();
 
-        for (SimulationLigne l : lignes) {
-            totalDepenses += l.depenseAnnuelle;
-            totalRecettes += l.recetteAnnuelle;
-            sommePrixFacture += l.prixFacture;
-            sommeCoutMoyen += l.coutMoyen;
-            nbLignes++;
+        // --- Coût moyen réel d'un repas (noté dans le CSV à la ligne 25) ---
+        // "Un repas coûte en moyenne 11,39€"
+        r.coutMoyenReel = 11.39;
 
-            // Détail des dépenses par tranche
-            String cle = l.codeTranche.isEmpty() ? l.tranche : l.codeTranche;
-            r.detailsCharges.put(cle, l.depenseAnnuelle);
-        }
+        // --- Dépenses réelles ventilées (section 2 - ligne Total général) ---
+        java.util.Map<String, Double> depenses =
+                simulationCalculateur.lireDepensesReellesRestauration();
 
-        r.depensesTotales = totalDepenses;
-        r.recettesTotales = totalRecettes;
+        // Le total est stocké sous la clé "TOTAL" dans la map
+        r.depensesTotales = depenses.getOrDefault("TOTAL", 0.0);
 
-        // Taux de couverture : recettes / dépenses × 100
-        r.tauxCouverture = (totalDepenses > 0)
-                ? Math.round((totalRecettes / totalDepenses) * 10000.0) / 100.0
-                : 0;
+        // Détail des charges exposé dans le dashboard (sans la clé TOTAL)
+        r.detailsCharges = new java.util.LinkedHashMap<>(depenses);
+        r.detailsCharges.remove("TOTAL");
 
-        // Multiplicateur : coût moyen / prix facturé moyen (sur l'ensemble des tranches)
-        if (nbLignes > 0 && sommePrixFacture > 0) {
-            double ratio = sommeCoutMoyen / sommePrixFacture;
-            r.multiplicateur = String.format("%.2f", ratio);
-        } else {
-            r.multiplicateur = "N/A";
-        }
+        // --- Recettes non calculées pour l'instant ---
+        r.recettesTotales = 0;
+        r.tauxCouverture  = 0;
+        r.multiplicateur  = "N/A";
 
         return r;
     }

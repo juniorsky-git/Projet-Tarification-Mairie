@@ -16,19 +16,22 @@ public class DashboardResponse {
     /** Nom du pôle concerné (ex: "Restauration"). */
     public String pole;
 
-    /** Somme des dépenses annuelles de toutes les tranches (en euros). */
+    /** Nombre total d'enfants concernés par ce pôle. */
+    public double nombreEnfants;
+
+    /** Coût moyen réel par unité de service (ex: coût réel d'un repas en €). */
+    public double coutMoyenReel;
+
+    /** Somme des dépenses réelles annuelles toutes natures confondues (en euros). */
     public double depensesTotales;
 
-    /** Somme des recettes annuelles de toutes les tranches (en euros). */
+    /** Somme des recettes annuelles (non calculé pour l'instant, vaut 0). */
     public double recettesTotales;
 
-    /** Taux de couverture global : recettes / dépenses × 100 (en %). */
+    /** Taux de couverture global (non calculé pour l'instant, vaut 0). */
     public double tauxCouverture;
 
-    /**
-     * Multiplicateur de tarif calculé : coût moyen / prix facturé moyen.
-     * Indique de combien les tarifs couvrent le coût réel.
-     */
+    /** Multiplicateur de tarif (non calculé pour l'instant). */
     public String multiplicateur;
 
     /**

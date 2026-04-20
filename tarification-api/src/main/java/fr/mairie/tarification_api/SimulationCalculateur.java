@@ -101,6 +101,79 @@ public class SimulationCalculateur {
     }
 
     /**
+     * Lit le nombre total d'enfants de la restauration depuis la ligne "Total"
+     * de la section Simulation (ligne 16 du CSV, col 3).
+     *
+     * @return Nombre total d'enfants (ex: 1128), ou 0 si non trouvé.
+     */
+    public double lireNombreEnfantsTotal() {
+        try (FileInputStream fis = new FileInputStream(fichierCsv);
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(fis, StandardCharsets.UTF_8))) {
+
+            String ligne;
+            int numeroLigne = 0;
+            while ((ligne = reader.readLine()) != null) {
+                numeroLigne++;
+                if (numeroLigne == 16) {
+                    // Ligne : Total;;;1128;;698 006,40 €;...
+                    String[] cols = ligne.split(SEPARATEUR, -1);
+                    return getNombre(cols, 3); // col 3 = nombre total enfants
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SimulationCalculateur] Erreur lecture nombre enfants : " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Lit le détail des dépenses réelles de la section Restauration.
+     *
+     * Extrait la ligne "Total général" (ligne 33 du CSV) qui contient
+     * la ventilation des dépenses par nature et le total général.
+     *
+     * Structure de la ligne (séparateur ;) :
+     * Col 1 = "Total général" | Col 2 = Scolarest | Col 3 = Personnel
+     * Col 4 = Alimentation    | Col 5 = Eau       | Col 6 = Électricité
+     * Col 7 = Gaz             | Col 8 = TOTAL
+     *
+     * @return Map ordonnée {nature → montant}, incluant la clé "TOTAL"
+     *         avec le montant total des dépenses réelles.
+     */
+    public java.util.Map<String, Double> lireDepensesReellesRestauration() {
+        java.util.Map<String, Double> detail = new java.util.LinkedHashMap<>();
+
+        try (FileInputStream fis = new FileInputStream(fichierCsv);
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(fis, StandardCharsets.UTF_8))) {
+
+            String ligne;
+            int numeroLigne = 0;
+            while ((ligne = reader.readLine()) != null) {
+                numeroLigne++;
+
+                // Ligne 33 : ;Total général;713 752,47;1 051 019,64;...
+                if (numeroLigne == 33) {
+                    String[] cols = ligne.split(SEPARATEUR, -1);
+                    detail.put("Scolarest (prestations)",  getNombre(cols, 2));
+                    detail.put("Personnel",                getNombre(cols, 3));
+                    detail.put("Alimentation",             getNombre(cols, 4));
+                    detail.put("Eau",                      getNombre(cols, 5));
+                    detail.put("Electricite",              getNombre(cols, 6));
+                    detail.put("Gaz",                      getNombre(cols, 7));
+                    detail.put("TOTAL",                    getNombre(cols, 8));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SimulationCalculateur] Erreur lecture dépenses réelles : " + e.getMessage());
+        }
+
+        return detail;
+    }
+
+    /**
      * Extrait une valeur textuelle depuis un tableau de colonnes CSV.
      *
      * @param cols  Tableau des colonnes de la ligne.
