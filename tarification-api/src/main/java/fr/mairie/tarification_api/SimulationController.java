@@ -1,5 +1,6 @@
 package fr.mairie.tarification_api;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,9 @@ import java.util.List;
  * Lit l'onglet "Simulation" du fichier CALC DEP(4).xlsx et expose
  * les résultats en JSON via un endpoint GET.
  *
+ * Le chemin du fichier Excel est configuré dans application.properties
+ * (propriété : simulation.fichier.excel).
+ *
  * @author Séri-khane YOLOU
  * @version 1.0
  */
@@ -20,10 +24,15 @@ public class SimulationController {
 
     /**
      * Calculateur pointant vers le fichier de données de simulation.
-     * Le chemin est relatif au répertoire de lancement de l'application.
+     * Le chemin est injecté depuis application.properties pour éviter
+     * tout chemin codé en dur.
      */
-    private final SimulationCalculateur simulationCalculateur =
-            new SimulationCalculateur("Donnees/Autres/CALC DEP(4).xlsx");
+    private final SimulationCalculateur simulationCalculateur;
+
+    public SimulationController(
+            @Value("${simulation.fichier.excel}") String cheminFichierExcel) {
+        this.simulationCalculateur = new SimulationCalculateur(cheminFichierExcel);
+    }
 
     /**
      * Retourne la liste des lignes de simulation pour la restauration scolaire.
