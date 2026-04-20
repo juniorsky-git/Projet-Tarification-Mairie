@@ -102,20 +102,31 @@
 
                 const data = await response.json();
 
+                // Formater un montant en euros avec séparateur de milliers
+                const euros = (val) =>
+                    val.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+
+                // Champs spécifiques à certains pôles (ex: Restauration)
+                const infoSpecifique = [];
+                if (data.nombreEnfants > 0)
+                    infoSpecifique.push(`<p><strong>Nombre d'enfants :</strong> ${data.nombreEnfants.toLocaleString("fr-FR")}</p>`);
+                if (data.coutMoyenReel > 0)
+                    infoSpecifique.push(`<p><strong>Coût réel par repas :</strong> ${euros(data.coutMoyenReel)}</p>`);
+
+                // Détail des charges par nature
                 let detailsHtml = "";
                 for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
-                    detailsHtml += `<li><strong>${cle}</strong> : ${valeur.toFixed(2)} €</li>`;
+                    detailsHtml += `<li><strong>${cle}</strong> : ${euros(valeur)}</li>`;
                 }
 
                 zone.innerHTML = `
-            <h3>${data.pole}</h3>
-            <p><strong>Total dépenses réelles :</strong> ${data.depensesTotales.toFixed(2)} €</p>
-            <p><strong>Total recettes théoriques :</strong> ${data.recettesTotales.toFixed(2)} €</p>
-            <p><strong>Taux de couverture :</strong> ${data.tauxCouverture.toFixed(2)} %</p>
-            <p><strong>Multiplicateur :</strong> ${data.multiplicateur}</p>
-            <h4>Détail des charges</h4>
-            <ul>${detailsHtml}</ul>
-        `;
+                    <h3>${data.pole}</h3>
+                    ${infoSpecifique.join("")}
+                    <p><strong>Total dépenses réelles :</strong> ${euros(data.depensesTotales)}</p>
+                    <h4>Détail par nature de dépense</h4>
+                    <ul>${detailsHtml}</ul>
+                `;
+
             } catch (error) {
                 zone.innerHTML = "❌ Erreur de communication avec le serveur.";
             }
