@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tarification Mairie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        input,
+        button {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 6px;
+        }
+
+        #uploadResultat,
+        #resultat {
+            margin-top: 15px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            width: 360px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Consultation tarifaire</h1>
+    <h2>Tableau de bord financier</h2>
+
+    <select id="pole">
+        <option value="Restauration">Restauration</option>
+        <option value="Accueil de Loisirs">Accueil de Loisirs</option>
+        <option value="Espace Ados">Espace Ados</option>
+        <option value="Sejours">Séjours</option>
+        <option value="Etudes surveillees">Études surveillées</option>
+        <option value="Accueil periscolaire">Accueil périscolaire</option>
+    </select>
+
+    <button type="button" onclick="chargerDashboard()">Afficher le dashboard</button>
+
+    <div id="dashboardResultat" style="margin-top: 20px;"></div>
+    <h2>Grille actuellement utilisée</h2>
+    <div id="grilleActive">Chargement...</div>
+    <br>
+    <button type="button" onclick="resetGrille()">Revenir à la grille 2025</button>
+    <h2>Charger une grille Excel</h2>
+    <input type="file" id="fichierExcel" accept=".xls,.xlsx">
+    <button type="button" onclick="uploaderFichier()">Charger le fichier</button>
+
+    <div id="uploadResultat">Aucun fichier chargé.</div>
+
+    <h2>Rechercher un tarif</h2>
+    <label for="qf">Quotient familial :</label>
+    <input type="number" id="qf" step="0.01" placeholder="Ex: 8000">
+    <button type="button" onclick="chercherTarif()">Rechercher</button>
+
+    <div id="resultat">Aucun résultat pour le moment.</div>
+
+    <script>
+        async function uploaderFichier() {
+            const input = document.getElementById("fichierExcel");
+            const uploadResultat = document.getElementById("uploadResultat");
+
+            if (!input.files || input.files.length === 0) {
+                uploadResultat.innerHTML = "Veuillez sélectionner un fichier Excel.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+
+            try {
+                const response = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const message = await response.text();
+                uploadResultat.innerHTML = message;
+            } catch (error) {
+                console.error("Erreur upload :", error);
+                uploadResultat.innerHTML = "Erreur lors de l'envoi du fichier.";
+            }
+        }
+
+        async function chargerDashboard() {
+            const pole = document.getElementById("pole").value;
+            const zone = document.getElementById("dashboardResultat");
+
+            try {
+                const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
+
+                if (!response.ok) {
+                    const txt = await response.text();
+                    zone.innerHTML = "❌ " + txt;
+                    return;
+                }
+
+                const data = await response.json();
+
+                let detailsHtml = "";
+                for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
+                    detailsHtml += `<li><strong>${cle}</strong> : ${valeur.toFixed(2)} €</li>`;
+                }
+
+                zone.innerHTML = `
+            <h3>${data.pole}</h3>
+            <p><strong>Total dépenses réelles :</strong> ${data.depensesTotales.toFixed(2)} €</p>
+            <p><strong>Total recettes théoriques :</strong> ${data.recettesTotales.toFixed(2)} €</p>
+            <p><strong>Taux de couverture :</strong> ${data.tauxCouverture.toFixed(2)} %</p>
+            <p><strong>Multiplicateur :</strong> ${data.multiplicateur}</p>
+            <h4>Détail des charges</h4>
+            <ul>${detailsHtml}</ul>
+        `;
+            } catch (error) {
+                zone.innerHTML = "❌ Erreur de communication avec le serveur.";
+            }
+        }
+        async function chargerGrilleActive() {
+            const zone = document.getElementById("grilleActive");
+
+            try {
+                const response = await fetch("/api/grille-active");
+                const data = await response.text();
+                zone.innerHTML = "<strong>" + data + "</strong>";
+            } catch (error) {
+                zone.innerHTML = "Erreur lors de la récupération de la grille active.";
+            }
+        }
+
+        async function resetGrille() {
+            const uploadResultat = document.getElementById("uploadResultat");
+
+            try {
+                const response = await fetch("/api/reset-grille", {
+                    method: "POST"
+                });
+
+                const message = await response.text();
+                uploadResultat.innerHTML = "✅ " + message;
+                chargerGrilleActive();
+            } catch (error) {
+                uploadResultat.innerHTML = "❌ Erreur lors du retour à la grille 2025.";
+            }
+        }
+
+        async function chercherTarif() {
+            const qf = document.getElementById("qf").value;
+            const resultat = document.getElementById("resultat");
+
+            if (!qf) {
+                resultat.innerHTML = "⚠️ Veuillez entrer un QF.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tarif?qf=${qf}`);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    resultat.innerHTML = "❌ " + errorText;
+                    return;
+                }
+
+                const data = await response.json();
+
+                resultat.innerHTML = `
+            <h3>Résultat pour le QF : ${qf}</h3>
+
+            <p><strong>Tranche :</strong> ${data.tranche}</p>
+            <p><strong>QF min :</strong> ${data.qfMin}</p>
+            <p><strong>QF max :</strong> ${data.qfMax}</p>
+
+            <hr>
+
+            <h4>Restauration</h4>
+            <p><strong>Repas :</strong> ${data.repas} €</p>
+
+            <h4>Accueil de loisirs</h4>
+            <p><strong>Journée :</strong> ${data.accueilJournee} €</p>
+            <p><strong>1/2 journée avec repas :</strong> ${data.accueilDemiRepas} €</p>
+
+            <h4>Périscolaire</h4>
+            <p><strong>Matin et soir :</strong> ${data.periscolaireMatinSoir} €</p>
+            <p><strong>Matin ou soir :</strong> ${data.periscolaireMatinOuSoir} €</p>
+
+            <h4>Études surveillées</h4>
+            <p><strong>Forfait mensuel :</strong> ${data.etudesForfaitMensuel} €</p>
+            <p><strong>Demi forfait :</strong> ${data.etudesDemiForfait} €</p>
+            <p><strong>Post études :</strong> ${data.tarifPostEtudes} €</p>
+            <p><strong>Classe découverte :</strong> ${data.classeDecouverte} €</p>
+
+            <h4>Jeunesse / Espace ados</h4>
+            <p><strong>Vac. journée avec repas :</strong> ${data.adosVacJourneeRepas} €</p>
+            <p><strong>Vac. journée sans repas :</strong> ${data.adosVacJourneeSans} €</p>
+            <p><strong>Vac. 1/2 journée avec repas :</strong> ${data.adosVacDemiRepas} €</p>
+            <p><strong>Vac. 1/2 journée sans repas :</strong> ${data.adosVacDemiSans} €</p>
+            <p><strong>Sortie 1/2 journée :</strong> ${data.adosSortieDemi} €</p>
+            <p><strong>Sortie journée :</strong> ${data.adosSortieJournee} €</p>
+
+            <h4>Séjours</h4>
+            <p><strong>Séjour 5 jours :</strong> ${data.sejour5Jours} €</p>
+            <p><strong>Séjour 6 jours :</strong> ${data.sejour6Jours} €</p>
+        `;
+            } catch (error) {
+                resultat.innerHTML = "❌ Erreur de communication avec le serveur.";
+            }
+        }
+
+        window.onload = function () {
+            chargerGrilleActive();
+        };
+
+    </script>
+</body>
+
+</html>
