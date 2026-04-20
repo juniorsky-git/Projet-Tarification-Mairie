@@ -30,8 +30,8 @@ public class DashboardController {
     private final SimulationCalculateur simulationCalculateur;
 
     public DashboardController(
-            @Value("${simulation.fichier.excel}") String cheminFichierExcel) {
-        this.simulationCalculateur = new SimulationCalculateur(cheminFichierExcel);
+            @Value("${simulation.fichier.csv}") String cheminFichierCsv) {
+        this.simulationCalculateur = new SimulationCalculateur(cheminFichierCsv);
     }
 
     /**

@@ -1,92 +1,99 @@
 package fr.mairie.tarification_api;
 
-import org.apache.poi.ss.usermodel.*;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Lecteur de l'onglet "Simulation" du fichier CALC DEP(4).xlsx.
+ * Lecteur du fichier CALC DEP(4).csv — section Restauration.
  *
- * Cette classe lit les données de simulation budgétaire pour la restauration :
- * tranches, prix facturés, nombre d'enfants, coût moyen, dépenses, recettes,
- * écart et taux de couverture.
+ * Le fichier CSV utilise le point-virgule (;) comme séparateur et le format
+ * français pour les nombres ("1 234,56 €", "85,01%").
+ *
+ * Structure de la section Restauration (1-indexé) :
+ * - Ligne 1-3  : vides
+ * - Ligne 4    : en-tête des colonnes
+ * - Ligne 5    : vide
+ * - Ligne 6-15 : données par tranche (EXT, A, B, B2, C, D, E, F, F2, G)
+ * - Ligne 16   : ligne Total (ignorée — col 1 vide)
+ *
+ * Colonnes :
+ * Col 0 = libellé tranche | Col 1 = code tranche | Col 2 = prix facturé
+ * Col 3 = nombre enfants  | Col 4 = coût moyen   | Col 5 = dépense annuelle
+ * Col 6 = recette annuelle | Col 7 = écart        | Col 8 = taux de couverture
  *
  * @author Séri-khane YOLOU
- * @version 1.0
+ * @version 2.0
  */
 public class SimulationCalculateur {
 
-    /** Chemin vers le fichier Excel contenant les données de simulation. */
-    private final String fichierExcel;
+    /** Chemin vers le fichier CSV de simulation. */
+    private final String fichierCsv;
 
-    /** Nom exact de l'onglet à lire dans le classeur. */
-    private static final String ONGLET_SIMULATION = "Simulation";
+    /** Séparateur de colonnes du CSV. */
+    private static final String SEPARATEUR = ";";
 
     /**
-     * Construit un calculateur pointant vers le fichier Excel indiqué.
+     * Construit un calculateur pointant vers le fichier CSV indiqué.
      *
-     * @param fichierExcel Chemin relatif ou absolu vers CALC DEP(4).xlsx.
+     * @param fichierCsv Chemin relatif ou absolu vers CALC DEP(4).csv.
      */
-    public SimulationCalculateur(String fichierExcel) {
-        this.fichierExcel = fichierExcel;
+    public SimulationCalculateur(String fichierCsv) {
+        this.fichierCsv = fichierCsv;
     }
 
     /**
-     * Lit l'onglet "Simulation" et retourne la liste des lignes budgétaires
-     * pour la restauration scolaire.
+     * Lit la section Restauration du CSV et retourne la liste des lignes
+     * budgétaires par tranche tarifaire.
      *
-     * D'après l'analyse du fichier CALC DEP(4).csv :
-     * - Ligne 4 (index 3) : en-tête des colonnes
-     * - Ligne 6 (index 5) : première tranche de données (EXT)
-     * - Ligne 15 (index 14) : dernière tranche (G)
-     * - Ligne 16 (index 15) : ligne Total — ignorée car codeTranche vide
+     * Les lignes dont le code tranche (col 1) est vide sont ignorées
+     * (ligne Total, lignes vides, autres sections du fichier).
      *
-     * Structure des colonnes :
-     * Col 0 = libellé tranche | Col 1 = code tranche | Col 2 = prix facturé
-     * Col 3 = nombre enfants  | Col 4 = coût moyen   | Col 5 = dépense annuelle
-     * Col 6 = recette annuelle | Col 7 = écart        | Col 8 = taux couverture
-     *
-     * @return Liste de {@link SimulationLigne} extraites du fichier, jamais null.
+     * @return Liste de {@link SimulationLigne} extraites du CSV, jamais null.
      */
     public List<SimulationLigne> lireSimulationRestauration() {
         List<SimulationLigne> lignes = new ArrayList<>();
 
-        try (FileInputStream fis = new FileInputStream(fichierExcel);
-             Workbook wb = WorkbookFactory.create(fis)) {
+        try (FileInputStream fis = new FileInputStream(fichierCsv);
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(fis, StandardCharsets.UTF_8))) {
 
-            Sheet s = wb.getSheet(ONGLET_SIMULATION);
-            if (s == null) {
-                System.err.println("[SimulationCalculateur] Onglet '" + ONGLET_SIMULATION + "' introuvable dans " + fichierExcel);
-                return lignes;
-            }
+            String ligne;
+            int numeroLigne = 0;
 
-            // Données : lignes Excel 6→15 = index POI 5→14
-            // La ligne 16 (index 15) est la ligne "Total" : codeTranche vide → ignorée
-            for (int i = 5; i <= 15; i++) {
-                Row row = s.getRow(i);
-                if (row == null) continue;
+            while ((ligne = reader.readLine()) != null) {
+                numeroLigne++;
 
-                SimulationLigne l = new SimulationLigne();
-                l.tranche         = getValeurTexte(row.getCell(0));
-                l.codeTranche     = getValeurTexte(row.getCell(1));
-                l.prixFacture     = getValeurNumerique(row.getCell(2));
-                l.nombreEnfants   = getValeurNumerique(row.getCell(3));
-                l.coutMoyen       = getValeurNumerique(row.getCell(4));
-                l.depenseAnnuelle = getValeurNumerique(row.getCell(5));
-                l.recetteAnnuelle = getValeurNumerique(row.getCell(6));
-                l.ecart           = getValeurNumerique(row.getCell(7));
-                l.tauxCouverture  = getValeurNumerique(row.getCell(8));
+                // Les données de Restauration commencent à la ligne 6
+                // et se terminent à la ligne 15 (ligne 16 = Total, ignorée)
+                if (numeroLigne < 6 || numeroLigne > 16) continue;
 
-                // On n'ajoute la ligne que si le code tranche est renseigné
-                // (filtre la ligne Total et les lignes vides)
-                if (!l.codeTranche.isEmpty()) {
-                    lignes.add(l);
-                }
+                String[] cols = ligne.split(SEPARATEUR, -1);
+
+                // Col 1 = code tranche : vide → ligne Total ou vide → on ignore
+                if (cols.length < 2) continue;
+                String codeTranche = cols[1].trim();
+                if (codeTranche.isEmpty()) continue;
+
+                SimulationLigne s = new SimulationLigne();
+                s.tranche         = getTexte(cols, 0);
+                s.codeTranche     = codeTranche;
+                s.prixFacture     = getNombre(cols, 2);
+                s.nombreEnfants   = getNombre(cols, 3);
+                s.coutMoyen       = getNombre(cols, 4);
+                s.depenseAnnuelle = getNombre(cols, 5);
+                s.recetteAnnuelle = getNombre(cols, 6);
+                s.ecart           = getNombre(cols, 7);
+                s.tauxCouverture  = getNombre(cols, 8);
+
+                lignes.add(s);
             }
 
         } catch (Exception e) {
-            System.err.println("[SimulationCalculateur] Erreur lecture onglet Simulation : " + e.getMessage());
+            System.err.println("[SimulationCalculateur] Erreur lecture CSV : " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -94,39 +101,41 @@ public class SimulationCalculateur {
     }
 
     /**
-     * Extrait la valeur textuelle d'une cellule.
+     * Extrait une valeur textuelle depuis un tableau de colonnes CSV.
      *
-     * @param c La cellule à lire (peut être null).
-     * @return Le texte de la cellule, ou une chaîne vide si null.
+     * @param cols  Tableau des colonnes de la ligne.
+     * @param index Index de la colonne à lire.
+     * @return La valeur trimée, ou une chaîne vide si hors limites.
      */
-    private String getValeurTexte(Cell c) {
-        if (c == null) return "";
-        return c.toString().trim();
+    private String getTexte(String[] cols, int index) {
+        if (index >= cols.length) return "";
+        return cols[index].trim();
     }
 
     /**
-     * Extrait la valeur numérique d'une cellule, avec gestion des formules
-     * et du texte (virgule → point).
+     * Extrait et parse une valeur numérique depuis un tableau de colonnes CSV.
      *
-     * @param c La cellule à lire (peut être null).
-     * @return La valeur numérique, ou 0 en cas d'absence ou d'erreur.
+     * Gère le format français : "6 806,80 €", "-53 816,00 €", "85,01%", "429"
+     *
+     * @param cols  Tableau des colonnes de la ligne.
+     * @param index Index de la colonne à lire.
+     * @return La valeur numérique parsée, ou 0 en cas d'absence ou d'erreur.
      */
-    private double getValeurNumerique(Cell c) {
-        if (c == null) return 0;
-        try {
-            if (c.getCellType() == CellType.NUMERIC) return c.getNumericCellValue();
-            if (c.getCellType() == CellType.FORMULA)  return c.getNumericCellValue();
+    private double getNombre(String[] cols, int index) {
+        if (index >= cols.length) return 0;
+        String val = cols[index].trim();
+        if (val.isEmpty()) return 0;
 
-            // Nettoyage du format français : "6 806,80 €" ou "125,34%"
-            String s = c.toString().trim()
-                    .replace("\u00A0", "")   // espace insécable
-                    .replace(" ", "")        // espace normal (séparateur milliers)
-                    .replace("€", "")        // symbole euro
-                    .replace("%", "")        // symbole pourcentage
-                    .replace(",", ".");      // virgule décimale → point
-            if (s.isEmpty()) return 0;
-            return Double.parseDouble(s);
-        } catch (Exception e) {
+        try {
+            // Nettoyage du format français : "6 806,80 €" → "6806.80"
+            val = val
+                    .replace("\u00A0", "") // espace insécable
+                    .replace(" ", "")      // espace (séparateur milliers)
+                    .replace("€", "")      // symbole euro
+                    .replace("%", "")      // symbole pourcentage
+                    .replace(",", ".");     // virgule décimale → point
+            return Double.parseDouble(val);
+        } catch (NumberFormatException e) {
             return 0;
         }
     }
