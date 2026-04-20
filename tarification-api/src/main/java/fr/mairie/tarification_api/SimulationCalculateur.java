@@ -36,8 +36,16 @@ public class SimulationCalculateur {
      * Lit l'onglet "Simulation" et retourne la liste des lignes budgétaires
      * pour la restauration scolaire.
      *
-     * Les lignes sont lues à partir de la ligne 7 (index 6) jusqu'à la ligne 16
-     * (index 15). Si une ligne ne possède pas de code tranche, elle est ignorée.
+     * D'après l'analyse du fichier CALC DEP(4).csv :
+     * - Ligne 4 (index 3) : en-tête des colonnes
+     * - Ligne 6 (index 5) : première tranche de données (EXT)
+     * - Ligne 15 (index 14) : dernière tranche (G)
+     * - Ligne 16 (index 15) : ligne Total — ignorée car codeTranche vide
+     *
+     * Structure des colonnes :
+     * Col 0 = libellé tranche | Col 1 = code tranche | Col 2 = prix facturé
+     * Col 3 = nombre enfants  | Col 4 = coût moyen   | Col 5 = dépense annuelle
+     * Col 6 = recette annuelle | Col 7 = écart        | Col 8 = taux couverture
      *
      * @return Liste de {@link SimulationLigne} extraites du fichier, jamais null.
      */
@@ -53,24 +61,25 @@ public class SimulationCalculateur {
                 return lignes;
             }
 
-            // Lignes 7 à 16 du fichier Excel (index 6 à 15, base 0)
-            // À ajuster si besoin selon la vraie zone de l'onglet Simulation
-            for (int i = 6; i <= 15; i++) {
+            // Données : lignes Excel 6→15 = index POI 5→14
+            // La ligne 16 (index 15) est la ligne "Total" : codeTranche vide → ignorée
+            for (int i = 5; i <= 15; i++) {
                 Row row = s.getRow(i);
                 if (row == null) continue;
 
                 SimulationLigne l = new SimulationLigne();
-                l.tranche        = getValeurTexte(row.getCell(0));
-                l.codeTranche    = getValeurTexte(row.getCell(1));
-                l.prixFacture    = getValeurNumerique(row.getCell(2));
-                l.nombreEnfants  = getValeurNumerique(row.getCell(3));
-                l.coutMoyen      = getValeurNumerique(row.getCell(4));
+                l.tranche         = getValeurTexte(row.getCell(0));
+                l.codeTranche     = getValeurTexte(row.getCell(1));
+                l.prixFacture     = getValeurNumerique(row.getCell(2));
+                l.nombreEnfants   = getValeurNumerique(row.getCell(3));
+                l.coutMoyen       = getValeurNumerique(row.getCell(4));
                 l.depenseAnnuelle = getValeurNumerique(row.getCell(5));
                 l.recetteAnnuelle = getValeurNumerique(row.getCell(6));
-                l.ecart          = getValeurNumerique(row.getCell(7));
-                l.tauxCouverture = getValeurNumerique(row.getCell(8));
+                l.ecart           = getValeurNumerique(row.getCell(7));
+                l.tauxCouverture  = getValeurNumerique(row.getCell(8));
 
                 // On n'ajoute la ligne que si le code tranche est renseigné
+                // (filtre la ligne Total et les lignes vides)
                 if (!l.codeTranche.isEmpty()) {
                     lignes.add(l);
                 }
@@ -107,7 +116,14 @@ public class SimulationCalculateur {
         try {
             if (c.getCellType() == CellType.NUMERIC) return c.getNumericCellValue();
             if (c.getCellType() == CellType.FORMULA)  return c.getNumericCellValue();
-            String s = c.toString().trim().replace(",", ".");
+
+            // Nettoyage du format français : "6 806,80 €" ou "125,34%"
+            String s = c.toString().trim()
+                    .replace("\u00A0", "")   // espace insécable
+                    .replace(" ", "")        // espace normal (séparateur milliers)
+                    .replace("€", "")        // symbole euro
+                    .replace("%", "")        // symbole pourcentage
+                    .replace(",", ".");      // virgule décimale → point
             if (s.isEmpty()) return 0;
             return Double.parseDouble(s);
         } catch (Exception e) {
