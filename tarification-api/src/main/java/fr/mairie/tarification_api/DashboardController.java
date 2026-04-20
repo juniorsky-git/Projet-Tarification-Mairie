@@ -9,20 +9,20 @@ import java.util.LinkedHashMap;
 /**
  * Contrôleur REST du tableau de bord financier.
  *
- * Expose l'endpoint GET /api/dashboard?pole={nom} qui retourne les dépenses
- * réelles ventilées par nature pour un pôle de service donné.
+ * Expose GET /api/dashboard?pole={nom} pour les 6 pôles du fichier CALC DEP(4).csv :
+ * Restauration, Accueil de Loisirs, Espace Ados, Séjours,
+ * Études surveillées, Accueil périscolaire.
  *
- * Actuellement seul le pôle "Restauration" est implémenté (données CALC DEP(4).csv).
- * Les recettes ne sont pas encore calculées (valeur 0).
+ * Seules les dépenses réelles sont calculées pour l'instant.
+ * Les recettes seront ajoutées dans une issue future.
  *
  * @author Séri-khane YOLOU
- * @version 1.1
+ * @version 1.2
  */
 @RestController
 @RequestMapping("/api")
 public class DashboardController {
 
-    /** Calculateur de simulation, pointant vers CALC DEP(4).xlsx. */
     private final SimulationCalculateur simulationCalculateur;
 
     public DashboardController(
@@ -31,81 +31,121 @@ public class DashboardController {
     }
 
     /**
-     * Retourne les indicateurs financiers agrégés pour un pôle de service.
+     * Retourne les dépenses réelles ventilées par nature pour un pôle donné.
      *
-     * Pour le pôle "Restauration", les données proviennent de l'onglet
-     * Simulation de CALC DEP(4).xlsx. Pour les autres pôles, une réponse
-     * vide est retournée (à compléter dans les issues suivantes).
+     * Le paramètre {@code pole} correspond aux valeurs du dropdown HTML :
+     * "Restauration", "Accueil de Loisirs", "Espace Ados",
+     * "Sejours", "Etudes surveillees", "Accueil periscolaire"
      *
-     * @param pole Nom du pôle (ex: "Restauration", "Accueil de Loisirs"...).
-     * @return 200 OK avec un {@link DashboardResponse} sérialisé en JSON.
+     * @param pole Nom du pôle (insensible à la casse et aux accents).
+     * @return 200 OK avec un {@link DashboardResponse} JSON.
      */
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboard(@RequestParam String pole) {
 
-        DashboardResponse response = new DashboardResponse();
-        response.pole = pole;
+        String cle = normaliserPole(pole);
+        DashboardResponse response;
 
-        if ("Restauration".equalsIgnoreCase(pole)) {
-            response = calculerDashboardRestauration();
-        } else {
-            // Pôles à implémenter dans les issues suivantes
-            response.depensesTotales = 0;
-            response.recettesTotales = 0;
-            response.tauxCouverture = 0;
-            response.multiplicateur = "N/A";
-            response.detailsCharges = new LinkedHashMap<>();
+        switch (cle) {
+
+            case "restauration":
+                response = construireDashboard(
+                        "Restauration",
+                        simulationCalculateur.lireDepensesReellesRestauration());
+                // Données supplémentaires spécifiques à la restauration
+                response.nombreEnfants = simulationCalculateur.lireNombreEnfantsTotal();
+                response.coutMoyenReel = 11.39; // "Un repas coûte en moyenne 11,39€" (CSV ligne 25)
+                break;
+
+            case "accueil de loisirs":
+                response = construireDashboard(
+                        "Accueil de Loisirs",
+                        simulationCalculateur.lireDepensesAccueilLoisirs());
+                break;
+
+            case "espace ados":
+                response = construireDashboard(
+                        "Espace Ados",
+                        simulationCalculateur.lireDepensesEspaceAdos());
+                break;
+
+            case "sejours":
+                response = construireDashboard(
+                        "Séjours",
+                        simulationCalculateur.lireDepensesSejours());
+                break;
+
+            case "etudes surveillees":
+                response = construireDashboard(
+                        "Études surveillées",
+                        simulationCalculateur.lireDepensesEtudesSurveillees());
+                break;
+
+            case "accueil periscolaire":
+                response = construireDashboard(
+                        "Accueil périscolaire",
+                        simulationCalculateur.lireDepensesAccueilPeriscolaire());
+                break;
+
+            default:
+                // Pôle inconnu — réponse vide
+                response = new DashboardResponse();
+                response.pole = pole;
+                response.depensesTotales = 0;
+                response.recettesTotales = 0;
+                response.tauxCouverture  = 0;
+                response.multiplicateur  = "N/A";
+                response.detailsCharges  = new LinkedHashMap<>();
+                break;
         }
 
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Calcule le tableau de bord financier de la Restauration.
+     * Construit un {@link DashboardResponse} à partir d'une map de dépenses réelles.
      *
-     * Données extraites du CSV CALC DEP(4) :
-     * - Nombre d'enfants total : ligne 16, col 3 (ex: 1 128)
-     * - Coût moyen réel d'un repas : 11,39 € (noté dans le fichier, ligne 25)
-     * - Dépenses réelles ventilées : ligne 33 "Total général", section 2
-     *   · Scolarest (prestations) : 713 752,47 €
-     *   · Personnel               : 1 051 019,64 €
-     *   · Alimentation            : 1 451,91 €
-     *   · Eau                     : 8 159,00 €
-     *   · Électricité             : 30 563,49 €
-     *   · Gaz                     : 8 159,00 €
-     *   · TOTAL                   : 1 813 105,51 €
+     * La clé "TOTAL" de la map est extraite pour renseigner {@code depensesTotales}.
+     * Les recettes ne sont pas encore calculées (valeur 0).
      *
-     * Les recettes ne sont pas calculées pour l'instant (valeur 0).
-     *
-     * @return Un {@link DashboardResponse} renseigné avec les dépenses réelles.
+     * @param nomPole  Libellé affiché du pôle.
+     * @param depenses Map {nature → montant} + clé "TOTAL" = total général.
+     * @return DashboardResponse prêt à être sérialisé en JSON.
      */
-    private DashboardResponse calculerDashboardRestauration() {
+    private DashboardResponse construireDashboard(
+            String nomPole, java.util.Map<String, Double> depenses) {
+
         DashboardResponse r = new DashboardResponse();
-        r.pole = "Restauration";
-
-        // --- Nombre d'enfants total (section 1 - ligne Total) ---
-        r.nombreEnfants = simulationCalculateur.lireNombreEnfantsTotal();
-
-        // --- Coût moyen réel d'un repas (noté dans le CSV à la ligne 25) ---
-        // "Un repas coûte en moyenne 11,39€"
-        r.coutMoyenReel = 11.39;
-
-        // --- Dépenses réelles ventilées (section 2 - ligne Total général) ---
-        java.util.Map<String, Double> depenses =
-                simulationCalculateur.lireDepensesReellesRestauration();
-
-        // Le total est stocké sous la clé "TOTAL" dans la map
+        r.pole            = nomPole;
         r.depensesTotales = depenses.getOrDefault("TOTAL", 0.0);
-
-        // Détail des charges exposé dans le dashboard (sans la clé TOTAL)
-        r.detailsCharges = new java.util.LinkedHashMap<>(depenses);
-        r.detailsCharges.remove("TOTAL");
-
-        // --- Recettes non calculées pour l'instant ---
-        r.recettesTotales = 0;
+        r.recettesTotales = 0;   // à implémenter dans une issue future
         r.tauxCouverture  = 0;
         r.multiplicateur  = "N/A";
+        r.nombreEnfants   = 0;
+        r.coutMoyenReel   = 0;
+
+        // Détail exposé sans la clé interne "TOTAL"
+        r.detailsCharges = new LinkedHashMap<>(depenses);
+        r.detailsCharges.remove("TOTAL");
 
         return r;
+    }
+
+    /**
+     * Normalise le nom d'un pôle pour la comparaison : minuscules + suppression accents.
+     *
+     * Permet de faire correspondre "Accueil périscolaire", "accueil periscolaire",
+     * "Accueil Périscolaire" à la même clé.
+     *
+     * @param pole Nom brut du pôle (depuis l'URL ou le dropdown).
+     * @return Clé normalisée pour le switch.
+     */
+    private String normaliserPole(String pole) {
+        return pole.toLowerCase()
+                .replace("é", "e").replace("è", "e").replace("ê", "e")
+                .replace("à", "a").replace("â", "a")
+                .replace("î", "i").replace("ï", "i")
+                .replace("ô", "o").replace("û", "u").replace("ù", "u")
+                .trim();
     }
 }

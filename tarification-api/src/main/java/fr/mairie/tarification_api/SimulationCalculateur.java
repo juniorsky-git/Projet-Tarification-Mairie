@@ -212,4 +212,149 @@ public class SimulationCalculateur {
             return 0;
         }
     }
+
+    // =========================================================================
+    // HELPER GÉNÉRIQUE — lecture d'une ligne "Total général" du CSV
+    // =========================================================================
+
+    /**
+     * Méthode utilitaire : lit la ligne {@code numeroLigne} du CSV et construit
+     * une map ordonnée {étiquette → montant} pour le tableau de bord.
+     *
+     * Les entrées dont le montant est 0 sont exclues du détail (sauf "TOTAL").
+     *
+     * @param numeroLigne  Numéro de ligne dans le CSV (base 1).
+     * @param etiquettes   Noms des natures de dépenses (dans l'ordre des colonnes).
+     * @param colonnes     Index de colonnes correspondants aux étiquettes.
+     * @param colonneTotal Index de la colonne contenant le total général.
+     * @return Map {libellé → montant} avec la clé "TOTAL" pour le total global.
+     */
+    private java.util.Map<String, Double> lireTotalGeneral(
+            int numeroLigne, String[] etiquettes, int[] colonnes, int colonneTotal) {
+
+        java.util.Map<String, Double> detail = new java.util.LinkedHashMap<>();
+
+        try (FileInputStream fis = new FileInputStream(fichierCsv);
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(fis, StandardCharsets.UTF_8))) {
+
+            String ligne;
+            int num = 0;
+            while ((ligne = reader.readLine()) != null) {
+                if (++num == numeroLigne) {
+                    String[] cols = ligne.split(SEPARATEUR, -1);
+                    for (int i = 0; i < etiquettes.length; i++) {
+                        double val = getNombre(cols, colonnes[i]);
+                        if (val != 0) detail.put(etiquettes[i], val); // on exclut les 0
+                    }
+                    detail.put("TOTAL", getNombre(cols, colonneTotal));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SimulationCalculateur] Erreur lecture ligne "
+                    + numeroLigne + " : " + e.getMessage());
+        }
+
+        return detail;
+    }
+
+    // =========================================================================
+    // DÉPENSES PAR PÔLE (extraites du CSV CALC DEP(4).csv)
+    // =========================================================================
+
+    /**
+     * Accueil de Loisirs — Total général (ligne 46 du CSV).
+     *
+     * Colonnes : Personnel(2) | Matériel(3) | Fournitures pédago.(4)
+     *            Matériel sportif(5) | Prestations(6) | Alimentation(7)
+     *            Transport(8) | Droits d'entrée(9) | Electricité(10)
+     *            Eau(11) | Restauration(12) | Autres(13) | TOTAL(15)
+     *
+     * @return Map {nature → montant} + clé "TOTAL" = 1 596 116,14 €
+     */
+    public java.util.Map<String, Double> lireDepensesAccueilLoisirs() {
+        return lireTotalGeneral(46,
+                new String[]{
+                        "Personnel", "Materiel", "Fournitures pedagogiques",
+                        "Materiel sportif", "Prestations (spectacles)",
+                        "Alimentation", "Transport", "Droits d'entree",
+                        "Electricite", "Eau", "Restauration", "Autres"
+                },
+                new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13},
+                15);
+    }
+
+    /**
+     * Études surveillées — Total général (ligne 60 du CSV).
+     *
+     * Colonnes : Personnel(2) | Fournitures scolaires(3) | Matériel(4) | TOTAL(5)
+     *
+     * @return Map {nature → montant} + clé "TOTAL" = 58 598,14 €
+     */
+    public java.util.Map<String, Double> lireDepensesEtudesSurveillees() {
+        return lireTotalGeneral(60,
+                new String[]{"Personnel", "Fournitures scolaires", "Materiel"},
+                new int[]{2, 3, 4},
+                5);
+    }
+
+    /**
+     * Espace Ados — Total général (ligne 75 du CSV).
+     *
+     * Colonnes : Personnel(2) | Electricité(3) | Gaz(4) | Eau(5)
+     *            Matériel(6) | Fournitures(7) | Petit matériel(8)
+     *            Alimentation(9) | Autres(10) | Transport(11) | Droits d'entrée(12)
+     *            TOTAL(13)
+     *
+     * @return Map {nature → montant} + clé "TOTAL" = 140 775,54 €
+     */
+    public java.util.Map<String, Double> lireDepensesEspaceAdos() {
+        return lireTotalGeneral(75,
+                new String[]{
+                        "Personnel", "Electricite", "Gaz", "Eau",
+                        "Materiel", "Fournitures", "Petit materiel",
+                        "Alimentation", "Autres", "Transport", "Droits d'entree"
+                },
+                new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+                13);
+    }
+
+    /**
+     * Séjours — Total général (ligne 95 du CSV).
+     *
+     * Colonnes : Personnel(2) | Transport bus(3) | Péage/Parking(4)
+     *            Hébergement(5) | Restauration(6) | Matériel(7)
+     *            Fournitures(8) | Autres(9) | TOTAL(10)
+     *
+     * @return Map {nature → montant} + clé "TOTAL" = 107 127,71 €
+     */
+    public java.util.Map<String, Double> lireDepensesSejours() {
+        return lireTotalGeneral(95,
+                new String[]{
+                        "Personnel", "Transport (bus/mini bus)", "Peage/Parking",
+                        "Hebergement (centre vacances)", "Restauration",
+                        "Materiel", "Fournitures", "Autres"
+                },
+                new int[]{2, 3, 4, 5, 6, 7, 8, 9},
+                10);
+    }
+
+    /**
+     * Accueil périscolaire — Total général (ligne 112 du CSV).
+     *
+     * Colonnes : Personnel(2) | Fournitures(3) | Alimentation(4)
+     *            Eau(5) | Electricité(6) | Gaz(7) | TOTAL(8)
+     *
+     * @return Map {nature → montant} + clé "TOTAL" = 658 856,78 €
+     */
+    public java.util.Map<String, Double> lireDepensesAccueilPeriscolaire() {
+        return lireTotalGeneral(112,
+                new String[]{
+                        "Personnel", "Fournitures", "Alimentation",
+                        "Eau", "Electricite", "Gaz"
+                },
+                new int[]{2, 3, 4, 5, 6, 7},
+                8);
+    }
 }
