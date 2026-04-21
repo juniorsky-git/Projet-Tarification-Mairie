@@ -3,70 +3,376 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Tarification Mairie</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-
-        input,
-        button {
-            padding: 8px;
-            font-size: 16px;
-            margin-top: 6px;
-        }
-
-        #uploadResultat,
-        #resultat {
-            margin-top: 15px;
-            padding: 12px;
-            border: 1px solid #ccc;
-            width: 360px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mairie Tarification | Outil d'aide à la décision</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <h1>Consultation tarifaire</h1>
-    <h2>Tableau de bord financier</h2>
+    <!-- SIDEBAR -->
+    <aside>
+        <div class="logo">
+            <i data-lucide="calculator"></i>
+            <span>Mairie Tarification</span>
+        </div>
 
-    <select id="pole">
-        <option value="Restauration">Restauration</option>
-        <option value="Accueil de Loisirs">Accueil de Loisirs</option>
-        <option value="Espace Ados">Espace Ados</option>
-        <option value="Sejours">Séjours</option>
-        <option value="Etudes surveillees">Études surveillées</option>
-        <option value="Accueil periscolaire">Accueil périscolaire</option>
-    </select>
+        <nav>
+            <div class="nav-item active" onclick="switchPage('dashboard', this)">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Tableau de bord</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('consultation', this)">
+                <i data-lucide="search"></i>
+                <span>Consultation tarifaire</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('simulation', this)">
+                <i data-lucide="line-chart"></i>
+                <span>Simulation financière</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('gestion', this)">
+                <i data-lucide="file-spreadsheet"></i>
+                <span>Gestion des grilles</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('historique', this)">
+                <i data-lucide="history"></i>
+                <span>Historique</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('parametres', this)">
+                <i data-lucide="settings"></i>
+                <span>Paramètres</span>
+            </div>
+        </nav>
 
-    <button type="button" onclick="chargerDashboard()">Afficher le dashboard</button>
+        <div class="nav-item logout-btn">
+            <i data-lucide="log-out"></i>
+            <span>Déconnexion</span>
+        </div>
+    </aside>
 
-    <div id="dashboardResultat" style="margin-top: 20px;"></div>
-    <h2>Grille actuellement utilisée</h2>
-    <div id="grilleActive">Chargement...</div>
-    <br>
-    <button type="button" onclick="resetGrille()">Revenir à la grille 2025</button>
-    <h2>Charger une grille Excel</h2>
-    <input type="file" id="fichierExcel" accept=".xls,.xlsx">
-    <button type="button" onclick="uploaderFichier()">Charger le fichier</button>
+    <!-- MAIN CONTENT -->
+    <main>
+        <header>
+            <div class="search-bar">
+                <i data-lucide="search" size="18" color="#64748b"></i>
+                <input type="number" id="quickSearchQf" placeholder="Rechercher un QF..." onkeypress="handleQuickSearch(event)">
+            </div>
+            <div class="user-profile">
+                <div class="avatar">JD</div>
+                <div class="user-info">
+                    <div style="font-weight: 600; font-size: 0.875rem;">Mairie de Démo</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Administrateur</div>
+                </div>
+            </div>
+        </header>
 
-    <div id="uploadResultat">Aucun fichier chargé.</div>
+        <!-- PAGE : DASHBOARD -->
+        <div id="page-dashboard" class="content-page active">
+            <h1>Tableau de bord</h1>
+            <p class="subtitle">Résumé budgétaire réel par pôle d'activité.</p>
 
-    <h2>Rechercher un tarif</h2>
-    <label for="qf">Quotient familial :</label>
-    <input type="number" id="qf" step="0.01" placeholder="Ex: 8000">
-    <button type="button" onclick="chercherTarif()">Rechercher</button>
+            <div class="stats-grid" id="dashboardBudgetSummary">
+                <!-- Peuplé par JS : Cartes de résumé par pôle -->
+            </div>
 
-    <div id="resultat">Aucun résultat pour le moment.</div>
+            <div class="form-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3>Analyse détaillée par pôle</h3>
+                    <div style="width: 300px;">
+                        <select id="selectPoleDetails" onchange="chargerDetailsPole()">
+                            <option value="">-- Choisir un pôle pour voir le détail --</option>
+                            <option value="Restauration">Restauration</option>
+                            <option value="Accueil de Loisirs">Accueil de Loisirs</option>
+                            <option value="Accueil periscolaire">Accueil périscolaire</option>
+                            <option value="Etudes surveillees">Études surveillées</option>
+                            <option value="Espace Ados">Espace Ados</option>
+                            <option value="Sejours">Séjours</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="poleDetailsResult">
+                    <div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border); border-radius: 8px;">
+                        Sélectionnez un pôle ci-dessus pour afficher le détail des charges et indicateurs.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE : CONSULTATION -->
+        <div id="page-consultation" class="content-page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1>Consultation tarifaire</h1>
+                    <p class="subtitle">Recherchez les tarifs applicables selon le quotient familial.</p>
+                </div>
+                <div id="grilleActiveCardMini" class="stat-card" style="padding: 12px 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Grille active</div>
+                    <div style="font-weight: 700; color: var(--primary);" id="grilleActiveNom">2025 - Par défaut</div>
+                </div>
+            </div>
+
+            <div class="form-card" style="display: flex; gap: 40px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Quotient familial (QF)</label>
+                    <input type="number" id="tarifQf" style="margin-bottom: 0;" placeholder="Ex: 7500">
+                </div>
+                <button class="btn-primary" onclick="chercherTarif()">Rechercher</button>
+            </div>
+
+            <!-- ONGLET FILTRES -->
+            <div id="serviceFilters" style="display: none; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                <button class="btn-tab active" onclick="filterConsultation('tous', this)">Tous</button>
+                <button class="btn-tab" onclick="filterConsultation('restauration', this)">Restauration</button>
+                <button class="btn-tab" onclick="filterConsultation('loisirs', this)">Loisirs</button>
+                <button class="btn-tab" onclick="filterConsultation('periscolaire', this)">Périscolaire</button>
+                <button class="btn-tab" onclick="filterConsultation('etudes', this)">Études</button>
+                <button class="btn-tab" onclick="filterConsultation('ados', this)">Jeunesse / Ados</button>
+                <button class="btn-tab" onclick="filterConsultation('sejours', this)">Séjours</button>
+            </div>
+
+            <div id="consultationResultat">
+                <!-- Zone de résultats -->
+            </div>
+        </div>
+
+        <!-- PAGE : SIMULATION (GRILLE EXHAUSTIVE) -->
+        <div id="page-simulation" class="content-page">
+            <h1>Simulation financière</h1>
+            <p class="subtitle">Analyse détaillée des tarifs par tranche et par service.</p>
+
+            <div class="table-container">
+                <table id="fullGridTable">
+                    <thead>
+                        <!-- En-tête généré par JS -->
+                    </thead>
+                    <tbody>
+                        <!-- Corps généré par JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGE : GESTION DES GRILLES -->
+        <div id="page-gestion" class="content-page">
+            <h1>Gestion des grilles Excel</h1>
+            <p class="subtitle">Importez et gérez vos grilles tarifaires en toute sécurité.</p>
+
+            <div class="form-card">
+                <div style="border: 2px dashed var(--border); padding: 40px; border-radius: var(--radius); text-align: center;">
+                    <i data-lucide="cloud-upload" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <h3>Déposez votre fichier Excel ici</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Formats acceptés : .xlsx, .xls</p>
+                    <input type="file" id="fichierExcel" accept=".xls,.xlsx" style="display: none;">
+                    <button class="btn-primary" onclick="document.getElementById('fichierExcel').click()">Sélectionner un fichier</button>
+                    <button class="btn-primary" style="background: #10b981; margin-left: 10px;" onclick="uploaderFichier()">Charger maintenant</button>
+                </div>
+                <div id="uploadResultat" style="margin-top: 20px; font-weight: 500;"></div>
+            </div>
+
+            <div class="form-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Grilles disponibles</h3>
+                    <button class="btn-primary" style="background: white; color: var(--text-main); border: 1px solid var(--border);" onclick="resetGrille()">Réinitialiser (2025)</button>
+                </div>
+                <div id="grilleActive" style="padding: 16px; background: #f8fafc; border-radius: 8px;">
+                    <!-- Info grille active -->
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
+        // --- NAVIGATION ---
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            document.getElementById('page-' + pageId).classList.add('active');
+            if (element) element.classList.add('active');
+
+            if (pageId === 'simulation') chargerGrilleComplete();
+            if (pageId === 'dashboard') chargerDashboardData();
+            
+            // Re-render icons
+            lucide.createIcons();
+        }
+
+        function handleQuickSearch(e) {
+            if (e.key === 'Enter') {
+                const qf = document.getElementById('quickSearchQf').value;
+                document.getElementById('tarifQf').value = qf;
+                switchPage('consultation', document.querySelector('[onclick*="consultation"]'));
+                chercherTarif();
+            }
+        }
+
+        // --- API : TARIFS (RECHERCHE) ---
+        async function chercherTarif() {
+            const qf = document.getElementById("tarifQf").value;
+            const zone = document.getElementById("consultationResultat");
+            const filterZone = document.getElementById("serviceFilters");
+
+            if (!qf) return;
+
+            zone.innerHTML = `<div class="loading-spinner">Chargement en cours...</div>`;
+            filterZone.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/tarif?qf=${qf}`);
+                if (!response.ok) {
+                    zone.innerHTML = `<div class="form-card" style="color: #ef4444;">❌ Erreur : ${await response.text()}</div>`;
+                    return;
+                }
+
+                const data = await response.json();
+                renderTarifCards(data);
+                filterZone.style.display = 'flex';
+            } catch (error) {
+                zone.innerHTML = `<div class="form-card" style="color: #ef4444;">❌ Erreur de communication serveur.</div>`;
+            }
+        }
+
+        function filterConsultation(category, btn) {
+            // UI Update
+            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Logic Update
+            document.querySelectorAll('.service-card').forEach(card => {
+                if (category === 'tous' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function renderTarifCards(data) {
+            const zone = document.getElementById("consultationResultat");
+            
+            let html = `
+                <div style="display: flex; gap: 24px; margin-bottom: 32px;">
+                    <div class="stat-card" style="flex: 1; border-left: 4px solid var(--primary);">
+                        <div class="stat-icon tranche-badge" style="width: 56px; height: 56px; font-size: 1.5rem; background: var(--primary); color: white; border-radius: 50%;">${data.tranche}</div>
+                        <div>
+                            <div class="label">Tranche correspondante</div>
+                            <div class="value">QF entre ${data.qfMin.toLocaleString()} et ${data.qfMax > 1000000 ? 'MAX' : data.qfMax.toLocaleString() + ' €'}</div>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="margin-bottom: 20px;">Tarifs détaillés par pôle</h3>
+                <div class="stats-grid">
+                    ${createServiceCard('utensils', 'Restauration', 'restauration', [
+                        { label: 'Repas enfant', price: data.repas }
+                    ])}
+                    ${createServiceCard('sun', 'Accueil de loisirs', 'loisirs', [
+                        { label: 'Journée complète', price: data.accueilJournee },
+                        { label: '1/2 journée avec repas', price: data.accueilDemiRepas }
+                    ])}
+                    ${createServiceCard('clock', 'Périscolaire', 'periscolaire', [
+                        { label: 'Matin et soir', price: data.periscolaireMatinSoir },
+                        { label: 'Matin ou soir', price: data.periscolaireMatinOuSoir }
+                    ])}
+                    ${createServiceCard('book-open', 'Études surveillées', 'etudes', [
+                        { label: 'Forfait mensuel', price: data.etudesForfaitMensuel },
+                        { label: 'Demi-forfait', price: data.etudesDemiForfait },
+                        { label: 'Post-Études', price: data.tarifPostEtudes },
+                        { label: 'Classe découverte', price: data.classeDecouverte }
+                    ])}
+                    ${createServiceCard('smile', 'Jeunesse / Ados', 'ados', [
+                        { label: 'Vac. Journée (S+R)', price: data.adosVacJourneeRepas },
+                        { label: 'Vac. Journée (S)', price: data.adosVacJourneeSans },
+                        { label: 'Sortie Journée', price: data.adosSortieJournee }
+                    ])}
+                    ${createServiceCard('tent', 'Séjours', 'sejours', [
+                        { label: 'Séjour 5 jours', price: data.sejour5Jours },
+                        { label: 'Séjour 6 jours', price: data.sejour6Jours }
+                    ])}
+                </div>
+            `;
+            zone.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function createServiceCard(icon, title, category, items) {
+            let itemsHtml = items.map(item => `
+                <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 8px;">
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">${item.label}</div>
+                    <div style="font-weight: 700; color: var(--text-main);">${item.price.toFixed(2)} €</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="stat-card service-card" data-category="${category}" style="flex-direction: column; align-items: flex-start; gap: 16px; min-height: 200px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <div class="stat-icon" style="background: #f1f5f9; width: 32px; height: 32px; font-size: 1rem;">
+                            <i data-lucide="${icon}"></i>
+                        </div>
+                        <div style="font-weight: 600; font-size: 1rem;">${title}</div>
+                    </div>
+                    <div style="width: 100%;">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- API : GRILLE COMPLETE (ISSUE #5) ---
+        async function chargerGrilleComplete() {
+            const table = document.getElementById("fullGridTable");
+            
+            try {
+                const response = await fetch("/api/tarifs/complet");
+                const grid = await response.json();
+
+                // En-têtes
+                let head = `
+                    <tr>
+                        <th>Tranche</th>
+                        <th>QF Min</th>
+                        <th>QF Max</th>
+                        <th>Repas</th>
+                        <th>Loisirs (J)</th>
+                        <th>Péri (M+S)</th>
+                        <th>Études (F)</th>
+                        <th>Ados (Vac)</th>
+                        <th>Séjour (5J)</th>
+                    </tr>
+                `;
+                table.querySelector('thead').innerHTML = head;
+
+                // Lignes
+                let body = "";
+                grid.forEach(t => {
+                    body += `
+                        <tr>
+                            <td><span class="tranche-badge">${t.tranche}</span></td>
+                            <td>${t.qfMin.toLocaleString()} €</td>
+                            <td>${t.qfMax > 1000000 ? 'MAX' : t.qfMax.toLocaleString() + ' €'}</td>
+                            <td class="price-tag">${t.repas.toFixed(2)} €</td>
+                            <td>${t.accueilJournee.toFixed(2)} €</td>
+                            <td>${t.periscolaireMatinSoir.toFixed(2)} €</td>
+                            <td>${t.etudesForfaitMensuel.toFixed(2)} €</td>
+                            <td>${t.adosVacJourneeRepas.toFixed(2)} €</td>
+                            <td>${t.sejour5Jours.toFixed(2)} €</td>
+                        </tr>
+                    `;
+                });
+                table.querySelector('tbody').innerHTML = body;
+            } catch (error) {
+                console.error("Erreur grille complète :", error);
+            }
+        }
+
+        // --- API : GESTION EXCEL ---
         async function uploaderFichier() {
             const input = document.getElementById("fichierExcel");
             const uploadResultat = document.getElementById("uploadResultat");
 
             if (!input.files || input.files.length === 0) {
-                uploadResultat.innerHTML = "Veuillez sélectionner un fichier Excel.";
+                uploadResultat.innerHTML = "⚠️ Veuillez sélectionner un fichier.";
                 return;
             }
 
@@ -74,154 +380,113 @@
             formData.append("file", input.files[0]);
 
             try {
-                const response = await fetch("/api/upload", {
-                    method: "POST",
-                    body: formData
-                });
-
+                const response = await fetch("/api/upload", { method: "POST", body: formData });
                 const message = await response.text();
-                uploadResultat.innerHTML = message;
+                uploadResultat.innerHTML = message.includes("Erreur") ? "❌ " + message : "✅ " + message;
+                chargerGrilleActive();
             } catch (error) {
-                console.error("Erreur upload :", error);
-                uploadResultat.innerHTML = "Erreur lors de l'envoi du fichier.";
-            }
-        }
-
-        async function chargerDashboard() {
-            const pole = document.getElementById("pole").value;
-            const zone = document.getElementById("dashboardResultat");
-
-            try {
-                const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
-
-                if (!response.ok) {
-                    const txt = await response.text();
-                    zone.innerHTML = "❌ " + txt;
-                    return;
-                }
-
-                const data = await response.json();
-
-                let detailsHtml = "";
-                for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
-                    detailsHtml += `<li><strong>${cle}</strong> : ${valeur.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</li>`;
-                }
-
-                let metricsHtml = "";
-                if (data.nombreEnfants) {
-                    metricsHtml += `<p><strong>Nombre d'enfants accompagnés :</strong> ${data.nombreEnfants.toLocaleString('fr-FR')}</p>`;
-                }
-                if (data.unitesAnnuelles) {
-                    metricsHtml += `<p><strong>Volume total de la prestation :</strong> ${data.unitesAnnuelles.toLocaleString('fr-FR')} unités</p>`;
-                }
-
-                zone.innerHTML = `
-            <h3>${data.pole}</h3>
-            <p><strong>Total des dépenses réelles :</strong> ${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</p>
-            ${metricsHtml}
-            <p><strong>Coût de revient unitaire :</strong> ${data.coutUnitaire.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})} ${data.unitesAnnuelles ? '(par repas/prestation)' : '(par enfant)'}</p>
-            <h4>Détail de la répartition des charges</h4>
-            <ul>${detailsHtml}</ul>
-        `;
-            } catch (error) {
-                zone.innerHTML = "❌ Erreur de communication avec le serveur.";
-            }
-        }
-        async function chargerGrilleActive() {
-            const zone = document.getElementById("grilleActive");
-
-            try {
-                const response = await fetch("/api/grille-active");
-                const data = await response.text();
-                zone.innerHTML = "<strong>" + data + "</strong>";
-            } catch (error) {
-                zone.innerHTML = "Erreur lors de la récupération de la grille active.";
+                uploadResultat.innerHTML = "❌ Erreur de communication.";
             }
         }
 
         async function resetGrille() {
-            const uploadResultat = document.getElementById("uploadResultat");
+            await fetch("/api/reset-grille", { method: "POST" });
+            chargerGrilleActive();
+        }
 
+        async function chargerGrilleActive() {
+            const response = await fetch("/api/grille-active");
+            const data = await response.text();
+            document.getElementById("grilleActive").innerHTML = `Grille active : <strong>${data}</strong>`;
+        }
+
+        // --- DASHBOARD DATA ---
+        async function chargerDashboardData() {
             try {
-                const response = await fetch("/api/reset-grille", {
-                    method: "POST"
-                });
-
-                const message = await response.text();
-                uploadResultat.innerHTML = "✅ " + message;
-                chargerGrilleActive();
+                const response = await fetch("/api/poles");
+                const poles = await response.json();
+                
+                let html = poles.map(p => `
+                    <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9; padding: 16px;">
+                        <div style="flex: 1;">
+                            <div class="label" style="font-size: 0.75rem;">${p.nom}</div>
+                            <div style="font-weight: 700;">${p.depensesTotales.toLocaleString()} €</div>
+                            <div style="font-size: 0.7rem; color: #10b981; margin-top: 4px;">${p.nombreEnfants} enfants</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('dashboardBudgetSummary').innerHTML = html;
             } catch (error) {
-                uploadResultat.innerHTML = "❌ Erreur lors du retour à la grille 2025.";
+                console.log("Erreur dashboard stats");
             }
         }
 
-        async function chercherTarif() {
-            const qf = document.getElementById("qf").value;
-            const resultat = document.getElementById("resultat");
+        async function chargerDetailsPole() {
+            const pole = document.getElementById("selectPoleDetails").value;
+            const zone = document.getElementById("poleDetailsResult");
 
-            if (!qf) {
-                resultat.innerHTML = "⚠️ Veuillez entrer un QF.";
+            if (!pole) {
+                zone.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border); border-radius: 8px;">Sélectionnez un pôle ci-dessus pour afficher le détail des charges et indicateurs.</div>`;
                 return;
             }
 
+            zone.innerHTML = `<div class="loading-spinner">Chargement en cours...</div>`;
+
             try {
-                const response = await fetch(`/api/tarif?qf=${qf}`);
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    resultat.innerHTML = "❌ " + errorText;
-                    return;
-                }
-
+                const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
                 const data = await response.json();
 
-                resultat.innerHTML = `
-            <h3>Résultat pour le QF : ${qf}</h3>
+                let detailsHtml = "";
+                for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
+                    detailsHtml += `
+                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
+                            <span style="font-weight: 500;">${cle}</span>
+                            <span style="font-weight: 700;">${valeur.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</span>
+                        </div>
+                    `;
+                }
 
-            <p><strong>Tranche :</strong> ${data.tranche}</p>
-            <p><strong>QF min :</strong> ${data.qfMin}</p>
-            <p><strong>QF max :</strong> ${data.qfMax}</p>
-
-            <hr>
-
-            <h4>Restauration</h4>
-            <p><strong>Repas :</strong> ${data.repas} €</p>
-
-            <h4>Accueil de loisirs</h4>
-            <p><strong>Journée :</strong> ${data.accueilJournee} €</p>
-            <p><strong>1/2 journée avec repas :</strong> ${data.accueilDemiRepas} €</p>
-
-            <h4>Périscolaire</h4>
-            <p><strong>Matin et soir :</strong> ${data.periscolaireMatinSoir} €</p>
-            <p><strong>Matin ou soir :</strong> ${data.periscolaireMatinOuSoir} €</p>
-
-            <h4>Études surveillées</h4>
-            <p><strong>Forfait mensuel :</strong> ${data.etudesForfaitMensuel} €</p>
-            <p><strong>Demi forfait :</strong> ${data.etudesDemiForfait} €</p>
-            <p><strong>Post études :</strong> ${data.tarifPostEtudes} €</p>
-            <p><strong>Classe découverte :</strong> ${data.classeDecouverte} €</p>
-
-            <h4>Jeunesse / Espace ados</h4>
-            <p><strong>Vac. journée avec repas :</strong> ${data.adosVacJourneeRepas} €</p>
-            <p><strong>Vac. journée sans repas :</strong> ${data.adosVacJourneeSans} €</p>
-            <p><strong>Vac. 1/2 journée avec repas :</strong> ${data.adosVacDemiRepas} €</p>
-            <p><strong>Vac. 1/2 journée sans repas :</strong> ${data.adosVacDemiSans} €</p>
-            <p><strong>Sortie 1/2 journée :</strong> ${data.adosSortieDemi} €</p>
-            <p><strong>Sortie journée :</strong> ${data.adosSortieJournee} €</p>
-
-            <h4>Séjours</h4>
-            <p><strong>Séjour 5 jours :</strong> ${data.sejour5Jours} €</p>
-            <p><strong>Séjour 6 jours :</strong> ${data.sejour6Jours} €</p>
-        `;
+                zone.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; animation: fadeIn 0.4s ease;">
+                        <!-- Colonne gauche : Indicateurs -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="stat-card" style="flex-direction: column; align-items: flex-start; background: #f8fafc; border: none; box-shadow: none;">
+                                <div class="label">Total dépenses réelles</div>
+                                <div class="value" style="color: var(--primary); font-size: 2rem;">${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                            </div>
+                            <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
+                                <div>
+                                    <div class="label">Nombre d'enfants</div>
+                                    <div class="value">${data.nombreEnfants}</div>
+                                </div>
+                            </div>
+                            <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
+                                <div>
+                                    <div class="label">Coût unitaire réel</div>
+                                    <div class="value">${data.coutUnitaire.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Colonne droite : Détail des charges -->
+                        <div style="background: white; border-radius: 12px; padding: 0;">
+                            <h4 style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Répartition des charges</h4>
+                            ${detailsHtml}
+                        </div>
+                    </div>
+                `;
             } catch (error) {
-                resultat.innerHTML = "❌ Erreur de communication avec le serveur.";
+                zone.innerHTML = `<div style="color: #ef4444; padding: 20px;">❌ Erreur lors de la récupération des détails.</div>`;
             }
         }
 
-        window.onload = function () {
+        // --- INITIALISATION ---
+        window.onload = () => {
+            lucide.createIcons();
             chargerGrilleActive();
+            chargerDashboardData();
         };
-
     </script>
 </body>
 
