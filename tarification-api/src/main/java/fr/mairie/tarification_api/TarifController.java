@@ -26,6 +26,11 @@ public class TarifController {
         return ResponseEntity.ok("Retour à la grille 2025 par défaut.");
     }
 
+    @GetMapping("/tarifs/complet")
+    public ResponseEntity<List<Tarif>> getGrilleComplete() {
+        return ResponseEntity.ok(this.grilleCourante);
+    }
+
     @GetMapping("/tarif")
     public ResponseEntity<?> getTarif(@RequestParam double qf) {
         try {
