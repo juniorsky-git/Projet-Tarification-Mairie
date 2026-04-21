@@ -104,16 +104,23 @@
 
                 let detailsHtml = "";
                 for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
-                    detailsHtml += `<li><strong>${cle}</strong> : ${valeur.toFixed(2)} €</li>`;
+                    detailsHtml += `<li><strong>${cle}</strong> : ${valeur.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</li>`;
+                }
+
+                let metricsHtml = "";
+                if (data.nombreEnfants) {
+                    metricsHtml += `<p><strong>Nombre d'enfants accompagnés :</strong> ${data.nombreEnfants.toLocaleString('fr-FR')}</p>`;
+                }
+                if (data.unitesAnnuelles) {
+                    metricsHtml += `<p><strong>Volume total de la prestation :</strong> ${data.unitesAnnuelles.toLocaleString('fr-FR')} unités</p>`;
                 }
 
                 zone.innerHTML = `
             <h3>${data.pole}</h3>
-            <p><strong>Total dépenses réelles :</strong> ${data.depensesTotales.toFixed(2)} €</p>
-            <p><strong>Total recettes théoriques :</strong> ${data.recettesTotales.toFixed(2)} €</p>
-            <p><strong>Taux de couverture :</strong> ${data.tauxCouverture.toFixed(2)} %</p>
-            <p><strong>Multiplicateur :</strong> ${data.multiplicateur}</p>
-            <h4>Détail des charges</h4>
+            <p><strong>Total des dépenses réelles :</strong> ${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</p>
+            ${metricsHtml}
+            <p><strong>Coût de revient unitaire :</strong> ${data.coutUnitaire.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})} ${data.unitesAnnuelles ? '(par repas/prestation)' : '(par enfant)'}</p>
+            <h4>Détail de la répartition des charges</h4>
             <ul>${detailsHtml}</ul>
         `;
             } catch (error) {
