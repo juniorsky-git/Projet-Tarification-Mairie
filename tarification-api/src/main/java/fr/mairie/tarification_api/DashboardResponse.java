@@ -9,4 +9,9 @@ public class DashboardResponse {
     public Integer nombreEnfants;
     public Integer unitesAnnuelles;
     public Map<String, Double> detailsCharges;
+    
+    // Nouveaux indicateurs financiers
+    public double recettesTotales;
+    public double tauxCouverture;
+    public double ecart;
 }

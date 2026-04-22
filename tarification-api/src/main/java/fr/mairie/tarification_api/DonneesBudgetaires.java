@@ -21,6 +21,18 @@ public class DonneesBudgetaires {
                 "Hebergement", 0.0,
                 "Personnel", 1_051_019.64,
                 "Autres", 0.0
+            ),
+            Map.of(
+                "EXT", 11,
+                "A", 429,
+                "B", 90,
+                "B2", 90,
+                "C", 79,
+                "D", 79,
+                "E", 90,
+                "F", 79,
+                "F2", 57,
+                "G", 124
             )
         ),
         new DepensePole(

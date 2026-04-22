@@ -8,5 +8,6 @@ public record DepensePole(
     double coutUnitaire,
     Integer nombreEnfants,
     Integer unitesAnnuelles,
-    Map<String, Double> chargesDetaillees
+    Map<String, Double> chargesDetaillees,
+    Map<String, Integer> distributionTranches
 ) {}
