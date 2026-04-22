@@ -3,6 +3,8 @@ package fr.mairie.tarification_api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -55,6 +57,7 @@ public class DashboardController {
                         r.recettesTotales = recettes;
                         r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
                         r.ecart = recettes - p.depensesTotales();
+                        r.distributionTranches = p.distributionTranches();
                         
                         return ResponseEntity.ok(r);
                     })

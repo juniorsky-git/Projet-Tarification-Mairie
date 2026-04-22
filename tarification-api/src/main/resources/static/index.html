@@ -437,6 +437,12 @@
                 const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
                 const data = await response.json();
 
+                // Calcul du badge couleur pour le taux de couverture
+                const couverturePct = (data.tauxCouverture * 100).toFixed(2);
+                let badgeClass = "badge-danger";
+                if (data.tauxCouverture >= 1.0) badgeClass = "badge-success";
+                else if (data.tauxCouverture >= 0.7) badgeClass = "badge-warning";
+
                 let detailsHtml = "";
                 for (const [cle, valeur] of Object.entries(data.detailsCharges || {})) {
                     detailsHtml += `
@@ -449,29 +455,34 @@
 
                 zone.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; animation: fadeIn 0.4s ease;">
-                        <!-- Colonne gauche : Indicateurs -->
+                        <!-- Colonne gauche : Indicateurs Financiers -->
                         <div style="display: flex; flex-direction: column; gap: 16px;">
-                            <div class="stat-card" style="flex-direction: column; align-items: flex-start; background: #f8fafc; border: none; box-shadow: none;">
-                                <div class="label">Total dépenses réelles</div>
-                                <div class="value" style="color: var(--primary); font-size: 2rem;">${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
-                            </div>
-                            <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
-                                <div>
-                                    <div class="label">Nombre d'enfants</div>
-                                    <div class="value">${data.nombreEnfants}</div>
+                            <div class="stat-card" style="flex-direction: column; align-items: flex-start; background: var(--primary-bg); border: 1px solid var(--primary); box-shadow: none;">
+                                <div class="label" style="color: var(--primary);">Recettes annuelles estimées</div>
+                                <div class="value" style="color: var(--primary); font-size: 2rem;">${data.recettesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                                <div style="font-size: 0.875rem; margin-top: 8px;">
+                                    Taux de couverture : <span class="badge ${badgeClass}">${couverturePct}%</span>
                                 </div>
                             </div>
+                            
                             <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
                                 <div>
-                                    <div class="label">Coût unitaire réel</div>
-                                    <div class="value">${data.coutUnitaire.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                                    <div class="label">Subvention Ville (Écart)</div>
+                                    <div class="value" style="color: ${data.ecart < 0 ? '#ef4444' : '#10b981'}">${data.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
+                                <div>
+                                    <div class="label">Coût unitaire réel vs Enfants</div>
+                                    <div class="value" style="font-size: 1.25rem;">${data.coutUnitaire.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})} <small style="font-size: 0.75rem; color: var(--text-muted);">/ ${data.nombreEnfants} enfants</small></div>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Colonne droite : Détail des charges -->
                         <div style="background: white; border-radius: 12px; padding: 0;">
-                            <h4 style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Répartition des charges</h4>
+                            <h4 style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Répartition réelle des charges</h4>
                             ${detailsHtml}
                         </div>
                     </div>

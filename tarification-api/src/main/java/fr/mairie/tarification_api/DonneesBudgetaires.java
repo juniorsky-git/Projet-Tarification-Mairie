@@ -50,7 +50,8 @@ public class DonneesBudgetaires {
                 "Hebergement", 0.0,
                 "Personnel", 1_428_849.37,
                 "Autres", 4_949.91
-            )
+            ),
+            Map.of()
         ),
         new DepensePole(
             "Accueil periscolaire",
@@ -67,7 +68,8 @@ public class DonneesBudgetaires {
                 "Hebergement", 0.0,
                 "Personnel", 597_977.38,
                 "Autres", 0.0
-            ) 
+            ),
+            Map.of()
         ),
         new DepensePole(
             "Etudes surveillees",
@@ -84,7 +86,8 @@ public class DonneesBudgetaires {
                 "Hebergement", 0.0,
                 "Personnel", 58_598.14,
                 "Autres", 0.0
-            )
+            ),
+            Map.of()
         ),
         new DepensePole(
             "Espace Ados",
@@ -101,7 +104,8 @@ public class DonneesBudgetaires {
                 "Hebergement", 0.0,
                 "Personnel", 119_794.89,
                 "Autres", 327.01
-            )
+            ),
+            Map.of()
         ),
         new DepensePole(
             "Sejours",
@@ -118,7 +122,8 @@ public class DonneesBudgetaires {
                 "Hebergement", 60_769.94,
                 "Personnel", 0.0,
                 "Autres", 314.73
-            )
+            ),
+            Map.of()
         )
     );
 }
