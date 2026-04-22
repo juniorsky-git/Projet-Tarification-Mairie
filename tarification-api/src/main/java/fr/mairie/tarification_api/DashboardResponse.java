@@ -1,5 +1,6 @@
 package fr.mairie.tarification_api;
 
+import java.util.List;
 import java.util.Map;
 
 public class DashboardResponse {
@@ -9,6 +10,7 @@ public class DashboardResponse {
     public Integer nombreEnfants;
     public Integer unitesAnnuelles;
     public Map<String, Double> detailsCharges;
+    public List<AnalytiqueFluide> detailsFluides;
     
     // Nouveaux indicateurs financiers
     public double recettesTotales;

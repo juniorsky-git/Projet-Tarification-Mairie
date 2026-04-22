@@ -12,6 +12,12 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/api")
 public class DashboardController {
 
+    private final AnalytiqueFluideService analytiqueFluideService;
+
+    public DashboardController(AnalytiqueFluideService analytiqueFluideService) {
+        this.analytiqueFluideService = analytiqueFluideService;
+    }
+
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboard(@RequestParam String pole) {
         try {
@@ -58,6 +64,7 @@ public class DashboardController {
                         r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
                         r.ecart = recettes - p.depensesTotales();
                         r.distributionTranches = p.distributionTranches();
+                        r.detailsFluides = analytiqueFluideService.genererAnalyseDetailed();
                         
                         return ResponseEntity.ok(r);
                     })

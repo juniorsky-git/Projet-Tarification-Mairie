@@ -486,6 +486,52 @@
                             ${detailsHtml}
                         </div>
                     </div>
+
+                    <!-- ANALYSE ANALYTIQUE DES FLUIDES (Issue #25) -->
+                    <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;">
+                        <h3 style="margin-bottom: 24px;">Diagnostic de la Performance Fluides</h3>
+                        <div class="table-container">
+                            <table style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Site / Compteur</th>
+                                        <th>Fluide</th>
+                                        <th>Consommation</th>
+                                        <th style="text-align: right;">Coût Théorique</th>
+                                        <th style="text-align: right;">Facturé Réel</th>
+                                        <th style="text-align: right;">Écart / Diagnostic</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.detailsFluides.map(f => {
+                                        const badgeColor = f.alerte ? '#ef4444' : '#10b981';
+                                        const trendIcon = f.ecart > 0 ? 'trending-up' : 'trending-down';
+                                        return `
+                                            <tr>
+                                                <td style="font-weight: 500;">${f.site}</td>
+                                                <td>
+                                                    <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                                        <i data-lucide="${f.fluide === 'Eau' ? 'droplet' : (f.fluide === 'Gaz' ? 'flame' : 'zap')}" size="14"></i>
+                                                        ${f.fluide}
+                                                    </span>
+                                                </td>
+                                                <td>${f.consommation.toLocaleString()} ${f.unite}</td>
+                                                <td style="text-align: right; color: var(--text-muted);">${f.montantTheorique.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</td>
+                                                <td style="text-align: right; font-weight: 700;">${f.montantReel.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</td>
+                                                <td style="text-align: right;">
+                                                    <span class="badge" style="background: ${badgeColor}20; color: ${badgeColor}; border: 1px solid ${badgeColor}40;">
+                                                        <i data-lucide="${trendIcon}" size="12"></i>
+                                                        ${f.pourcentageEcart > 0 ? '+' : ''}${f.pourcentageEcart.toFixed(1)}%
+                                                    </span>
+                                                    ${f.alerte ? `<div style="font-size: 0.65rem; color: #ef4444; font-weight: 600; margin-top: 4px;">ANOMALIE DETECTEE</div>` : ''}
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 `;
             } catch (error) {
                 zone.innerHTML = `<div style="color: #ef4444; padding: 20px;">❌ Erreur lors de la récupération des détails.</div>`;
