@@ -14,4 +14,5 @@ public class DashboardResponse {
     public double recettesTotales;
     public double tauxCouverture;
     public double ecart;
+    public Map<String, Integer> distributionTranches;
 }
