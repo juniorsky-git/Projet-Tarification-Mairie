@@ -26,11 +26,53 @@ public class DashboardController {
                         r.nombreEnfants = p.nombreEnfants();
                         r.unitesAnnuelles = p.unitesAnnuelles();
                         r.detailsCharges = p.chargesDetaillees();
+                        
+                        // --- CALCUL DES RECETTES ---
+                        double recettes = 0;
+                        List<Tarif> tarifs = DonneesTarifs.chargerTarifsReference();
+                        String serviceKey = getServiceKeyForPole(p.nom());
+                        
+                        if (p.distributionTranches() != null && serviceKey != null) {
+                            double volumeMoyen = 1.0; 
+                            if (p.unitesAnnuelles() != null && p.nombreEnfants() != null && p.nombreEnfants() > 0) {
+                                volumeMoyen = (double) p.unitesAnnuelles() / p.nombreEnfants();
+                            }
+
+                            for (Map.Entry<String, Integer> entry : p.distributionTranches().entrySet()) {
+                                String tranche = entry.getKey();
+                                Integer count = entry.getValue();
+                                
+                                double prixTranche = tarifs.stream()
+                                    .filter(t -> t.getTranche().equalsIgnoreCase(tranche))
+                                    .findFirst()
+                                    .map(t -> t.getPrix(serviceKey))
+                                    .orElse(0.0);
+                                
+                                recettes += (count * prixTranche * volumeMoyen);
+                            }
+                        }
+                        
+                        r.recettesTotales = recettes;
+                        r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
+                        r.ecart = recettes - p.depensesTotales();
+                        
                         return ResponseEntity.ok(r);
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
+        }
+    }
+
+    private String getServiceKeyForPole(String pole) {
+        switch (pole) {
+            case "Restauration": return DonneesTarifs.REPAS;
+            case "Accueil de Loisirs": return DonneesTarifs.ACCUEIL_JOURNEE;
+            case "Accueil periscolaire": return DonneesTarifs.PERISCOLAIRE_MATIN_SOIR;
+            case "Etudes surveillees": return DonneesTarifs.ETUDES_FORFAIT_MENSUEL;
+            case "Espace Ados": return DonneesTarifs.ADOS_VAC_JOURNEE_REPAS;
+            case "Sejours": return DonneesTarifs.SEJOUR_5_JOURS;
+            default: return null;
         }
     }
 }
