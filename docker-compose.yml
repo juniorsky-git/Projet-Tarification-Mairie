@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  mairie-db:
+    image: postgres:17-alpine
+    container_name: mairie-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: mairie_tarifs
+    ports:
+      - "5432:5432"
+    volumes:
+      - C:/Users/stagedg2/Documents/Mairie_DB:/var/lib/postgresql/data
+    restart: unless-stopped
