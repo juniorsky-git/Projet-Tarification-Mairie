@@ -513,10 +513,27 @@
                                         <th style="text-align: right;">Écart / Diagnostic</th>
                                     </tr>
                                 </thead>
-                                <tbody id="fluidesTableBody">
+                <tbody id="fluidesTableBody">
                                     ${data.detailsFluides.map(f => {
-                                        const badgeColor = f.alerte ? '#ef4444' : '#10b981';
-                                        const trendIcon = f.ecart > 0 ? 'trending-up' : 'trending-down';
+                                        const p = f.pourcentageEcart;
+                                        let label = "CONSOMMATION MAÎTRISÉE";
+                                        let badgeColor = "#3b82f6"; // Bleu par défaut
+                                        let trendIcon = "check-circle";
+                                        
+                                        if (p < -15) {
+                                            label = "PERFORMANCE OPTIMALE";
+                                            badgeColor = "#10b981"; // Vert
+                                            trendIcon = "trending-down";
+                                        } else if (p > 50) {
+                                            label = "ANOMALIE CRITIQUE";
+                                            badgeColor = "#ef4444"; // Rouge
+                                            trendIcon = "alert-triangle";
+                                        } else if (p > 15) {
+                                            label = "SURCOÛT À SURVEILLER";
+                                            badgeColor = "#f59e0b"; // Orange
+                                            trendIcon = "trending-up";
+                                        }
+
                                         return `
                                             <tr class="fluide-row" data-type="${f.fluide}">
                                                 <td>
@@ -537,11 +554,11 @@
                                                 <td style="text-align: right; color: var(--text-muted);">${f.montantTheorique.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</td>
                                                 <td style="text-align: right; font-weight: 700;">${f.montantReel.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</td>
                                                 <td style="text-align: right;">
-                                                    <span class="badge" style="background: ${badgeColor}20; color: ${badgeColor}; border: 1px solid ${badgeColor}40;">
+                                                    <div class="badge" style="background: ${badgeColor}20; color: ${badgeColor}; border: 1px solid ${badgeColor}40; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px;">
                                                         <i data-lucide="${trendIcon}" size="12"></i>
-                                                        ${f.pourcentageEcart > 0 ? '+' : ''}${f.pourcentageEcart.toFixed(1)}%
-                                                    </span>
-                                                    ${f.alerte ? `<div style="font-size: 0.65rem; color: #ef4444; font-weight: 600; margin-top: 4px;">ANOMALIE DETECTEE</div>` : ''}
+                                                        <span style="font-weight: 700;">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>
+                                                    </div>
+                                                    <div style="font-size: 0.65rem; color: ${badgeColor}; font-weight: 700; margin-top: 4px; letter-spacing: 0.02em;">${label}</div>
                                                 </td>
                                             </tr>
                                         `;
@@ -549,8 +566,33 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- LÉGENDE DE DIAGNOSTIC -->
+                        <div style="margin-top: 24px; display: flex; gap: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; flex-wrap: wrap;">
+                            <div style="font-size: 0.75rem; font-weight: 600; color: #64748b; width: 100%; margin-bottom: 8px; text-transform: uppercase;">Guide d'aide à la décision :</div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                                <span style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></span>
+                                <strong>Performance</strong> : Économies générées (>15%)
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                                <span style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6;"></span>
+                                <strong>Maîtrisé</strong> : Facturation conforme au théorique
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                                <span style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></span>
+                                <strong>Surveillance</strong> : Surcoût modéré (>15%)
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                                <span style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></span>
+                                <strong>Critique</strong> : Anomalie majeure détectée (>50%)
+                            </div>
+                        </div>
                     </div>
                 `;
+                
+                // Re-rendre les icônes Lucide pour les nouveaux éléments
+                lucide.createIcons();
+
             } catch (error) {
                 zone.innerHTML = `<div style="color: #ef4444; padding: 20px;">❌ Erreur lors de la récupération des détails.</div>`;
             }
