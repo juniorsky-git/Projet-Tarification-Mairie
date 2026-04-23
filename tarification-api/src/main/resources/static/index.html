@@ -487,9 +487,20 @@
                         </div>
                     </div>
 
-                    <!-- ANALYSE ANALYTIQUE DES FLUIDES (Issue #25) -->
+                    <!-- ANALYSE ANALYTIQUE DES FLUIDES (Issue #29) -->
                     <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;">
-                        <h3 style="margin-bottom: 24px;">Diagnostic de la Performance Fluides</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <div>
+                                <h3 style="margin-bottom: 4px;">Diagnostic de la Performance Fluides</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);"><i data-lucide="info" size="14" style="vertical-align: middle;"></i> Bilan budgétaire cumulé sur l'exercice 2025</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-tab active" onclick="filterTypeFluide('Tous', this)">Tous</button>
+                                <button class="btn-tab" onclick="filterTypeFluide('Eau', this)">Eau</button>
+                                <button class="btn-tab" onclick="filterTypeFluide('Gaz', this)">Gaz</button>
+                                <button class="btn-tab" onclick="filterTypeFluide('Electricité', this)">Électricité</button>
+                            </div>
+                        </div>
                         <div class="table-container">
                             <table style="width: 100%;">
                                 <thead>
@@ -502,13 +513,20 @@
                                         <th style="text-align: right;">Écart / Diagnostic</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="fluidesTableBody">
                                     ${data.detailsFluides.map(f => {
                                         const badgeColor = f.alerte ? '#ef4444' : '#10b981';
                                         const trendIcon = f.ecart > 0 ? 'trending-up' : 'trending-down';
                                         return `
-                                            <tr>
-                                                <td style="font-weight: 500;">${f.site}</td>
+                                            <tr class="fluide-row" data-type="${f.fluide}">
+                                                <td>
+                                                    <div style="font-weight: 500;">${f.site}</div>
+                                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                                                        <span style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 4px;">CUMUL 2025</span>
+                                                        <i data-lucide="calendar" size="10" style="vertical-align: middle;"></i>
+                                                        ${f.periode}
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <span style="display: inline-flex; align-items: center; gap: 8px;">
                                                         <i data-lucide="${f.fluide === 'Eau' ? 'droplet' : (f.fluide === 'Gaz' ? 'flame' : 'zap')}" size="14"></i>
@@ -539,6 +557,22 @@
         }
 
         // --- INITIALISATION ---
+        function filterTypeFluide(type, btn) {
+            // UI Update
+            const menu = btn.parentElement;
+            menu.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Logic Update
+            document.querySelectorAll('.fluide-row').forEach(row => {
+                if (type === 'Tous' || row.dataset.type === type) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
         window.onload = () => {
             lucide.createIcons();
             chargerGrilleActive();
