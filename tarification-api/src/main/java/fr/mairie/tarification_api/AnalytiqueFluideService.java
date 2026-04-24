@@ -2,10 +2,9 @@ package fr.mairie.tarification_api;
 
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
-import java.io.FileInputStream;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * Service d'analyse universel des fluides.
@@ -24,24 +23,36 @@ public class AnalytiqueFluideService {
     private static final double ABO_EAU_SEMESTRE = 10.67;
     // 1.21€/m3 : Conversion du prix de marché (0.11€/kWh) vers le volume (1m3 ≈ 11kWh)
     private static final double PRIX_GAZ_M3 = 1.21; 
-    // 0.31€/kWh : Prix incluant l'abonnement et la hausse du TURPE de juillet 2025
     private static final double PRIX_ELEC_KWH = 0.31; 
 
-    public List<AnalytiqueFluide> genererAnalyseDetailed() {
-        List<AnalytiqueFluide> analyses = new ArrayList<>();
-        
-        try (FileInputStream fis = new FileInputStream(FICHIER);
-             Workbook wb = WorkbookFactory.create(fis)) {
+    @org.springframework.beans.factory.annotation.Autowired
+    private LogService logService;
 
-            analyserEau(wb, analyses);
-            analyserGaz(wb, analyses);
-            analyserElec(wb, analyses);
+    /**
+     * Version par défaut utilisée par le Dashboard
+     */
+    public List<AnalytiqueFluide> analyserTout() {
+        return analyserTout(FICHIER);
+    }
+
+    public List<AnalytiqueFluide> analyserTout(String cheminExcel) {
+        List<AnalytiqueFluide> resultats = new ArrayList<>();
+        logService.reinitialiser();
+
+        try (FileInputStream fis = new FileInputStream(new File(cheminExcel))) {
+            Workbook wb = WorkbookFactory.create(fis);
+            
+            analyserGaz(wb, resultats);
+            analyserElec(wb, resultats);
+            analyserEau(wb, resultats);
+
+            resultats.sort((a, b) -> Double.compare(b.montantReel(), a.montantReel()));
+            logService.sauvegarderFichiers();
 
         } catch (Exception e) {
-            System.err.println("[AnalytiqueFluideService] Erreur technique : " + e.getMessage());
+            e.printStackTrace();
         }
-        
-        return analyses;
+        return resultats;
     }
 
     private void analyserEau(Workbook wb, List<AnalytiqueFluide> list) {
@@ -68,89 +79,122 @@ public class AnalytiqueFluideService {
         Sheet s = wb.getSheet("CONSO GAZ");
         if (s == null) return;
 
+        Map<String, Accumulateur> stats = new LinkedHashMap<>();
+        String siteCourant = "";
+
         for (int i = 9; i <= s.getLastRowNum(); i++) {
             Row r = s.getRow(i);
             if (r == null) continue;
 
-            String site = getStr(r, 2);
-            if (site.trim().isEmpty()) continue;
+            String siteNom = getStr(r, 2).trim();
+            if (!siteNom.isEmpty()) {
+                siteCourant = siteNom;
+            }
+            if (siteCourant.isEmpty()) continue;
 
-            double totalConso = 0;
-            double totalReel = 0;
-            String dateDebut = null;
-            String dateFin = null;
-            
-            for (int col = 2; col < Math.min(r.getLastCellNum(), 150); col++) {
-                String val = getStrRaw(r, col);
-                if (val.toLowerCase().startsWith("du") && (val.contains("25") || val.contains("2025"))) {
-                    double c = getVal(r, col + 2);
+            Accumulateur acc = stats.computeIfAbsent(siteCourant, k -> new Accumulateur());
+
+            for (int col = 2; col < Math.min(r.getLastCellNum(), 200); col++) {
+                String valRaw = getStrRaw(r, col).toLowerCase();
+                if (valRaw.contains("au") && valRaw.contains("/") && (valRaw.contains("25") || valRaw.contains("2025"))
+                    && !valRaw.contains("total") && !valRaw.contains("cumul") && !valRaw.contains("annuel")) {
+                    
                     double m = getVal(r, col + 3);
-                    if (m < 100000) {
-                        totalConso += c;
-                        totalReel += m;
-                        try {
-                            String[] parts = val.toLowerCase().replace("du ", "").split(" au ");
-                            if (parts.length == 2) {
-                                if (dateFin == null) dateFin = parts[1].trim(); 
-                                dateDebut = parts[0].trim(); 
-                            }
-                        } catch (Exception e) {}
+                    String cleUnique = valRaw + "_" + m;
+
+                    if (acc.periodes.contains(cleUnique)) {
+                        col += 3;
+                        continue;
+                    }
+                    acc.periodes.add(cleUnique);
+
+                    double c = getVal(r, col + 2);
+                    
+                    if (m < 100000 && m > 0) {
+                        acc.totalConso += c;
+                        acc.totalReel += m;
+                        logService.ajouterLogGaz(siteCourant, col + 3, m, valRaw);
+                        if (acc.dateFin == null) acc.dateFin = valRaw;
+                        acc.dateDebut = valRaw;
                     }
                     col += 3;
                 }
             }
-
-            String periodeReelle = (dateDebut != null && dateFin != null) ? "du " + dateDebut + " au " + dateFin : "Année 2025";
-            if (totalConso > 0 || totalReel > 0) {
-                list.add(calculer(site, "Gaz", totalConso, totalReel, "m3", PRIX_GAZ_M3, 0, "Cumul Annuel 2025 (" + periodeReelle + ")"));
-            }
         }
+
+        // Conversion des accumulateurs en objets finaux
+        stats.forEach((site, acc) -> {
+            if (acc.totalConso > 0 || acc.totalReel > 0) {
+                list.add(calculer(site, "Gaz", acc.totalConso, acc.totalReel, "m3", PRIX_GAZ_M3, 0, "Cumul Annuel 2025"));
+            }
+        });
+    }
+
+    // Petite classe interne pour accumuler les données multi-lignes
+    private static class Accumulateur {
+        double totalConso = 0;
+        double totalReel = 0;
+        String dateDebut = null;
+        String dateFin = null;
+        Set<String> periodes = new HashSet<>();
     }
 
     private void analyserElec(Workbook wb, List<AnalytiqueFluide> list) {
         Sheet s = wb.getSheet("CONSO ELEC");
         if (s == null) return;
 
+        Map<String, Accumulateur> stats = new LinkedHashMap<>();
+        String siteCourant = "";
+
         for (int i = 9; i <= s.getLastRowNum(); i++) {
             Row r = s.getRow(i);
             if (r == null) continue;
 
-            String site = getStr(r, 5);
-            if (site.trim().isEmpty()) continue;
+            String siteNom = getStr(r, 5).trim();
+            if (!siteNom.isEmpty()) {
+                siteCourant = siteNom;
+            }
+            if (siteCourant.isEmpty()) continue;
 
-            double totalConso = 0;
-            double totalReel = 0;
-            String dateDebut = null;
-            String dateFin = null;
-            
-            for (int col = 6; col < Math.min(r.getLastCellNum(), 150); col++) {
-                String val = getStrRaw(r, col);
-                if (val.toLowerCase().startsWith("du") && (val.contains("25") || val.contains("2025"))) {
-                    double c = getVal(r, col + 2);
-                    double m = getVal(r, col + 3);
+            Accumulateur acc = stats.computeIfAbsent(siteCourant, k -> new Accumulateur());
+
+            for (int col = 6; col < Math.min(r.getLastCellNum(), 200); col++) {
+                String valRaw = getStrRaw(r, col).toLowerCase();
+                if (valRaw.contains("/") && valRaw.contains("au")
+                    && !valRaw.contains("total") && !valRaw.contains("cumul") && !valRaw.contains("annuel")
+                    && (valRaw.contains("25") || valRaw.contains("2025"))) {
                     
-                    if (m < 100000) {
-                        totalConso += c;
-                        totalReel += m;
-                        
-                        // Extraction intelligente des bornes "du [Début] au [Fin]"
-                        try {
-                            String[] parts = val.toLowerCase().replace("du ", "").split(" au ");
-                            if (parts.length == 2) {
-                                if (dateFin == null) dateFin = parts[1].trim(); // La première trouvée (souvent la plus récente à gauche)
-                                dateDebut = parts[0].trim(); // On met à jour pour garder la plus ancienne (à droite)
-                            }
-                        } catch (Exception e) {}
+                    double m = getVal(r, col + 3);
+                    // Dédoublonnage intelligent : Date + Montant
+                    String cleUnique = valRaw + "_" + m;
+
+                    if (acc.periodes.contains(cleUnique)) {
+                        col += 3;
+                        continue;
+                    }
+                    acc.periodes.add(cleUnique);
+
+                    double c = getVal(r, col + 2);
+                    
+                    if (m < 100000 && m != 0) {
+                        acc.totalConso += c;
+                        acc.totalReel += m;
+                        logService.ajouterLogElec(siteCourant, col + 3, m, valRaw);
+                        if (acc.dateFin == null) acc.dateFin = valRaw;
+                        acc.dateDebut = valRaw;
                     }
                     col += 3;
                 }
             }
-
-            String periodeReelle = (dateDebut != null && dateFin != null) ? "du " + dateDebut + " au " + dateFin : "Année 2025";
-            if (totalConso > 0 || totalReel > 0) {
-                list.add(calculer(site, "Electricité", totalConso, totalReel, "kWh", PRIX_ELEC_KWH, 0, periodeReelle));
-            }
         }
+
+        // Conversion des accumulateurs en objets finaux
+        stats.forEach((site, acc) -> {
+            String periode = (acc.dateDebut != null && acc.dateFin != null) ? "du " + acc.dateDebut + " au " + acc.dateFin : "Année 2025";
+            if (acc.totalConso > 0 || acc.totalReel > 0) {
+                list.add(calculer(site, "Electricité", acc.totalConso, acc.totalReel, "kWh", PRIX_ELEC_KWH, 0, periode));
+            }
+        });
     }
 
     private AnalytiqueFluide calculer(String site, String fluide, double conso, double reel, String unite, double prixUnit, double fixe, String periode) {

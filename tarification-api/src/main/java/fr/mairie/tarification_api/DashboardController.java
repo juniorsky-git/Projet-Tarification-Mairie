@@ -64,7 +64,7 @@ public class DashboardController {
                         r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
                         r.ecart = recettes - p.depensesTotales();
                         r.distributionTranches = p.distributionTranches();
-                        r.detailsFluides = analytiqueFluideService.genererAnalyseDetailed();
+                        r.detailsFluides = analytiqueFluideService.analyserTout();
                         
                         return ResponseEntity.ok(r);
                     })

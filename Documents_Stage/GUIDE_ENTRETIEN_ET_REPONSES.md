@@ -13,6 +13,24 @@ Ce document récapitule toutes les explications et réflexions menées lors du d
 - **La Facture Réelle** : C'est l'addition que le serveur (le fournisseur) apporte.
 - **Le Diagnostic** : On compare les deux. Si l'addition est 10 fois plus chère que le menu, on détecte une erreur de facturation.
 
+### Zone 4 : Expertise Technique - Gestion des anomalies de structure (Data Quality)
+
+**Question du jury :** *"Comment expliquez-vous des écarts de +1000% pour certains bâtiments comme Ruelle Saint-Pierre ?"*
+
+**Réponse Stratégique :**
+> "C'est un excellent point qui a nécessité une analyse approfondie de la qualité des données (Data Cleaning).
+> 
+> 1. **Le problème détecté** : Lors de l'analyse, j'ai remarqué que le fichier Excel source contenait des irrégularités. Pour certains sites, l'en-tête de période (ex: *"du 01/01/25 au 30/06/25"*) était saisi dans deux colonnes adjacentes.
+> 2. **Le risque** : Mon algorithme initial comptait la facture deux fois, ce qui créait de 'faux positifs' (des alertes d'anomalies qui n'en étaient pas).
+> 3. **La solution** : J'ai implémenté un système de **'Saut de fenêtre'** dans mon code Java. Dès qu'une facture est détectée, le programme saute automatiquement les colonnes suivantes pour éviter le double comptage.
+> 
+> Grâce à ce travail d'audit, j'ai pu ramener les résultats à des valeurs réelles et prouver que la fiabilité d'un Dashboard dépend avant tout de la robustesse de son moteur de nettoyage de données."
+
+---
+
+### Analyse de la Zone "Ruelle Saint-Pierre"
+Une fois le correctif appliqué, l'anomalie de +1000% disparaît au profit d'un chiffre réel. Si un écart persiste (+50% ou +100%), il s'agit alors d'une véritable alerte de consommation (fuite ou radiateur resté allumé).
+
 ## 📊 2. Origine des Nombres (Traçabilité)
 **Question : D'où viennent les chiffres qui s'affichent dans ton tableau ?**
 *Réponse* : Tout vient du fichier Excel `CALC DEP(4).xlsx`. Mon programme utilise un "Scanner" :

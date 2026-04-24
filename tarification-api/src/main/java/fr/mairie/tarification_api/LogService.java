@@ -1,72 +1,58 @@
 package fr.mairie.tarification_api;
 
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.springframework.stereotype.Service;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-/**
- * Service de journalisation pour l'API de tarification.
- *
- * Écrit les logs INFO et ERROR dans un fichier dédié (logs/api-erreur.log)
- * et affiche également les messages sur la sortie d'erreur standard.
- *
- * @author Séri-khane YOLOU
- * @version 1.0
- */
+@Service
 public class LogService {
 
-    /** Chemin vers le fichier de log de l'API. */
-    private static final String LOG_FILE = "logs/api-erreur.log";
+    private StringBuilder logElec = new StringBuilder("");
+    private StringBuilder logGaz = new StringBuilder("");
 
-    static {
-        java.io.File directory = new java.io.File("logs");
-        if (!directory.exists()) {
-            directory.mkdirs();
+    // --- Méthodes pour l'Audit Fluides (Instance) ---
+
+    public void reinitialiser() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        logElec = new StringBuilder("\n=== SESSION D'AUDIT DU " + timestamp + " ===\n");
+        logGaz = new StringBuilder("\n=== SESSION D'AUDIT DU " + timestamp + " ===\n");
+    }
+
+    public void ajouterLogElec(String site, int col, double montant, String periode) {
+        logElec.append(String.format("[%s] Col %d : +%.2f€ (%s)\n", site, col, montant, periode));
+    }
+
+    public void ajouterLogGaz(String site, int col, double montant, String periode) {
+        logGaz.append(String.format("[%s] Col %d : +%.2f€ (%s)\n", site, col, montant, periode));
+    }
+
+    public void sauvegarderFichiers() {
+        try {
+            Files.createDirectories(Paths.get("logs_audit"));
+            Files.write(Paths.get("logs_audit/audit_electricite.log"), 
+                        logElec.toString().getBytes(StandardCharsets.UTF_8), 
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.write(Paths.get("logs_audit/audit_gaz.log"), 
+                        logGaz.toString().getBytes(StandardCharsets.UTF_8), 
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            System.out.println("✅ Audit complété. Historique conservé dans 'logs_audit/'.");
+        } catch (Exception e) {
+            System.err.println("Erreur LogService : " + e.getMessage());
         }
     }
 
-    /**
-     * Enregistre un message d'information.
-     *
-     * @param message Message à journaliser.
-     */
+    // --- Méthodes Statiques (Requis pour le reste du projet) ---
+
     public static void log(String message) {
-        log("INFO", message, null);
+        System.out.println("[LOG] " + message);
     }
 
-    /**
-     * Enregistre une erreur avec sa trace d'exception.
-     *
-     * @param message Description de l'erreur.
-     * @param e       L'exception générée.
-     */
     public static void error(String message, Exception e) {
-        log("ERROR", message, e);
-    }
-
-    /**
-     * Méthode interne d'écriture synchronisée dans le fichier de log.
-     *
-     * @param level   Niveau de log (INFO ou ERROR).
-     * @param message Message à écrire.
-     * @param e       Exception optionnelle (peut être null).
-     */
-    private static synchronized void log(String level, String message, Exception e) {
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String ligne = String.format("[%s] [%s] %s", timestamp, level, message);
-
-        // Affichage console
-        System.err.println(ligne);
-        if (e != null) e.printStackTrace();
-
-        // Écriture dans le fichier
-        try (FileWriter fw = new FileWriter(LOG_FILE, true);
-             PrintWriter pw = new PrintWriter(fw)) {
-            pw.println(ligne);
-            if (e != null) e.printStackTrace(pw);
-        } catch (Exception ex) {
-            System.err.println("Impossible d'écrire dans le fichier de log : " + ex.getMessage());
-        }
+        System.err.println("[ERROR] " + message + " : " + (e != null ? e.getMessage() : "Inconnue"));
     }
 }
