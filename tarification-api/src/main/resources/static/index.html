@@ -137,15 +137,43 @@
             </div>
         </div>
 
-        <!-- PAGE : SIMULATION (GRILLE EXHAUSTIVE) -->
+        <!-- PAGE : SIMULATION (HIFI - RESTAURATION) -->
         <div id="page-simulation" class="content-page">
-            <h1>Simulation financière</h1>
-            <p class="subtitle">Analyse détaillée des tarifs par tranche et par service.</p>
+            <h1>Simulation financière - Restauration</h1>
+            <p class="subtitle">Analyse des coûts, recettes et taux de couverture par tranche.</p>
+
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Recettes totales</div>
+                    <div class="value" id="sim-recettes-totales" style="color: #10b981; font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Dépenses totales</div>
+                    <div class="value" id="sim-depenses-totales" style="font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Écart global</div>
+                    <div class="value" id="sim-ecart-global" style="font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Taux de couverture moyen</div>
+                    <div class="value" id="sim-taux-moyen" style="color: #10b981; font-size: 1.75rem;">...</div>
+                </div>
+            </div>
 
             <div class="table-container">
                 <table id="fullGridTable">
                     <thead>
-                        <!-- En-tête généré par JS -->
+                        <tr>
+                            <th>Tranche</th>
+                            <th>Prix facturé<br><span style="font-size: 0.65rem; color: #94a3b8; font-weight: 400; text-transform: none;">(moyen)</span></th>
+                            <th>Coût réel<br><span style="font-size: 0.65rem; color: #94a3b8; font-weight: 400; text-transform: none;">(moyen)</span></th>
+                            <th>Nombre<br>d'enfants</th>
+                            <th>Dépense<br>annuelle</th>
+                            <th>Recette<br>annuelle</th>
+                            <th>Écart</th>
+                            <th>Taux de<br>couverture</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <!-- Corps généré par JS -->
@@ -192,7 +220,7 @@
             document.getElementById('page-' + pageId).classList.add('active');
             if (element) element.classList.add('active');
 
-            if (pageId === 'simulation') chargerGrilleComplete();
+            if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'dashboard') chargerDashboardData();
             
             // Re-render icons
@@ -319,50 +347,64 @@
             `;
         }
 
-        // --- API : GRILLE COMPLETE (ISSUE #5) ---
-        async function chargerGrilleComplete() {
+        // --- API : SIMULATION (HIFI - RESTAURATION) ---
+        async function chargerSimulationRestauration() {
             const table = document.getElementById("fullGridTable");
+            const tbody = table.querySelector('tbody');
             
             try {
-                const response = await fetch("/api/tarifs/complet");
-                const grid = await response.json();
+                tbody.innerHTML = `<tr><td colspan="8" class="loading-spinner">Chargement des données de simulation...</td></tr>`;
+                
+                const response = await fetch("/api/simulation/restauration");
+                const simulationData = await response.json();
 
-                // En-têtes
-                let head = `
-                    <tr>
-                        <th>Tranche</th>
-                        <th>QF Min</th>
-                        <th>QF Max</th>
-                        <th>Repas</th>
-                        <th>Loisirs (J)</th>
-                        <th>Péri (M+S)</th>
-                        <th>Études (F)</th>
-                        <th>Ados (Vac)</th>
-                        <th>Séjour (5J)</th>
-                    </tr>
-                `;
-                table.querySelector('thead').innerHTML = head;
-
-                // Lignes
                 let body = "";
-                grid.forEach(t => {
+                let sumRecettes = 0;
+                let sumDepenses = 0;
+                let sumEcart = 0;
+
+                simulationData.forEach(t => {
+                    // Agrégation pour le header (seulement les lignes valides, hors Total si déjà agrégé, 
+                    // mais l'API fournit l'intégration de toutes les tranches A-G et EXT)
+                    sumRecettes += t.recetteAnnuelle;
+                    sumDepenses += t.depenseAnnuelle;
+                    sumEcart += t.ecart;
+
                     body += `
                         <tr>
-                            <td><span class="tranche-badge">${t.tranche}</span></td>
-                            <td>${t.qfMin.toLocaleString()} €</td>
-                            <td>${t.qfMax > 1000000 ? 'MAX' : t.qfMax.toLocaleString() + ' €'}</td>
-                            <td class="price-tag">${t.repas.toFixed(2)} €</td>
-                            <td>${t.accueilJournee.toFixed(2)} €</td>
-                            <td>${t.periscolaireMatinSoir.toFixed(2)} €</td>
-                            <td>${t.etudesForfaitMensuel.toFixed(2)} €</td>
-                            <td>${t.adosVacJourneeRepas.toFixed(2)} €</td>
-                            <td>${t.sejour5Jours.toFixed(2)} €</td>
+                            <td><span style="font-weight: 600; color: var(--text-main); font-size: 0.95rem;">${t.codeTranche}</span></td>
+                            <td class="price-tag">${t.prixFacture.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits:2})} €</td>
+                            <td>${t.coutMoyen.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits:2})} €</td>
+                            <td>${t.nombreEnfants}</td>
+                            <td>${t.depenseAnnuelle.toLocaleString('fr-FR')} €</td>
+                            <td>${t.recetteAnnuelle.toLocaleString('fr-FR')} €</td>
+                            <td style="color: ${t.ecart < 0 ? '#ef4444' : '#10b981'}; font-weight: 500;">
+                                ${t.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}
+                            </td>
+                            <td style="font-weight: 500;">${(t.tauxCouverture * 100).toLocaleString('fr-FR', {maximumFractionDigits: 1})} %</td>
                         </tr>
                     `;
                 });
-                table.querySelector('tbody').innerHTML = body;
+                
+                tbody.innerHTML = body;
+
+                // Mise à jour des Stats Cards
+                const globalTaux = sumDepenses > 0 ? (sumRecettes / sumDepenses) * 100 : 0;
+                
+                document.getElementById('sim-recettes-totales').innerText = sumRecettes.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
+                document.getElementById('sim-depenses-totales').innerText = sumDepenses.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
+                
+                const ecartEl = document.getElementById('sim-ecart-global');
+                ecartEl.innerText = sumEcart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
+                ecartEl.style.color = sumEcart < 0 ? '#ef4444' : '#10b981';
+
+                const tauxEl = document.getElementById('sim-taux-moyen');
+                tauxEl.innerText = globalTaux.toLocaleString('fr-FR', {maximumFractionDigits: 1}) + ' %';
+                tauxEl.style.color = globalTaux >= 100 ? '#10b981' : (globalTaux > 50 ? '#f59e0b' : '#ef4444');
+
             } catch (error) {
-                console.error("Erreur grille complète :", error);
+                console.error("Erreur simulation restauration :", error);
+                tbody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center; padding: 20px;">Erreur de communication avec le serveur</td></tr>`;
             }
         }
 
