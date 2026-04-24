@@ -458,7 +458,11 @@
                         <!-- Colonne gauche : Indicateurs Financiers -->
                         <div style="display: flex; flex-direction: column; gap: 16px;">
                             <div class="stat-card" style="flex-direction: column; align-items: flex-start; background: var(--primary-bg); border: 1px solid var(--primary); box-shadow: none;">
-                                <div class="label" style="color: var(--primary);">Recettes annuelles estimées (Théoriques) <i data-lucide="info" size="14" title="Calcul basé sur la tarification pleine et le volume moyen. Ne reflète pas le montant réel encaissé en trésorerie." style="vertical-align: middle; cursor: help;"></i></div>
+                                <div class="label tooltip-container" style="color: var(--primary);">
+                                    Recettes annuelles estimées (Théoriques) 
+                                    <i data-lucide="info" size="14" style="vertical-align: middle; cursor: help; margin-left: 4px;"></i>
+                                    <span class="tooltip-text">Calcul basé sur la tarification pleine et le volume moyen. Ne reflète pas le montant réel encaissé en trésorerie.</span>
+                                </div>
                                 <div class="value" style="color: var(--primary); font-size: 2rem;">${data.recettesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
                                 <div style="font-size: 0.875rem; margin-top: 8px;">
                                     Taux de couverture : <span class="badge ${badgeClass}">${couverturePct}%</span>
@@ -467,7 +471,11 @@
                             
                             <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9;">
                                 <div>
-                                    <div class="label">Subvention Ville (Écart Théorique) <i data-lucide="info" size="14" title="Différence entre les dépenses réelles totales et les recettes estimées théoriques." style="vertical-align: middle; cursor: help;"></i></div>
+                                    <div class="label tooltip-container">
+                                        Subvention Ville (Écart Théorique) 
+                                        <i data-lucide="info" size="14" style="vertical-align: middle; cursor: help; margin-left: 4px;"></i>
+                                        <span class="tooltip-text">Différence entre les dépenses réelles totales et les recettes estimées théoriques.</span>
+                                    </div>
                                     <div class="value" style="color: ${data.ecart < 0 ? '#ef4444' : '#10b981'}">${data.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
                                 </div>
                             </div>
