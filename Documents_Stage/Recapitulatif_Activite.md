@@ -21,3 +21,19 @@
 ## 6. Documentation et Vulgarisation
 - **Action** : Création d'un guide d'interprétation métier (Analogie du restaurant).
 - **Résultat** : Un dossier technique pédagogique expliquant la valeur ajoutée financière du projet (Détection d'anomalies).
+
+# 🧙‍♂️ Expertise Technique et Workflow - 24 Avril 2026
+
+## 1. Fiabilisation Avancée (Électricité & Multi-comptes)
+- **Action** : Portabilité de la lecture verticale "site-aware" au module d'électricité.
+- **Innovation** : Implémentation du dédoublonnage par clé composite `(Période + Montant)`.
+- **Résultat** : Capture de 100% des factures pour les sites à compteurs multiples (ex: Gymnase Palestre), autrefois ignorées.
+
+## 2. Industrialisation du Projet (GitHub Expert)
+- **Action** : Mise en place d'un cycle de gestion par **Issues** et **Pull Requests**.
+- **Technique** : Utilisation de branches de fonctionnalités (`feature branching`) pour la documentation.
+- **Preuve** : Liaison automatique des correctifs aux tickets techniques sur GitHub (#31 à #34).
+
+## 3. Livrables de Passation (Audit Final)
+- **Action** : Création d'une **Checklist d'Audit Finale**.
+- **Objectif** : Assurer la pérennité de l'outil et permettre au service financier de la Mairie de refaire l'analyse chaque année sans aide technique extérieure.

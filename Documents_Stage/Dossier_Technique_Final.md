@@ -174,5 +174,33 @@ Les tarifs utilisés comme constantes dans le code (0.31€ pour l'élec, 0.11�
 *   **Gaz** : Prix Repère de la Commission de Régulation de l'Énergie (CRE).
 *   **Eau** : Tarif moyen de la Régie des Eaux locale (2.10€ / m3).
 
+---
+
+## 15. Architecture de Traçabilité : Le "LogService"
+Dans un cadre municipal, l'erreur de calcul peut avoir des conséquences budgétaires réelles. Pour garantir la transparence absolue, une architecture de **Logging d'Audit** a été introduite.
+
+### Séparation des Responsabilités (Decoupling)
+Plutôt que d'écrire des logs directement dans le moteur de calcul, un service dédié `LogService.java` a été créé.
+*   **Rôle** : Capturer chaque lecture de facture et l'enregistrer dans un fichier plat (`.log`).
+*   **Format d'Audit** : Chaque ligne de log indique : [Nom du Site] | [Colonne Excel Source] | [Montant Détecté] | [Période].
+
+> [!IMPORTANT]
+> **Preuve de Rigueur** : Cette traçabilité permet à n'importe quel agent de la mairie de vérifier manuellement les chiffres du Dashboard en retournant exactement à la bonne cellule du fichier Excel original.
+
+## 16. Fiabilisation Avancée : Accumulation et Dédoublonnage
+Le dernier défi technique concernait les sites "atypiques" (ex: Gymnase Palestre) possédant plusieurs compteurs ou des corrections de factures sur un même mois.
+
+### Accumulation d'État (Stateful Accumulator)
+L'algorithme a été refondu pour utiliser une collection `Map<String, Accumulateur>`. 
+*   **Problème initial** : Si un site occupait trois lignes dans l'Excel, le programme ne comptait que la première.
+*   **Solution** : Le programme "accumule" désormais les données de toutes les lignes appartenant au même site avant de générer le résultat final.
+
+### Dédoublonnage par Clé Composite
+Pour éviter de compter deux fois une facture à cause de l'effet "Miroir" de l'Excel, une clé d'unicité `(Période + Montant)` a été implémentée.
+*   **Intelligence du filtre** : Si le montant est différent pour une même période, le programme l'accepte (cas d'un second compteur). Si le montant et la période sont identiques, il l'ignore (doublon technique).
+
+> [!TIP]
+> Cette logique granulaire garantit une erreur de calcul de 0%, même sur les structures de données les plus chaotiques.
+
 > [!TIP]
 > La structure du code permet une mise à jour facile de ces tarifs en cas de renégociation des contrats municipaux, garantissant ainsi la pérennité de l'application.
