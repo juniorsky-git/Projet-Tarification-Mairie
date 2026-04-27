@@ -15,9 +15,16 @@ Ce document sert de journal de bord en temps réel. Chaque action est documenté
   - **Cause racine** : La formule JS utilisait `prix × nombreEnfants` au lieu de `prix × (recetteOriginale / prixOriginal)` qui intègre le nombre de jours de repas annuels.
   - **Correction** : Au chargement des données, on calcule `facteurAnnuel = recetteOriginale / prixOriginal` et on le stocke sur chaque ligne. La simulation utilise ensuite `prix × facteurAnnuel`.
  
- ### 📋 Prochaines étapes planifiées
-- [ ] **Traitement des retours de comparaison** : Ajustements basés sur le feedback de l'autre IA si nécessaire.
-- [ ] **Nettoyage optionnel** : Fusion des branches de fonctionnalités vers le main si validé.
+### 📋 Prochaines étapes planifiées
+- [x] **PR #42 ouverte** : `feat/simulateur-what-if-interactif` → `main` pour clôturer l'Issue #20. URL : https://github.com/juniorsky-git/Projet-Tarification-Mairie/pull/42
+- [/] **Démarrage Issue #24 : Analytique Fluides (Eau/Gaz)** :
+  - **Objectif** : Créer le dashboard de suivi des consommations bi-semestriel.
+  - **Action 1** : Analyse du fichier Excel source des consommations.
+  - **Action 2** : Création de la branche `feat/analytique-fluides-m3`.
+
+### 📋 Prochaines étapes planifiées
+- [ ] **Développement de l'API Fluides** : Extraction des données m3 par site.
+- [ ] **Interface HiFi Fluides** : Création de la vue dashboard avec graphiques ou indicateurs m3.
 
 ---
 *Note: Ce fichier est mis à jour "Automatiquement" avant chaque intervention technique.*

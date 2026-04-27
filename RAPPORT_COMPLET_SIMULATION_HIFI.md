@@ -68,20 +68,35 @@ Pour éviter de compter le total *deux fois* (une fois via la somme des lignes e
 
 ---
 
-## 📈 5. Workflow et Standard Professionnel
+## ⚡ 5. Phase d'Innovation : Le Simulateur Interactif "What-If"
+
+Pour transformer ce tableau de bord en un véritable outil prospectif, j'ai implémenté un moteur de simulation côté client.
+
+### Fonctionnement technique :
+- **Inputs Dynamiques** : La colonne "Prix facturé" est désormais composée de champs éditables (`<input>`).
+- **Moteur de Recalcul (JS)** : À chaque touche pressée, une fonction Javascript intercepte la nouvelle valeur, recalcule le produit `Prix * Nombre d'enfants` pour la ligne, puis propage les sommes jusqu'aux cartes KPI supérieures.
+- **Bouton de secours (Reset)** : Un mécanisme de réinitialisation permet de vider la mémoire tampon du navigateur pour recharger les données certifiées issues du fichier Excel original.
+
+### Valeur Ajoutée pour la Mairie :
+Ce mode permet de tester instantanément des hypothèses de travail en conseil municipal (ex: une hausse uniforme de 0,10€ sur toutes les tranches) et d'en voir l'impact immédiat sur le déficit global de -104k€.
+
+---
+
+## 📈 6. Workflow et Standard Professionnel
 
 Pour ce projet, j'ai appliqué un workflow de niveau "Ingénieur Logiciel" :
 
-1. **Isolation (Branches Git)** : Jamais de modification directe sur le `main`. Création de `feat/simulation-financiere-hifi`.
+1. **Isolation (Branches Git)** : Jamais de modification directe sur le `main`. Création de `feat/simulation-financiere-hifi` et `feat/simulateur-what-if-interactif`.
 2. **Standardisation des messages** : Utilisation des "Conventional Commits" en français pour faciliter la lecture de ton historique.
 3. **Double Documentation** : 
     - Un `task.md` pour le suivi immédiat (le "Faire").
     - Un `walkthrough.md` pour le résumé (le "Fait").
     - Un `RETEX` pour la réflexion (le "Pourquoi").
+    - Un `SUIVI_DEVELOPPEMENT.md` pour la traçabilité en temps réel.
 
 ---
 
-## 🏁 6. Conclusion
+## 🏁 7. Conclusion
 
 Le résultat final est un outil **robuste** (lecture Excel directe), **précis** (inclusion de tous les effectifs EXT/Total) et **esthétique** (design HiFi). L'application n'est plus seulement un projet informatique de stage, c'est devenu un véritable outil de présentation de données financières.
 
