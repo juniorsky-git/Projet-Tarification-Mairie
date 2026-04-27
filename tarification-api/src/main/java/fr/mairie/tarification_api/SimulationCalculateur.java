@@ -40,16 +40,23 @@ public class SimulationCalculateur {
                 return lignes;
             }
 
-            // Lignes Excel 7 à 16 (index 6 à 15 dans POI)
-            for (int i = 6; i <= 15; i++) {
+            // Lignes Excel 7 à 17 (index 6 à 16 dans POI)
+            for (int i = 6; i <= 16; i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
                 String codeTranche = getTexte(row, 1);
-                if (codeTranche.isEmpty() || codeTranche.equalsIgnoreCase("Total")) continue;
+                String labelTranche = getTexte(row, 0);
+                
+                // Si la colonne B est vide (comme pour EXT ou Total), on utilise la colonne A
+                if (codeTranche.isEmpty()) {
+                    codeTranche = labelTranche;
+                }
+                
+                if (codeTranche.isEmpty()) continue;
 
                 SimulationLigne s = new SimulationLigne();
-                s.tranche         = getTexte(row, 0);
+                s.tranche         = labelTranche;
                 s.codeTranche     = codeTranche;
                 s.prixFacture     = getNombre(row, 2);
                 s.nombreEnfants   = getNombre(row, 3);
