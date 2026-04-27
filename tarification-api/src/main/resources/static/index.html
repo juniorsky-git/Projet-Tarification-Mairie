@@ -293,13 +293,16 @@
 
                     html += `
                         <tr>
-                            <td style="font-weight: 600;">${row.site}</td>
+                            <td>
+                                <div style="font-weight: 600;">${row.site}</div>
+                                ${row.remarque ? `<div style="font-size: 11px; color: #64748b; font-style: italic;">ℹ️ ${row.remarque}</div>` : ''}
+                            </td>
                             <td>
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
                                     <i data-lucide="droplet" size="14"></i> ${row.fluide}
                                 </span>
                             </td>
-                            <td>${row.m3_S1.toLocaleString()} m3</td>
+                            <td style="${row.m3_S1 === 0 && row.reel_S1 > 0 ? 'color: #94a3b8;' : ''}">${row.m3_S1.toLocaleString()} m3</td>
                             <td>${row.m3_S2.toLocaleString()} m3</td>
                             <td style="color: ${deltaColor}; font-weight: 700;">
                                 <i data-lucide="${trendIcon}" size="14" style="vertical-align: middle;"></i>
@@ -309,7 +312,9 @@
                             <td>
                                 ${row.alerte ? 
                                     `<span class="badge" style="background: #ef444420; color: #ef4444; border: 1px solid #ef444440;">ANOMALIE</span>` : 
-                                    `<span class="badge" style="background: #10b98120; color: #10b981; border: 1px solid #10b98140;">NOMINAL</span>`
+                                    (row.remarque && row.m3_S1 === 0 ? 
+                                        `<span class="badge" style="background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b40;">DATA PARTIEL</span>` :
+                                        `<span class="badge" style="background: #10b98120; color: #10b981; border: 1px solid #10b98140;">NOMINAL</span>`)
                                 }
                             </td>
                         </tr>

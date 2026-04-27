@@ -111,6 +111,63 @@ public class AnalytiqueFluideService {
     }
 
     /**
+     * Analyse comparative bi-semestrielle pour l'Issue #24.
+     * Restreint à l'Eau pour le moment.
+     */
+    public List<RapportSemestrielFluide> analyserBiSemestriel() {
+        return analyserBiSemestriel(FICHIER);
+    }
+
+    public List<RapportSemestrielFluide> analyserBiSemestriel(String cheminExcel) {
+        List<RapportSemestrielFluide> resultats = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(new File(cheminExcel))) {
+            Workbook wb = WorkbookFactory.create(fis);
+            Sheet s = wb.getSheet("Conso eau");
+            if (s != null) {
+                for (int i = 5; i <= s.getLastRowNum(); i++) {
+                    Row r = s.getRow(i);
+                    if (r == null) continue;
+
+                    String site = getStr(r, 1) + " " + getStr(r, 2) + " " + getStr(r, 3);
+                    site = site.trim();
+                    if (site.isEmpty()) continue;
+
+                    double m3_S1 = getVal(r, 7); // H ou G selon offset, on garde l'existant
+                    double reel_S1 = getVal(r, 8);
+                    
+                    double m3_S2 = getVal(r, 17); // R ou Q selon offset
+                    double reel_S2 = getVal(r, 18);
+
+                    double m3_Total = m3_S1 + m3_S2;
+                    double reel_Total = reel_S1 + reel_S2;
+
+                    if (m3_Total > 0 || reel_Total > 0) {
+                        double delta = m3_S1 > 0 ? ((m3_S2 - m3_S1) / m3_S1) * 100 : 0;
+                        boolean alerte = Math.abs(delta) > 20;
+                        
+                        String remarque = "";
+                        if (m3_S1 == 0 && reel_S1 > 0) {
+                            remarque = "S1 : Abonnement uniquement (0 m3)";
+                        } else if (m3_Total == 0 && reel_Total > 0) {
+                            remarque = "Abonnements uniquement";
+                        }
+
+                        resultats.add(new RapportSemestrielFluide(
+                            site, "Eau", 
+                            m3_S1, m3_S2, m3_Total, 
+                            reel_S1, reel_S2, reel_Total, 
+                            delta, alerte, remarque
+                        ));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultats;
+    }
+
+    /**
      * Analyse l'onglet Gaz. Gestion complexe des sites multi-lignes et multi-compteurs.
      * @param wb Workbook Excel
      * @param list Liste à enrichir
