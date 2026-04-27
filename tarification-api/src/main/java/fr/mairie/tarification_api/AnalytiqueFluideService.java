@@ -410,7 +410,9 @@ public class AnalytiqueFluideService {
     private String getStr(Row r, int col) {
         String val = getStrRaw(r, col);
         String upper = val.toUpperCase();
-        if (upper.contains("TOTAL") || upper.contains("FACTURATION") || upper.contains("BILAN") || upper.startsWith("SUM") || upper.startsWith("=")) {
+        if (upper.contains("TOTAL") || upper.contains("FACTURATION") || upper.contains("BILAN") || 
+            upper.startsWith("SUM") || upper.startsWith("=") || upper.contains("BUDGET") || 
+            upper.contains("DELTA") || upper.contains("CONSO")) {
             return ""; 
         }
         // Si c'est juste un nombre, c'est probablement une donnée technique et pas un nom de site

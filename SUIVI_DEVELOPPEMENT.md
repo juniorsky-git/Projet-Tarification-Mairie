@@ -30,6 +30,7 @@ Ce document sert de journal de bord en temps réel. Chaque action est documenté
   - [x] **Action 3** : Développement de la page "Audit Fluides" avec calcul de tendance.
   - [x] **Action 4** : Push et création de la Pull Request #45.
   - [x] **Action 5** : Extension de l'audit au **Gaz** et à l'**Électricité** (Scan horizontal de factures).
+  - [x] **Action 6** : **Nettoyage du bruit Excel** (Filtrage des formules SUM, des lignes Budget/Delta et correction des unités kWh).
 
 - [x] **Issue #46 : Fiabilisation de l'audit (Investigation Index)** :
   - [x] **Enquête** : Scan de 150 colonnes via des scripts d'inspection (`InspectEau.java`).
