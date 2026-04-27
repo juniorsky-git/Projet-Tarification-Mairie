@@ -402,6 +402,15 @@
                 const response = await fetch("/api/simulation/restauration");
                 originalSimData = await response.json();
 
+                // Stocker le prix original et le facteur annuel (nb_repas × enfants)
+                // pour que le moteur What-if puisse recalculer en gardant la temporalité réelle
+                originalSimData.forEach(t => {
+                    t.prixOriginal = t.prixFacture;
+                    // facteurAnnuel = nb_enfants × nb_jours_de_repas
+                    // = recetteAnnuelle / prixFacture (mais on évite la division par 0)
+                    t.facteurAnnuel = (t.prixFacture > 0) ? (t.recetteAnnuelle / t.prixFacture) : t.nombreEnfants;
+                });
+
                 // Appliquer les overrides sauvegardés en localStorage
                 const saved = loadSimulationFromStorage();
                 if (saved && saved.overrides && Object.keys(saved.overrides).length > 0) {
@@ -409,7 +418,8 @@
                         const ligne = originalSimData.find(t => t.codeTranche === codeTranche);
                         if (ligne) {
                             ligne.prixFacture = prix;
-                            ligne.recetteAnnuelle = prix * ligne.nombreEnfants;
+                            // Correction : utiliser le facteurAnnuel pour respecter le nb de jours de repas
+                            ligne.recetteAnnuelle = prix * ligne.facteurAnnuel;
                             ligne.ecart = ligne.recetteAnnuelle - ligne.depenseAnnuelle;
                             ligne.tauxCouverture = ligne.depenseAnnuelle > 0
                                 ? (ligne.recetteAnnuelle / ligne.depenseAnnuelle) : 0;
@@ -492,7 +502,10 @@
             // Mise à jour locale de la ligne
             const line = originalSimData[index];
             line.prixFacture = price;
-            line.recetteAnnuelle = price * line.nombreEnfants;
+            // CORRECTION BUG : On utilise le facteurAnnuel (nbEnfants × nbJoursRepas)
+            // et non pas simplement prix × nombreEnfants qui ignore les jours annuels.
+            // facteurAnnuel = recetteOrigine / prixOriginal, calculé au chargement.
+            line.recetteAnnuelle = price * line.facteurAnnuel;
             line.ecart = line.recetteAnnuelle - line.depenseAnnuelle;
             line.tauxCouverture = line.depenseAnnuelle > 0 ? (line.recetteAnnuelle / line.depenseAnnuelle) : 0;
 
