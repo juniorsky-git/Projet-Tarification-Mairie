@@ -128,4 +128,12 @@ public class DashboardController {
                 return null;
         }
     }
+
+    /**
+     * Nouvel endpoint pour l'Issue #24 : Audit bi-semestriel des consommations
+     */
+    @GetMapping("/analytique/fluides/bi-semestriel")
+    public ResponseEntity<List<RapportSemestrielFluide>> getRapportBiSemestriel() {
+        return ResponseEntity.ok(analytiqueFluideService.analyserBiSemestriel());
+    }
 }

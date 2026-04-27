@@ -7,24 +7,40 @@ Ce document sert de journal de bord en temps réel. Chaque action est documenté
 ### 27 Avril 2026 - Matin
 - [x] **Implémentation du mode "What-If" Interactif** : Transformation du tableau de simulation pour permettre l'édition en direct des tarifs.
 - [x] **Gestion Git** : Création de la branche `feat/simulateur-what-if-interactif` et push des modifications.
-- [x] **Action terminée : Mise à jour de la documentation Maître** : Actualisation du fichier `RAPPORT_COMPLET_SIMULATION_HIFI.md` pour intégrer les détails techniques du simulateur interactif.
+- [x] **Bug corrigé : Calcul de recette What-If** : Utilisation du facteur annuel pour garantir l'exactitude des projections budgétaires.
 
-- [x] **Action terminée : État des lieux (Topo) What-If** : Analyse de la branche interactive et identification des axes d'amélioration pour comparaison externe.
-- [x] **Bug corrigé : Calcul de recette What-If** :
-  - **Symptôme** : Saisir 1,20€ sur F2 (57 enfants) affichait 68,4€ au lieu de ~4 700€.
-  - **Cause racine** : La formule JS utilisait `prix × nombreEnfants` au lieu de `prix × (recetteOriginale / prixOriginal)` qui intègre le nombre de jours de repas annuels.
-  - **Correction** : Au chargement des données, on calcule `facteurAnnuel = recetteOriginale / prixOriginal` et on le stocke sur chaque ligne. La simulation utilise ensuite `prix × facteurAnnuel`.
- 
-### 📋 Prochaines étapes planifiées
-- [x] **PR #42 ouverte** : `feat/simulateur-what-if-interactif` → `main` pour clôturer l'Issue #20. URL : https://github.com/juniorsky-git/Projet-Tarification-Mairie/pull/42
-- [/] **Démarrage Issue #24 : Analytique Fluides (Eau/Gaz)** :
-  - **Objectif** : Créer le dashboard de suivi des consommations bi-semestriel.
-  - **Action 1** : Analyse du fichier Excel source des consommations.
-  - **Action 2** : Création de la branche `feat/analytique-fluides-m3`.
+### 27 Avril 2026 - Après-midi
+- [x] **Issue #24 : Audit Bi-Semestriel des Fluides (Complet)** :
+  - [x] **Extension Gaz & Électricité** : Scan intelligent des dates de factures horizontales pour regrouper les données par semestre (S1/S2).
+  - [x] **Nettoyage des Données** : Filtrage automatique du "bruit" Excel (formules SUM, sites nommés "Budget", "Delta", ou "Factures").
+  - [x] **Corrections Unités** : Affichage dynamique des unités (m³ pour l'Eau/Gaz, kWh pour l'Électricité).
+  - [x] **Interface Agents** : Ajout d'onglets de filtrage par fluide et d'un guide lexical simplifié.
 
-### 📋 Prochaines étapes planifiées
-- [ ] **Développement de l'API Fluides** : Extraction des données m3 par site.
-- [ ] **Interface HiFi Fluides** : Création de la vue dashboard avec graphiques ou indicateurs m3.
+- [x] **Issue #46 : Fiabilisation de l'audit (Investigation Index)** :
+  - [x] **Enquête** : Scan de 150 colonnes via des scripts d'inspection (`InspectEau.java`).
+  - [x] **Solution logicielle** : Ajout de **badges "DATA PARTIEL"** et gestion du **"N/A"** pour les évolutions incalculables.
 
 ---
-*Note: Ce fichier est mis à jour "Automatiquement" avant chaque intervention technique.*
+
+## 🚶‍♂️ Walkthrough Final : Audit des Fluides
+
+### 📊 Fonctionnalités clés
+1.  **Interface Unifiée** : Un seul tableau regroupe l'Eau 💧, le Gaz 🔥 et l'Électricité ⚡.
+2.  **Navigation par Onglets** : Les agents peuvent filtrer instantanément par type d'énergie (Eau, Gaz, Électricité ou Tous).
+3.  **Analyse Intelligente** :
+    - **Calcul de Delta** : Comparaison automatique S1 (Jan-Juin) vs S2 (Juil-Déc) pour détecter les surconsommations.
+    - **Alertes Anomalies** : Notification visuelle rouge (**ANOMALIE**) si la consommation bondit de plus de 20%.
+    - **Gestion du Bruit** : Le système ignore automatiquement les formules Excel et les lignes de budget/synthèse.
+4.  **Pédagogie Intégrée** : Un guide lexical simple en bas de page explique les termes techniques (S1, S2, Delta) de manière accessible.
+
+### ⚙️ Coulisses Techniques
+- **Backend (Java)** : `AnalytiqueFluideService` utilise des accumulateurs semestriels pour sommer les coûts et volumes par bâtiment.
+- **Frontend (JS)** : Système de rendu dynamique avec stockage local des données pour un filtrage instantané.
+- **Robustesse** : Utilisation de Regex pour filtrer les faux noms de sites et sécurisation des flux de lecture Excel.
+
+### 🚀 Prochaines étapes
+- [ ] Fusionner la branche `feat/fiabilisation-audit-index-46` vers `main`.
+- [ ] Partager le lien du dashboard avec les agents concernés.
+
+---
+*Note: Mission accomplie. Le dashboard est verrouillé et validé.*

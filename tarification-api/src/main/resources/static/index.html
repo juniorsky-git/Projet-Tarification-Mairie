@@ -31,6 +31,10 @@
                 <i data-lucide="line-chart"></i>
                 <span>Simulation financière</span>
             </div>
+            <div class="nav-item" onclick="switchPage('fluides-audit', this)">
+                <i data-lucide="droplets"></i>
+                <span>Audit Fluides</span>
+            </div>
             <div class="nav-item" onclick="switchPage('gestion', this)">
                 <i data-lucide="file-spreadsheet"></i>
                 <span>Gestion des grilles</span>
@@ -100,7 +104,73 @@
             </div>
         </div>
 
-        <!-- PAGE : CONSULTATION -->
+        <!-- PAGE : AUDIT FLUIDES (ISSUE #24) -->
+        <div id="page-fluides-audit" class="content-page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1>Audit Bi-Semestriel des Fluides</h1>
+                    <p class="subtitle">Analyse comparative des consommations (S1 vs S2) par bâtiment.</p>
+                </div>
+                <button class="btn-primary" onclick="chargerAuditFluides()">Actualiser l'audit</button>
+            </div>
+
+            <!-- ONGLETS DE FILTRAGE PAR FLUIDE -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-tab active" id="tab-fluide-tous" onclick="filtrerFluideAudit('tours', this)">Tous les fluides</button>
+                <button class="btn-tab" onclick="filtrerFluideAudit('Eau', this)">💧 Eau</button>
+                <button class="btn-tab" onclick="filtrerFluideAudit('Gaz', this)">🔥 Gaz</button>
+                <button class="btn-tab" onclick="filtrerFluideAudit('Electricité', this)">⚡ Électricité</button>
+            </div>
+
+            <div class="table-container">
+                <table id="tableAuditFluides">
+                    <thead>
+                        <tr>
+                            <th>Bâtiment / Site</th>
+                            <th>Fluide</th>
+                            <th>Début d'année (S1)</th>
+                            <th>Fin d'année (S2)</th>
+                            <th>Évolution (%)</th>
+                            <th>Total Annuel</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">Cliquez sur "Actualiser l'audit" pour charger les données.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GUIDE PEDAGOGIQUE POUR LES AGENTS -->
+            <div style="margin-top: 40px; padding: 24px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="help-circle" size="20"></i> Guide pour comprendre cet audit
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">1. C'est quoi S1 et S2 ?</h4>
+                        <p style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">
+                            <b>S1</b> est la consommation des 6 premiers mois (Janvier à Juin).<br>
+                            <b>S2</b> est celle des 6 derniers mois (Juillet à Décembre).
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">2. Comment lire l'évolution ?</h4>
+                        <p style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">
+                            C'est la différence entre le début et la fin de l'année. Une flèche rouge vers le haut <b>(+)</b> signifie que la consommation augmente. 
+                            Si ça augmente de plus de 20%, le logiciel affiche <b>ANOMALIE</b>.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">3. Pourquoi "N/A" ou "Partiel" ?</h4>
+                        <p style="font-size: 0.9rem; color: #64748b; line-height: 1.5;">
+                            Quand le bâtiment est fermé ou que seule une petite facture d'abonnement est reçue au début, on ne peut pas comparer. 
+                            Dans ce cas, on écrit <b>N/A</b> (Non Applicable) pour ne pas fausser les graphiques.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="page-consultation" class="content-page">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div>
@@ -233,8 +303,90 @@
 
             if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'dashboard') chargerDashboardData();
+            if (pageId === 'fluides-audit') chargerAuditFluides();
             
             // Re-render icons
+            lucide.createIcons();
+        }
+
+        let rawAuditData = [];
+
+        async function chargerAuditFluides() {
+            const tbody = document.querySelector('#tableAuditFluides tbody');
+            tbody.innerHTML = `<tr><td colspan="7" class="loading-spinner">Analyse des consommations semestrielles...</td></tr>`;
+
+            try {
+                const response = await fetch('/api/analytique/fluides/bi-semestriel');
+                rawAuditData = await response.json();
+                
+                // On active l'onglet "Tous" par défaut
+                const tabTous = document.getElementById('tab-fluide-tous');
+                filtrerFluideAudit('tours', tabTous);
+
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="7" style="color: #ef4444; text-align: center; padding: 20px;">❌ Erreur lors du chargement des données.</td></tr>`;
+            }
+        }
+
+        function filtrerFluideAudit(fluide, element) {
+            // Style des onglets
+            element.parentElement.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            let filtered = rawAuditData;
+            if (fluide !== 'tours') {
+                filtered = rawAuditData.filter(d => d.fluide === fluide);
+            }
+            renderAuditTable(filtered);
+        }
+
+        function renderAuditTable(data) {
+            const tbody = document.querySelector('#tableAuditFluides tbody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">Aucune donnée pour ce fluide.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach(row => {
+                const absDelta = Math.abs(row.delta_S1_S2_Percent);
+                const isIncrease = row.delta_S1_S2_Percent > 0;
+                const deltaColor = row.alerte ? '#ef4444' : (absDelta > 10 ? '#f59e0b' : '#10b981');
+                const trendIcon = isIncrease ? 'trending-up' : 'trending-down';
+                const fluidIcon = row.fluide === 'Eau' ? 'droplet' : (row.fluide === 'Gaz' ? 'flame' : 'zap');
+
+                html += `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${row.site}</div>
+                            ${row.remarque ? `<div style="font-size: 11px; color: #64748b; font-style: italic;">ℹ️ ${row.remarque}</div>` : ''}
+                        </td>
+                        <td>
+                            <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                <i data-lucide="${fluidIcon}" size="14"></i> ${row.fluide}
+                            </span>
+                        </td>
+                        <td style="${row.m3_S1 === 0 && row.reel_S1 > 0 ? 'color: #94a3b8;' : ''}">${row.m3_S1.toLocaleString()} ${row.unite}</td>
+                        <td>${row.m3_S2.toLocaleString()} ${row.unite}</td>
+                        <td style="color: ${row.m3_S1 === 0 ? '#64748b' : deltaColor}; font-weight: 700;">
+                            ${row.m3_S1 > 0 ? 
+                                `<i data-lucide="${trendIcon}" size="14" style="vertical-align: middle;"></i> ${isIncrease ? '+' : ''}${row.delta_S1_S2_Percent.toFixed(1)}%` : 
+                                '<span style="font-size: 11px; font-weight: 500;">N/A</span>'
+                            }
+                        </td>
+                        <td style="font-weight: 700;">${row.m3_Total.toLocaleString()} ${row.unite}</td>
+                        <td>
+                            ${row.alerte ? 
+                                `<span class="badge" style="background: #ef444420; color: #ef4444; border: 1px solid #ef444440;">ANOMALIE</span>` : 
+                                (row.remarque && row.m3_S1 === 0 ? 
+                                    `<span class="badge" style="background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b40;">DATA PARTIEL</span>` :
+                                    `<span class="badge" style="background: #10b98120; color: #10b981; border: 1px solid #10b98140;">NORMAL</span>`)
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
             lucide.createIcons();
         }
 

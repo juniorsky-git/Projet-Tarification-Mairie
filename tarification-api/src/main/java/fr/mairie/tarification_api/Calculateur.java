@@ -34,11 +34,18 @@ public class Calculateur {
         }
         
         SyntheseGlobale sg = new SyntheseGlobale();
-        try (FileInputStream fis = new FileInputStream(new File(FICHIER));
+        File f = new File(FICHIER);
+        if (!f.exists()) {
+            System.err.println("CRITIQUE : Fichier source manquant à : " + f.getAbsolutePath());
+            return sg;
+        }
+        
+        try (FileInputStream fis = new FileInputStream(f);
              Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheet(ONGLET_SYNTHESE);
             if (s == null) {
+                System.err.println("ERREUR : Onglet '" + ONGLET_SYNTHESE + "' absent du fichier.");
                 return sg;
             }
 
