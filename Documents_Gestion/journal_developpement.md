@@ -461,3 +461,135 @@ Immédiatement après le chargement, le fichier subit une inspection :
 ### 3. Encapsulation Ultime dans la Console
 Cette exception `IllegalArgumentException` est désormais attrapée tout en haut de la chaîne de l'Interface Utilisateur (ConsoleUI). 
 Lorsqu'elle survient, l'utilisateur d'accueil se voit afficher un message propre en français, ex: *"ERREUR : Grille invalide. Impossible de détecter les colonnes essentielles."*, sans que le logiciel ne plante ou ne délivre une ligne en jargon anglophone. L'administration gagne en totale autonomie !
+
+---
+
+## Etape 22 : Persistance des Simulations What-If via localStorage (27/04/2026)
+
+Cette étape répond à la limite principale du simulateur interactif : la perte des simulations en cours lors d'un rechargement de page (F5) ou d'une navigation entre onglets.
+
+### 1. Le Problème (Amnésie du Simulateur)
+
+Le simulateur What-If stockait les modifications de prix dans la variable JavaScript `originalSimData`. Cette variable vit uniquement en mémoire vive du navigateur. Dès qu'on rafraîchissait la page ou qu'on naviguait vers le Dashboard puis revenait sur Simulation, `chargerSimulationRestauration()` était rappelée, les données fraîches de l'API écrasaient tout, et les prix simulés disparaissaient.
+
+**Impact concret** : un agent en réunion budgétaire qui construisait un scénario "+0.20€ sur la tranche A, -0.10€ sur la tranche G" perdait tout son travail en un clic involontaire.
+
+### 2. Analyse du Code Avant Modification
+
+Avant de toucher quoi que ce soit, l'intégralité du fichier `index.html` (755 lignes) a été lue pour cartographier les 4 points critiques :
+
+1. **`let originalSimData = []`** : variable centrale mutée en place à chaque frappe utilisateur
+2. **`chargerSimulationRestauration()`** : point d'entrée unique déclenché par la navigation ET par le bouton Reset — il fallait y injecter la restauration
+3. **`simulerChangementPrix(index, prix)`** : seule fonction qui modifie les prix — c'est ici qu'il fallait déclencher la sauvegarde
+4. **La ligne "Total" dans `originalSimData`** : identifiée comme un piège — elle ne serait pas automatiquement recalculée lors d'une restauration, créant des KPI incorrects en haut de page
+
+### 3. Décision Architecturale : Quoi Stocker ?
+
+**Option rejetée — Stocker `originalSimData` en entier** :
+Si le fichier Excel source est mis à jour (nouveau chargement via "Gestion des grilles"), les données en localStorage auraient été périmées sans que l'utilisateur s'en aperçoive. Risque de présenter de faux chiffres certifiés.
+
+**Option retenue — Stocker uniquement les overrides utilisateur** :
+Structure minimale : `{ overrides: { "0": 2.50, "3": 3.20 }, savedAt: "2026-04-27T10:30:00.000Z" }`.
+À chaque chargement, les données fraîches arrivent du serveur (source de vérité), et on applique par-dessus uniquement les intentions de simulation de l'utilisateur. La séparation "données certifiées / scénario simulé" est architecturalement propre.
+
+### 4. Implémentation (Étapes Atomiques)
+
+L'implémentation a été décomposée en 5 modifications ciblées pour minimiser le risque de régression :
+
+**Étape 1 — HTML (bandeau de contrôle)** : Ajout d'un `<span id="whatif-restored-info">` pour afficher la date de restauration, et remplacement du `onclick="chargerSimulationRestauration()"` du bouton Reset par `onclick="resetSimulation()"` — separation of concerns.
+
+**Étape 2 — Helpers localStorage (25 lignes)** : Ajout de 4 fonctions après `let originalSimData = []` :
+- `saveSimulationToStorage()` : parcourt `originalSimData`, extrait uniquement les prix des lignes non-Total, sérialise en JSON avec timestamp
+- `loadSimulationFromStorage()` : désérialise ou retourne `null`
+- `clearSimulationStorage()` : supprime la clé `whatif_restauration_prix`
+- `resetSimulation()` : encapsule `clear` + `charger` (nécessaire pour que la navigation vers la page ne déclenche pas le clear)
+
+**Étape 3 — `chargerSimulationRestauration()`** : Après réception des données de l'API, ajout d'un bloc conditionnel : si `loadSimulationFromStorage()` retourne des overrides, les appliquer ligne par ligne, recalculer la ligne Total, afficher le bandeau avec la date.
+
+**Étape 4 — `simulerChangementPrix()`** : Ajout d'un appel à `saveSimulationToStorage()` en toute fin de fonction, après `updateSimulationStats()`. Sauvegarde transparente, sans action utilisateur.
+
+**Étape 5 — Synchronisation** : Copie du fichier vers `target/classes/static/` pour que le serveur Spring Boot embarqué serve bien la version mise à jour sans nécessiter de recompilation.
+
+### 5. Problèmes Rencontrés
+
+**Bug silencieux sur la ligne Total** : Lors des premiers tests mentaux du flux, il est apparu que la ligne Total de `originalSimData` (qui alimente les 4 KPI cards en haut de page via `renderSimulationTable`) ne serait pas mise à jour lors d'une restauration. Le serveur renvoie ses propres totaux, mais avec des prix modifiés, ils sont faux. Ce bloc de recalcul a donc été ajouté explicitement après application des overrides.
+
+**Séparation Reset vs Navigation** : Appeler `clearStorage()` directement dans `chargerSimulationRestauration()` aurait effacé les données à chaque navigation sur la page Simulation. La solution `resetSimulation()` comme wrapper dédié a résolu ce problème proprement.
+
+### 6. Résultat
+
+| Scénario | Avant | Après |
+|---|---|---|
+| F5 sur la page Simulation | Simulation perdue | Simulation restaurée automatiquement |
+| Navigation Dashboard → Simulation | Simulation perdue | Simulation restaurée automatiquement |
+| Clic "Réinitialiser (Excel)" | Rechargement API | Effacement localStorage + rechargement API |
+| Frappe dans un champ prix | Calcul en mémoire uniquement | Calcul + sauvegarde automatique localStorage |
+
+---
+
+## Etape 23 : Correctif Clé de Persistance Stable — codeTranche vs index (27/04/2026)
+
+### 1. Déclencheur
+
+Immédiatement après la livraison de l'Étape 22, une revue de code automatique (GPT-5.4, confiance 0.94, catégorie `logic_error`, priorité P1) a identifié une faille structurelle dans l'implémentation du localStorage.
+
+Le rapport pointait les lignes 367-373 de `index.html` avec le message :
+> *"Les prix modifiés sont sauvegardés dans localStorage avec index comme clé. Dès que /api/simulation/restauration renvoie les tranches dans un ordre différent ou avec une ligne ajoutée/supprimée, un prix restauré est affecté à la mauvaise tranche."*
+
+Décision immédiate : **corriger avant de continuer**, ne pas laisser une faille P1 en production.
+
+### 2. Analyse du Problème
+
+La revue a été lue, comprise, et le scénario de corruption a été retracé pas à pas :
+
+- `saveSimulationToStorage()` stockait `overrides[index] = t.prixFacture` où `index` est la position numérique dans `originalSimData[]`
+- À la restauration, `originalSimData[parseInt(idx)]` récupère la ligne par sa **position**, pas par son **identité**
+- Si le serveur change l'ordre des tranches (ex: tri alphabétique modifié, nouvelle tranche insérée), la restauration applique le prix de la Tranche A à la Tranche EXT ou inversement, sans aucune alerte
+
+La donnée stable existait déjà dans chaque objet retourné par l'API : `t.codeTranche` ("A", "B", "C", "EXT"...). C'est une valeur métier fournie par le serveur Java, indépendante de l'ordre du tableau JS.
+
+### 3. Périmètre de la Correction
+
+Avant de toucher quoi que ce soit, les fonctions impliquées ont été relues via une recherche ciblée dans `index.html` pour identifier précisément les deux blocs à modifier :
+
+- `saveSimulationToStorage()` : lignes 367-377 — la construction de l'objet `overrides`
+- Le bloc `Object.entries(saved.overrides).forEach(...)` dans `chargerSimulationRestauration()` — la réapplication des overrides
+
+**Aucune autre fonction n'a été touchée** : `loadSimulationFromStorage()`, `clearSimulationStorage()`, `resetSimulation()`, `renderSimulationTable()`, `simulerChangementPrix()`, `updateSimulationStats()` — tous intacts.
+
+### 4. Modifications Atomiques
+
+**Modification 1 — saveSimulationToStorage()**
+
+```
+Avant : overrides[index] = t.prixFacture     (index = position numérique)
+Après : overrides[t.codeTranche] = t.prixFacture  (clé = valeur métier stable)
+```
+
+Conséquence supplémentaire : le paramètre `index` du callback `.forEach((t, index) => ...)` n'est plus utilisé. La signature a été nettoyée en `.forEach(t => ...)` pour éviter un paramètre mort trompeur.
+
+**Modification 2 — chargerSimulationRestauration() — bloc de restauration**
+
+```
+Avant : const i = parseInt(idx); if (originalSimData[i]) { originalSimData[i].prixFacture = prix; }
+Après : const ligne = originalSimData.find(t => t.codeTranche === codeTranche); if (ligne) { ligne.prixFacture = prix; }
+```
+
+Le `.find()` parcourt le tableau en cherchant l'objet dont la propriété `codeTranche` correspond à la clé stockée. Si la tranche a disparu de l'Excel, `.find()` retourne `undefined`, le `if (ligne)` l'intercepte sans erreur — comportement fail-safe.
+
+### 5. Synchronisation
+
+Le fichier `src/main/resources/static/index.html` a été copié vers `target/classes/static/index.html` pour que le serveur Spring Boot embarqué serve la version corrigée sans recompilation Maven.
+
+### 6. Résultat et Garantie de Robustesse
+
+| Scénario | Avant le patch | Après le patch |
+|---|---|---|
+| Ordre des tranches identique | Correct | Correct |
+| Nouvelle tranche ajoutée en début de liste | Corruption silencieuse | Ignorée proprement |
+| Tranche supprimée de l'Excel | Prix appliqué à une autre ligne | Override ignoré (fail-safe) |
+| Ordre alphabétique modifié | Corruption silencieuse | Correct (lookup par nom) |
+
+### 7. Règle de Travail Instaurée
+
+À partir de cette étape, toute modification de code — même mineure — est documentée de manière exhaustive selon le schéma : problème identifié → lecture du code avant modification → analyse → décision architecturale → étapes atomiques réalisées → fichiers touchés ET fichiers non touchés → résultat obtenu. Cette règle s'applique sans exception.

@@ -146,7 +146,8 @@
                 </div>
                 <div id="whatif-controls" style="display: none; background: #f8fafc; padding: 12px 18px; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center; gap: 15px;">
                     <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">🛠 MOTEUR SIMULATION ACTIF</span>
-                    <button onclick="chargerSimulationRestauration()" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">
+                    <span id="whatif-restored-info" style="font-size: 0.75rem; color: #94a3b8; font-style: italic;"></span>
+                    <button onclick="resetSimulation()" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">
                         Réinitialiser (Excel)
                     </button>
                 </div>
@@ -360,17 +361,80 @@
         // --- API : SIMULATION (HIFI - RESTAURATION + WHAT-IF) ---
         let originalSimData = [];
 
+        // --- LOCALSTORAGE : PERSISTANCE DES SIMULATIONS ---
+        const WHATIF_STORAGE_KEY = 'whatif_restauration_prix';
+
+        function saveSimulationToStorage() {
+            const overrides = {};
+            originalSimData.forEach(t => {
+                const isTotal = (t.codeTranche.toLowerCase() === 'total' || t.tranche.toLowerCase() === 'total');
+                if (!isTotal) overrides[t.codeTranche] = t.prixFacture;
+            });
+            localStorage.setItem(WHATIF_STORAGE_KEY, JSON.stringify({
+                overrides,
+                savedAt: new Date().toISOString()
+            }));
+        }
+
+        function loadSimulationFromStorage() {
+            const raw = localStorage.getItem(WHATIF_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        }
+
+        function clearSimulationStorage() {
+            localStorage.removeItem(WHATIF_STORAGE_KEY);
+        }
+
+        function resetSimulation() {
+            clearSimulationStorage();
+            chargerSimulationRestauration();
+        }
+
         async function chargerSimulationRestauration() {
             const table = document.getElementById("fullGridTable");
             const tbody = table.querySelector('tbody');
             document.getElementById('whatif-controls').style.display = 'none';
+            document.getElementById('whatif-restored-info').textContent = '';
 
             try {
                 tbody.innerHTML = `<tr><td colspan="8" class="loading-spinner">Chargement des données de simulation...</td></tr>`;
                 
                 const response = await fetch("/api/simulation/restauration");
                 originalSimData = await response.json();
-                
+
+                // Appliquer les overrides sauvegardés en localStorage
+                const saved = loadSimulationFromStorage();
+                if (saved && saved.overrides && Object.keys(saved.overrides).length > 0) {
+                    Object.entries(saved.overrides).forEach(([codeTranche, prix]) => {
+                        const ligne = originalSimData.find(t => t.codeTranche === codeTranche);
+                        if (ligne) {
+                            ligne.prixFacture = prix;
+                            ligne.recetteAnnuelle = prix * ligne.nombreEnfants;
+                            ligne.ecart = ligne.recetteAnnuelle - ligne.depenseAnnuelle;
+                            ligne.tauxCouverture = ligne.depenseAnnuelle > 0
+                                ? (ligne.recetteAnnuelle / ligne.depenseAnnuelle) : 0;
+                        }
+                    });
+
+                    // Recalculer la ligne Total
+                    const totalIndex = originalSimData.findIndex(t => t.codeTranche.toLowerCase() === 'total' || t.tranche.toLowerCase() === 'total');
+                    if (totalIndex !== -1) {
+                        let totalRecettes = 0, totalDepenses = 0;
+                        originalSimData.forEach((t, i) => {
+                            const isTotal = (t.codeTranche.toLowerCase() === 'total' || t.tranche.toLowerCase() === 'total');
+                            if (!isTotal) { totalRecettes += t.recetteAnnuelle; totalDepenses += t.depenseAnnuelle; }
+                        });
+                        originalSimData[totalIndex].recetteAnnuelle = totalRecettes;
+                        originalSimData[totalIndex].depenseAnnuelle = totalDepenses;
+                        originalSimData[totalIndex].ecart = totalRecettes - totalDepenses;
+                        originalSimData[totalIndex].tauxCouverture = totalDepenses > 0 ? totalRecettes / totalDepenses : 0;
+                    }
+
+                    const dateStr = new Date(saved.savedAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('whatif-restored-info').textContent = `Restauré du ${dateStr}`;
+                    document.getElementById('whatif-controls').style.display = 'flex';
+                }
+
                 renderSimulationTable(originalSimData);
 
             } catch (error) {
@@ -456,6 +520,9 @@
 
             const totalEcart = totalRecettes - totalDepenses;
             updateSimulationStats(totalRecettes, totalDepenses, totalEcart);
+
+            // Sauvegarder la simulation dans localStorage
+            saveSimulationToStorage();
 
             // Optionnel : mettre à jour la ligne Total dans le tableau
             const totalIndex = originalSimData.findIndex(t => t.codeTranche.toLowerCase() === 'total' || t.tranche.toLowerCase() === 'total');
