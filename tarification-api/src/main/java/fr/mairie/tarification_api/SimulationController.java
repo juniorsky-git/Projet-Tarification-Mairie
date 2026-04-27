@@ -30,8 +30,8 @@ public class SimulationController {
     private final SimulationCalculateur simulationCalculateur;
 
     public SimulationController(
-            @Value("${simulation.fichier.csv}") String cheminFichierCsv) {
-        this.simulationCalculateur = new SimulationCalculateur(cheminFichierCsv);
+            @Value("${simulation.fichier.excel}") String cheminFichierExcel) {
+        this.simulationCalculateur = new SimulationCalculateur(cheminFichierExcel);
     }
 
     /**
