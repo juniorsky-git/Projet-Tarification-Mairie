@@ -157,7 +157,7 @@ public class AnalytiqueFluideService {
             double m3_S2 = getVal(r, 17);
             double reel_S2 = getVal(r, 18);
 
-            resultats.add(creerRapport(site, "Eau", m3_S1, m3_S2, reel_S1, reel_S2));
+            resultats.add(creerRapport(site, "Eau", "m3", m3_S1, m3_S2, reel_S1, reel_S2));
         }
     }
 
@@ -167,7 +167,7 @@ public class AnalytiqueFluideService {
 
         Map<String, Accumulateur> stats = agregerParSemestre(s, 2); // Col 2 pour le nom du site
         stats.forEach((site, acc) -> {
-            resultats.add(creerRapport(site, "Gaz", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
+            resultats.add(creerRapport(site, "Gaz", "m3", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
         });
     }
 
@@ -177,7 +177,7 @@ public class AnalytiqueFluideService {
 
         Map<String, Accumulateur> stats = agregerParSemestre(s, 5); // Col 5 pour l'élec
         stats.forEach((site, acc) -> {
-            resultats.add(creerRapport(site, "Electricité", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
+            resultats.add(creerRapport(site, "Electricité", "kWh", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
         });
     }
 
@@ -229,17 +229,17 @@ public class AnalytiqueFluideService {
         return 1;
     }
 
-    private RapportSemestrielFluide creerRapport(String site, String fluide, double s1_vol, double s2_vol, double s1_eur, double s2_eur) {
+    private RapportSemestrielFluide creerRapport(String site, String fluide, String unite, double s1_vol, double s2_vol, double s1_eur, double s2_eur) {
         double total_vol = s1_vol + s2_vol;
         double total_eur = s1_eur + s2_eur;
         double delta = s1_vol > 0 ? ((s2_vol - s1_vol) / s1_vol) * 100 : 0;
         boolean alerte = Math.abs(delta) > 20;
 
         String remarque = "";
-        if (s1_vol == 0 && s1_eur > 0) remarque = "S1 : Abonnement uniquement (0 m3)";
+        if (s1_vol == 0 && s1_eur > 0) remarque = "S1 : Abonnement uniquement (0 " + unite + ")";
         else if (total_vol == 0 && total_eur > 0) remarque = "Abonnements uniquement";
 
-        return new RapportSemestrielFluide(site, fluide, s1_vol, s2_vol, total_vol, s1_eur, s2_eur, total_eur, delta, alerte, remarque);
+        return new RapportSemestrielFluide(site, fluide, s1_vol, s2_vol, total_vol, s1_eur, s2_eur, total_eur, delta, alerte, remarque, unite);
     }
 
     /**
@@ -409,8 +409,13 @@ public class AnalytiqueFluideService {
      */
     private String getStr(Row r, int col) {
         String val = getStrRaw(r, col);
-        if (val.toUpperCase().contains("TOTAL") || val.toUpperCase().contains("FACTURATION") || val.toUpperCase().contains("BILAN")) {
+        String upper = val.toUpperCase();
+        if (upper.contains("TOTAL") || upper.contains("FACTURATION") || upper.contains("BILAN") || upper.startsWith("SUM") || upper.startsWith("=")) {
             return ""; 
+        }
+        // Si c'est juste un nombre, c'est probablement une donnée technique et pas un nom de site
+        if (val.matches("^[0-9\\.\\s,]+$")) {
+            return "";
         }
         return val;
     }

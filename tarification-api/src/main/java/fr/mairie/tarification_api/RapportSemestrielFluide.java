@@ -14,5 +14,6 @@ public record RapportSemestrielFluide(
     double reel_Total,
     double delta_S1_S2_Percent, // Evolution entre S1 et S2
     boolean alerte,
-    String remarque
+    String remarque,
+    String unite
 ) {}
