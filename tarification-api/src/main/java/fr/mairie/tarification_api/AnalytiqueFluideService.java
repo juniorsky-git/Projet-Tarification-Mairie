@@ -120,51 +120,126 @@ public class AnalytiqueFluideService {
 
     public List<RapportSemestrielFluide> analyserBiSemestriel(String cheminExcel) {
         List<RapportSemestrielFluide> resultats = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(new File(cheminExcel))) {
-            Workbook wb = WorkbookFactory.create(fis);
-            Sheet s = wb.getSheet("Conso eau");
-            if (s != null) {
-                for (int i = 5; i <= s.getLastRowNum(); i++) {
-                    Row r = s.getRow(i);
-                    if (r == null) continue;
+        File fichier = new File(cheminExcel);
+        
+        if (!fichier.exists()) {
+            System.err.println("ERREUR : Fichier Excel introuvable à : " + cheminExcel);
+            return resultats;
+        }
 
-                    String site = getStr(r, 1) + " " + getStr(r, 2) + " " + getStr(r, 3);
-                    site = site.trim();
-                    if (site.isEmpty()) continue;
-
-                    double m3_S1 = getVal(r, 7); // H ou G selon offset, on garde l'existant
-                    double reel_S1 = getVal(r, 8);
-                    
-                    double m3_S2 = getVal(r, 17); // R ou Q selon offset
-                    double reel_S2 = getVal(r, 18);
-
-                    double m3_Total = m3_S1 + m3_S2;
-                    double reel_Total = reel_S1 + reel_S2;
-
-                    if (m3_Total > 0 || reel_Total > 0) {
-                        double delta = m3_S1 > 0 ? ((m3_S2 - m3_S1) / m3_S1) * 100 : 0;
-                        boolean alerte = Math.abs(delta) > 20;
-                        
-                        String remarque = "";
-                        if (m3_S1 == 0 && reel_S1 > 0) {
-                            remarque = "S1 : Abonnement uniquement (0 m3)";
-                        } else if (m3_Total == 0 && reel_Total > 0) {
-                            remarque = "Abonnements uniquement";
-                        }
-
-                        resultats.add(new RapportSemestrielFluide(
-                            site, "Eau", 
-                            m3_S1, m3_S2, m3_Total, 
-                            reel_S1, reel_S2, reel_Total, 
-                            delta, alerte, remarque
-                        ));
-                    }
-                }
-            }
+        try (FileInputStream fis = new FileInputStream(fichier);
+             Workbook wb = WorkbookFactory.create(fis)) {
+            
+            analyserBiSemestrielEau(wb, resultats);
+            analyserBiSemestrielGaz(wb, resultats);
+            analyserBiSemestrielElec(wb, resultats);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
         return resultats;
+    }
+
+    private void analyserBiSemestrielEau(Workbook wb, List<RapportSemestrielFluide> resultats) {
+        Sheet s = wb.getSheet("Conso eau");
+        if (s == null) return;
+
+        for (int i = 5; i <= s.getLastRowNum(); i++) {
+            Row r = s.getRow(i);
+            if (r == null) continue;
+
+            String site = getStr(r, 1) + " " + getStr(r, 2) + " " + getStr(r, 3);
+            site = site.trim();
+            if (site.isEmpty()) continue;
+
+            double m3_S1 = getVal(r, 7);
+            double reel_S1 = getVal(r, 8);
+            double m3_S2 = getVal(r, 17);
+            double reel_S2 = getVal(r, 18);
+
+            resultats.add(creerRapport(site, "Eau", m3_S1, m3_S2, reel_S1, reel_S2));
+        }
+    }
+
+    private void analyserBiSemestrielGaz(Workbook wb, List<RapportSemestrielFluide> resultats) {
+        Sheet s = wb.getSheet("CONSO GAZ");
+        if (s == null) return;
+
+        Map<String, Accumulateur> stats = agregerParSemestre(s, 2); // Col 2 pour le nom du site
+        stats.forEach((site, acc) -> {
+            resultats.add(creerRapport(site, "Gaz", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
+        });
+    }
+
+    private void analyserBiSemestrielElec(Workbook wb, List<RapportSemestrielFluide> resultats) {
+        Sheet s = wb.getSheet("CONSO ELEC");
+        if (s == null) return;
+
+        Map<String, Accumulateur> stats = agregerParSemestre(s, 5); // Col 5 pour l'élec
+        stats.forEach((site, acc) -> {
+            resultats.add(creerRapport(site, "Electricité", acc.consoS1, acc.consoS2, acc.reelS1, acc.reelS2));
+        });
+    }
+
+    private Map<String, Accumulateur> agregerParSemestre(Sheet s, int colSite) {
+        Map<String, Accumulateur> stats = new LinkedHashMap<>();
+        String siteCourant = "";
+
+        for (int i = 9; i <= s.getLastRowNum(); i++) {
+            Row r = s.getRow(i);
+            if (r == null) continue;
+
+            String siteNom = getStr(r, colSite).trim();
+            if (!siteNom.isEmpty()) siteCourant = siteNom;
+            if (siteCourant.isEmpty()) continue;
+
+            Accumulateur acc = stats.computeIfAbsent(siteCourant, k -> new Accumulateur());
+
+            for (int col = 2; col < Math.min(r.getLastCellNum(), 200); col++) {
+                String valRaw = getStrRaw(r, col).toLowerCase();
+                if (valRaw.contains("au") && valRaw.contains("/") && (valRaw.contains("25") || valRaw.contains("2025"))) {
+                    double m = getVal(r, col + 3);
+                    String cle = valRaw + "_" + m;
+                    if (acc.periodes.contains(cle)) { col += 3; continue; }
+                    
+                    double c = getVal(r, col + 2);
+                    if (m < 100000 && m > 0) {
+                        int semestre = determinerSemestre(valRaw);
+                        if (semestre == 1) { acc.consoS1 += c; acc.reelS1 += m; }
+                        else { acc.consoS2 += c; acc.reelS2 += m; }
+                        acc.periodes.add(cle);
+                    }
+                    col += 3;
+                }
+            }
+        }
+        return stats;
+    }
+
+    private int determinerSemestre(String dateStr) {
+        try {
+            // Format attendu "au 15/04/25" -> on cherche le 04
+            String[] parts = dateStr.split("/");
+            if (parts.length >= 2) {
+                String moisStr = parts[1].replaceAll("[^0-9]", "");
+                int mois = Integer.parseInt(moisStr);
+                return (mois <= 6) ? 1 : 2;
+            }
+        } catch (Exception e) {}
+        return 1;
+    }
+
+    private RapportSemestrielFluide creerRapport(String site, String fluide, double s1_vol, double s2_vol, double s1_eur, double s2_eur) {
+        double total_vol = s1_vol + s2_vol;
+        double total_eur = s1_eur + s2_eur;
+        double delta = s1_vol > 0 ? ((s2_vol - s1_vol) / s1_vol) * 100 : 0;
+        boolean alerte = Math.abs(delta) > 20;
+
+        String remarque = "";
+        if (s1_vol == 0 && s1_eur > 0) remarque = "S1 : Abonnement uniquement (0 m3)";
+        else if (total_vol == 0 && total_eur > 0) remarque = "Abonnements uniquement";
+
+        return new RapportSemestrielFluide(site, fluide, s1_vol, s2_vol, total_vol, s1_eur, s2_eur, total_eur, delta, alerte, remarque);
     }
 
     /**
@@ -374,6 +449,12 @@ public class AnalytiqueFluideService {
     private static class Accumulateur {
         double totalConso = 0;
         double totalReel = 0;
+        
+        double consoS1 = 0;
+        double reelS1 = 0;
+        double consoS2 = 0;
+        double reelS2 = 0;
+
         String dateDebut = null;
         String dateFin = null;
         Set<String> periodes = new HashSet<>();

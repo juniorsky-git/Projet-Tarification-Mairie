@@ -26,10 +26,18 @@ Ce document sert de journal de bord en temps réel. Chaque action est documenté
 ### 27 Avril 2026 - Après-midi
 - [x] **Issue #24 : Audit Bi-Semestriel des Fluides (Eau/Gaz)** :
   - [x] **Action 1** : Analyse Excel (Confirmé : Colonnes G=S1, Q=S2 pour l'eau).
-  - [x] **Action 2** : Création du DTO `RapportSemestrielFluide`.
-  - [x] **Action 3** : Dev API : Extraction des m3 par semestre.
-  - [x] **Action 4** : Dev UI : Nouvelle interface "Audit Fluides" avec table comparative et indicateurs de tendance.
-- [ ] **Prochaine étape** : Création de la Pull Request pour l'audit des fluides.
+  - [x] **Action 2** : Création du DTO `RapportSemestrielFluide` et de l'endpoint API.
+  - [x] **Action 3** : Développement de la page "Audit Fluides" avec calcul de tendance.
+  - [x] **Action 4** : Push et création de la Pull Request #45.
+
+- [x] **Issue #46 : Fiabilisation de l'audit (Investigation Index)** :
+  - [x] **Enquête** : Scan de 150 colonnes via des scripts d'inspection (`InspectEau.java`).
+  - [x] **Constat** : Pas d'index de compteurs dans le fichier source ; le S1 est comptablement à 0.0 m3 dans l'Excel.
+  - [x] **Solution logicielle** : 
+    - Ajout de **badges "DATA PARTIEL"** pour informer l'utilisateur.
+    - Gestion de l'évolution **"N/A"** pour éviter les 0% trompeurs.
+    - Ajout de remarques automatiques *"Abonnement uniquement"* sous le nom des sites.
+  - [x] **Livraison** : Création de la branche `feat/fiabilisation-audit-index-46` et PR #47.
 
 ---
 *Note: Ce fichier est mis à jour "Automatiquement" avant chaque intervention technique.*
