@@ -10,7 +10,33 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body>
+<body onload="checkAuth()">
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div style="background: #eef2ff; width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                <i data-lucide="shield-lock" style="width: 40px; height: 40px; color: var(--primary);"></i>
+            </div>
+            <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 8px;">Mairie de Crosne</h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 0.9rem;">Espace d'administration sécurisé</p>
+            
+            <form onsubmit="handleLogin(event)">
+                <div style="text-align: left; margin-bottom: 16px;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">UTILISATEUR</label>
+                    <input type="text" id="username" placeholder="admin" required style="margin-bottom: 0; padding: 14px;">
+                </div>
+                <div style="text-align: left; margin-bottom: 24px;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">MOT DE PASSE</label>
+                    <input type="password" id="password" placeholder="••••••••" required style="margin-bottom: 0; padding: 14px;">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);">
+                    Se connecter
+                </button>
+            </form>
+            <div id="loginError" style="color: #ef4444; font-size: 0.85rem; margin-top: 16px; display: none;">Identifiants incorrects</div>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
     <aside>
         <div class="logo">
@@ -49,7 +75,7 @@
             </div>
         </nav>
 
-        <div class="nav-item logout-btn">
+        <div class="nav-item logout-btn" onclick="handleLogout()">
             <i data-lucide="log-out"></i>
             <span>Déconnexion</span>
         </div>
@@ -293,6 +319,44 @@
     </main>
 
     <script>
+        // --- AUTHENTIFICATION ---
+        function checkAuth() {
+            const isAuth = localStorage.getItem('mairie_auth');
+            if (isAuth === 'true') {
+                document.body.classList.add('authenticated');
+                document.getElementById('login-overlay').style.display = 'none';
+                chargerDashboardData();
+            } else {
+                document.body.classList.remove('authenticated');
+                document.getElementById('login-overlay').style.display = 'flex';
+            }
+            lucide.createIcons();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (u === 'admin' && p === 'admin') {
+                localStorage.setItem('mairie_auth', 'true');
+                errorDiv.style.display = 'none';
+                checkAuth();
+            } else {
+                errorDiv.style.display = 'block';
+                // Petit effet de vibration sur la carte
+                const card = document.querySelector('.login-card');
+                card.style.animation = 'none';
+                setTimeout(() => card.style.animation = 'shake 0.4s', 10);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('mairie_auth');
+            location.reload();
+        }
+
         // --- NAVIGATION ---
         function switchPage(pageId, element) {
             document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
@@ -761,15 +825,27 @@
                 const response = await fetch("/api/poles");
                 const poles = await response.json();
                 
-                let html = poles.map(p => `
-                    <div class="stat-card" style="box-shadow: none; border: 1px solid #f1f5f9; padding: 16px;">
+                let html = poles.map(p => {
+                    let icon = "activity";
+                    if(p.nom.includes("Restauration")) icon = "utensils";
+                    if(p.nom.includes("Loisirs")) icon = "sun";
+                    if(p.nom.includes("periscolaire")) icon = "clock";
+                    
+                    return `
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
+                            <i data-lucide="${icon}"></i>
+                        </div>
                         <div style="flex: 1;">
-                            <div class="label" style="font-size: 0.75rem;">${p.nom}</div>
-                            <div style="font-weight: 700;">${p.depensesTotales.toLocaleString()} €</div>
-                            <div style="font-size: 0.7rem; color: #10b981; margin-top: 4px;">${p.nombreEnfants} enfants</div>
+                            <div class="label">${p.nom}</div>
+                            <div class="value">${p.depensesTotales.toLocaleString()} €</div>
+                            <div style="font-size: 0.8rem; color: #10b981; margin-top: 4px; font-weight: 600;">
+                                <i data-lucide="users" size="12" style="display: inline; margin-right: 4px;"></i>
+                                ${p.nombreEnfants} enfants
+                            </div>
                         </div>
                     </div>
-                `).join('');
+                `;}).join('');
                 
                 document.getElementById('dashboardBudgetSummary').innerHTML = html;
             } catch (error) {
