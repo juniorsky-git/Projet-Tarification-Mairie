@@ -5,37 +5,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mairie Tarification | Outil d'aide à la décision</title>
+    <meta name="description" content="Outil SaaS pour les collectivités. Simulez, analysez et pilotez vos tarifs municipaux en toute simplicité.">
     <link rel="stylesheet" href="style.css">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body onload="checkAuth()">
-    <!-- LOGIN OVERLAY -->
-    <div id="login-overlay">
-        <div class="login-card">
-            <div style="background: #eef2ff; width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-                <i data-lucide="shield-lock" style="width: 40px; height: 40px; color: var(--primary);"></i>
+
+    <!-- ===== LANDING PAGE ===== -->
+    <div id="landing-page">
+
+        <!-- NAVBAR -->
+        <nav class="lp-nav">
+            <div class="lp-nav-logo">
+                <div class="lp-logo-icon"><i data-lucide="calculator"></i></div>
+                <span>Mairie Tarification</span>
             </div>
-            <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 8px;">Mairie de Crosne</h2>
-            <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 0.9rem;">Espace d'administration sécurisé</p>
-            
+            <div class="lp-nav-badge">Beta</div>
+            <button class="lp-btn-cta" onclick="ouvrirLogin()">
+                <i data-lucide="log-in"></i> Accéder à l'outil
+            </button>
+        </nav>
+
+        <!-- HERO SECTION -->
+        <section class="lp-hero">
+            <div class="lp-hero-content">
+                <div class="lp-hero-eyebrow">
+                    <span class="lp-pill"><i data-lucide="shield-check"></i> Accès sécurisé · Bêta Agents</span>
+                </div>
+                <h1 class="lp-hero-title">Un outil complet pour<br><span class="lp-gradient-text">simuler, analyser<br>et décider.</span></h1>
+                <p class="lp-hero-subtitle">Consultez les tarifs par quotient familial, simulez l'impact financier réel et pilotez vos politiques tarifaires en toute simplicité.</p>
+                <div class="lp-hero-features">
+                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Tarifs par QF en temps réel</div>
+                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Simulation financière avancée</div>
+                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Import de grilles Excel sécurisé</div>
+                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Tableaux de bord et indicateurs clés</div>
+                </div>
+                <div class="lp-hero-actions">
+                    <button class="lp-btn-primary" onclick="ouvrirLogin()">
+                        <i data-lucide="arrow-right"></i> Accéder à mon espace
+                    </button>
+                    <span class="lp-hint">Réservé aux agents de la Mairie de Crosne</span>
+                </div>
+            </div>
+            <div class="lp-hero-visual">
+                <div class="lp-mockup">
+                    <div class="lp-mockup-bar">
+                        <span class="lp-dot red"></span>
+                        <span class="lp-dot yellow"></span>
+                        <span class="lp-dot green"></span>
+                        <span class="lp-mockup-url">tarification.crosne.fr</span>
+                    </div>
+                    <div class="lp-mockup-screen">
+                        <div class="lp-mock-sidebar"></div>
+                        <div class="lp-mock-content">
+                            <div class="lp-mock-header"></div>
+                            <div class="lp-mock-cards">
+                                <div class="lp-mock-card blue"></div>
+                                <div class="lp-mock-card purple"></div>
+                                <div class="lp-mock-card green"></div>
+                            </div>
+                            <div class="lp-mock-table">
+                                <div class="lp-mock-row"></div>
+                                <div class="lp-mock-row short"></div>
+                                <div class="lp-mock-row"></div>
+                                <div class="lp-mock-row short"></div>
+                                <div class="lp-mock-row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS BAR -->
+        <section class="lp-stats">
+            <div class="lp-stat">
+                <i data-lucide="building-2"></i>
+                <div class="lp-stat-num">6</div>
+                <div class="lp-stat-label">Pôles tarifaires</div>
+            </div>
+            <div class="lp-stat-divider"></div>
+            <div class="lp-stat">
+                <i data-lucide="layers"></i>
+                <div class="lp-stat-num">10</div>
+                <div class="lp-stat-label">Tranches QF</div>
+            </div>
+            <div class="lp-stat-divider"></div>
+            <div class="lp-stat">
+                <i data-lucide="calendar"></i>
+                <div class="lp-stat-num">2025</div>
+                <div class="lp-stat-label">Grille active</div>
+            </div>
+            <div class="lp-stat-divider"></div>
+            <div class="lp-stat">
+                <i data-lucide="users"></i>
+                <div class="lp-stat-num">+1000</div>
+                <div class="lp-stat-label">Simulations réalisées</div>
+            </div>
+        </section>
+
+        <!-- FOOTER BANNER -->
+        <footer class="lp-footer">
+            <div class="lp-footer-icon"><i data-lucide="shield-check"></i></div>
+            <div>
+                <div class="lp-footer-title">Un outil d'aide à la décision au service des collectivités.</div>
+                <div class="lp-footer-sub">Pilotez vos tarifs, maîtrisez vos budgets, agissez pour vos usagers.</div>
+            </div>
+            <div class="lp-footer-badges">
+                <div class="lp-footer-badge"><i data-lucide="lock"></i> Sécurité</div>
+                <div class="lp-footer-badge"><i data-lucide="check-square"></i> Fiable</div>
+                <div class="lp-footer-badge"><i data-lucide="zap"></i> Intuitif</div>
+                <div class="lp-footer-badge"><i data-lucide="trending-up"></i> Évolutif</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL DE CONNEXION -->
+    <div id="login-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(8px); z-index:10000; align-items:center; justify-content:center;">
+        <div class="login-card">
+            <button onclick="fermerLogin()" style="position:absolute; top:20px; right:20px; background:none; border:none; cursor:pointer; color:#64748b;"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+            <div style="background: linear-gradient(135deg,#6366f1,#a855f7); width: 72px; height: 72px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 25px rgba(99,102,241,0.4);">
+                <i data-lucide="shield-lock" style="width: 36px; height: 36px; color: white;"></i>
+            </div>
+            <h2 style="font-family:'Outfit',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:6px;">Mairie de Crosne</h2>
+            <p style="color:var(--text-muted); margin-bottom:32px; font-size:0.9rem;">Espace d'administration sécurisé</p>
             <form onsubmit="handleLogin(event)">
-                <div style="text-align: left; margin-bottom: 16px;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">UTILISATEUR</label>
-                    <input type="text" id="username" placeholder="admin" required style="margin-bottom: 0; padding: 14px;">
+                <div style="text-align:left; margin-bottom:16px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:#475569; display:block; margin-bottom:8px; letter-spacing:0.05em;">UTILISATEUR</label>
+                    <input type="text" id="username" placeholder="admin" required style="margin-bottom:0;">
                 </div>
-                <div style="text-align: left; margin-bottom: 24px;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">MOT DE PASSE</label>
-                    <input type="password" id="password" placeholder="••••••••" required style="margin-bottom: 0; padding: 14px;">
+                <div style="text-align:left; margin-bottom:28px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:#475569; display:block; margin-bottom:8px; letter-spacing:0.05em;">MOT DE PASSE</label>
+                    <input type="password" id="password" placeholder="••••••••" required style="margin-bottom:0;">
                 </div>
-                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);">
+                <button type="submit" class="btn-primary" style="width:100%; padding:16px; font-size:1rem;">
                     Se connecter
                 </button>
             </form>
-            <div id="loginError" style="color: #ef4444; font-size: 0.85rem; margin-top: 16px; display: none;">Identifiants incorrects</div>
+            <div id="loginError" style="color:#ef4444; font-size:0.85rem; margin-top:16px; display:none;">❌ Identifiants incorrects. Réessayez.</div>
         </div>
     </div>
+
 
     <!-- SIDEBAR -->
     <aside>
@@ -319,18 +431,40 @@
     </main>
 
     <script>
-        // --- AUTHENTIFICATION ---
+        // --- AUTHENTIFICATION & LANDING ---
         function checkAuth() {
             const isAuth = localStorage.getItem('mairie_auth');
             if (isAuth === 'true') {
-                document.body.classList.add('authenticated');
-                document.getElementById('login-overlay').style.display = 'none';
-                chargerDashboardData();
+                afficherDashboard();
             } else {
-                document.body.classList.remove('authenticated');
-                document.getElementById('login-overlay').style.display = 'flex';
+                afficherLanding();
             }
             lucide.createIcons();
+        }
+
+        function afficherLanding() {
+            document.getElementById('landing-page').style.display = 'block';
+            document.body.classList.remove('authenticated');
+        }
+
+        function afficherDashboard() {
+            document.getElementById('landing-page').style.display = 'none';
+            fermerLogin();
+            document.body.classList.add('authenticated');
+            chargerDashboardData();
+        }
+
+        function ouvrirLogin() {
+            const modal = document.getElementById('login-modal');
+            modal.style.display = 'flex';
+            lucide.createIcons();
+            // Focus sur le premier champ
+            setTimeout(() => document.getElementById('username').focus(), 100);
+        }
+
+        function fermerLogin() {
+            const modal = document.getElementById('login-modal');
+            if (modal) modal.style.display = 'none';
         }
 
         function handleLogin(e) {
@@ -342,10 +476,9 @@
             if (u === 'admin' && p === 'admin') {
                 localStorage.setItem('mairie_auth', 'true');
                 errorDiv.style.display = 'none';
-                checkAuth();
+                afficherDashboard();
             } else {
                 errorDiv.style.display = 'block';
-                // Petit effet de vibration sur la carte
                 const card = document.querySelector('.login-card');
                 card.style.animation = 'none';
                 setTimeout(() => card.style.animation = 'shake 0.4s', 10);
