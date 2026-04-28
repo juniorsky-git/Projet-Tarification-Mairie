@@ -217,7 +217,7 @@
     <aside>
         <div class="logo">
             <i data-lucide="calculator"></i>
-            <span>Mairie Tarification</span>
+            <span>Tarification</span>
         </div>
 
         <nav>
@@ -227,11 +227,11 @@
             </div>
             <div class="nav-item" onclick="switchPage('consultation', this)">
                 <i data-lucide="search"></i>
-                <span>Consultation tarifaire</span>
+                <span>Consultation</span>
             </div>
             <div class="nav-item" onclick="switchPage('simulation', this)">
                 <i data-lucide="line-chart"></i>
-                <span>Simulation financière</span>
+                <span>Simulation</span>
             </div>
             <div class="nav-item" onclick="switchPage('fluides-audit', this)">
                 <i data-lucide="droplets"></i>
@@ -239,7 +239,7 @@
             </div>
             <div class="nav-item" onclick="switchPage('gestion', this)">
                 <i data-lucide="file-spreadsheet"></i>
-                <span>Gestion des grilles</span>
+                <span>Grilles Excel</span>
             </div>
             <div class="nav-item" onclick="switchPage('historique', this)">
                 <i data-lucide="history"></i>
@@ -251,7 +251,15 @@
             </div>
         </nav>
 
-        <div class="nav-item logout-btn" onclick="handleLogout()">
+        <!-- USER BLOCK BOTTOM — style Squire -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">JD</div>
+            <div>
+                <div class="sidebar-user-name">Mairie de Crosne</div>
+                <div class="sidebar-user-role">Administrateur</div>
+            </div>
+        </div>
+        <div class="nav-item logout-btn" onclick="handleLogout()" style="margin: 8px 10px 4px;">
             <i data-lucide="log-out"></i>
             <span>Déconnexion</span>
         </div>
