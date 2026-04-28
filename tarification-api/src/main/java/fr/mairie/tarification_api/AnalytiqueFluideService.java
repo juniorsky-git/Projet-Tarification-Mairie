@@ -55,8 +55,7 @@ public class AnalytiqueFluideService {
         List<AnalytiqueFluide> resultats = new ArrayList<>();
         logService.reinitialiser();
 
-        try (FileInputStream fis = new FileInputStream(new File(cheminExcel))) {
-            Workbook wb = WorkbookFactory.create(fis);
+        try (Workbook wb = WorkbookFactory.create(new File(cheminExcel))) {
             
             // Lancement séquentiel des analyses par type de fluide
             analyserGaz(wb, resultats);
