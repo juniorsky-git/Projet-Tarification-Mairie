@@ -22,33 +22,63 @@
                 <div class="lp-logo-icon"><i data-lucide="calculator"></i></div>
                 <span>Mairie Tarification</span>
             </div>
-            <div class="lp-nav-badge">Beta</div>
+            <div class="lp-nav-center">
+                <span class="lp-nav-badge">Version Bêta</span>
+                <span class="lp-nav-sep">·</span>
+                <span class="lp-nav-info">Mairie de Crosne</span>
+            </div>
             <button class="lp-btn-cta" onclick="ouvrirLogin()">
-                <i data-lucide="log-in"></i> Accéder à l'outil
+                Se connecter <i data-lucide="arrow-right"></i>
             </button>
         </nav>
 
         <!-- HERO SECTION -->
         <section class="lp-hero">
-            <div class="lp-hero-content">
+            <!-- Blob background -->
+            <div class="lp-blob lp-blob-1"></div>
+            <div class="lp-blob lp-blob-2"></div>
+
+            <div class="lp-hero-inner">
                 <div class="lp-hero-eyebrow">
-                    <span class="lp-pill"><i data-lucide="shield-check"></i> Accès sécurisé · Bêta Agents</span>
+                    <span class="lp-pill">
+                        <span class="lp-pill-dot"></span>
+                        Déploiement Bêta — Agents uniquement
+                    </span>
                 </div>
-                <h1 class="lp-hero-title">Un outil complet pour<br><span class="lp-gradient-text">simuler, analyser<br>et décider.</span></h1>
-                <p class="lp-hero-subtitle">Consultez les tarifs par quotient familial, simulez l'impact financier réel et pilotez vos politiques tarifaires en toute simplicité.</p>
-                <div class="lp-hero-features">
-                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Tarifs par QF en temps réel</div>
-                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Simulation financière avancée</div>
-                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Import de grilles Excel sécurisé</div>
-                    <div class="lp-feature-item"><i data-lucide="check-circle"></i> Tableaux de bord et indicateurs clés</div>
-                </div>
+                <h1 class="lp-hero-title">Pilotez vos tarifs<br><span class="lp-gradient-text">avec précision.</span></h1>
+                <p class="lp-hero-subtitle">La plateforme de gestion tarifaire conçue pour les collectivités. Calculez, simulez et décidez en confiance.</p>
+
                 <div class="lp-hero-actions">
                     <button class="lp-btn-primary" onclick="ouvrirLogin()">
-                        <i data-lucide="arrow-right"></i> Accéder à mon espace
+                        Accéder à l'espace agents
+                        <i data-lucide="arrow-right"></i>
                     </button>
-                    <span class="lp-hint">Réservé aux agents de la Mairie de Crosne</span>
+                    <div class="lp-trust">
+                        <i data-lucide="lock"></i>
+                        Accès sécurisé · Données locales
+                    </div>
+                </div>
+
+                <!-- STATS INLINE -->
+                <div class="lp-hero-stats">
+                    <div class="lp-hstat">
+                        <div class="lp-hstat-num">6</div>
+                        <div class="lp-hstat-label">Pôles</div>
+                    </div>
+                    <div class="lp-hstat-div"></div>
+                    <div class="lp-hstat">
+                        <div class="lp-hstat-num">10</div>
+                        <div class="lp-hstat-label">Tranches QF</div>
+                    </div>
+                    <div class="lp-hstat-div"></div>
+                    <div class="lp-hstat">
+                        <div class="lp-hstat-num">2025</div>
+                        <div class="lp-hstat-label">Grille active</div>
+                    </div>
                 </div>
             </div>
+
+            <!-- MOCKUP -->
             <div class="lp-hero-visual">
                 <div class="lp-mockup">
                     <div class="lp-mockup-bar">
@@ -58,93 +88,127 @@
                         <span class="lp-mockup-url">tarification.crosne.fr</span>
                     </div>
                     <div class="lp-mockup-screen">
-                        <div class="lp-mock-sidebar"></div>
+                        <div class="lp-mock-sidebar">
+                            <div class="lp-mock-logo"></div>
+                            <div class="lp-mock-nav-item active"></div>
+                            <div class="lp-mock-nav-item"></div>
+                            <div class="lp-mock-nav-item"></div>
+                            <div class="lp-mock-nav-item"></div>
+                        </div>
                         <div class="lp-mock-content">
-                            <div class="lp-mock-header"></div>
+                            <div class="lp-mock-topbar">
+                                <div class="lp-mock-search"></div>
+                                <div class="lp-mock-avatar"></div>
+                            </div>
+                            <div class="lp-mock-title-row"></div>
                             <div class="lp-mock-cards">
                                 <div class="lp-mock-card blue"></div>
-                                <div class="lp-mock-card purple"></div>
-                                <div class="lp-mock-card green"></div>
+                                <div class="lp-mock-card violet"></div>
+                                <div class="lp-mock-card emerald"></div>
                             </div>
                             <div class="lp-mock-table">
                                 <div class="lp-mock-row"></div>
                                 <div class="lp-mock-row short"></div>
                                 <div class="lp-mock-row"></div>
-                                <div class="lp-mock-row short"></div>
+                                <div class="lp-mock-row short w40"></div>
                                 <div class="lp-mock-row"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- Floating cards -->
+                <div class="lp-float-card left">
+                    <i data-lucide="trending-up"></i>
+                    <div>
+                        <div class="lp-fc-title">Simulation What-If</div>
+                        <div class="lp-fc-sub">Impact en temps réel</div>
+                    </div>
+                </div>
+                <div class="lp-float-card right">
+                    <i data-lucide="droplets"></i>
+                    <div>
+                        <div class="lp-fc-title">Audit Fluides</div>
+                        <div class="lp-fc-sub">Eau · Gaz · Élec</div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- STATS BAR -->
-        <section class="lp-stats">
-            <div class="lp-stat">
-                <i data-lucide="building-2"></i>
-                <div class="lp-stat-num">6</div>
-                <div class="lp-stat-label">Pôles tarifaires</div>
-            </div>
-            <div class="lp-stat-divider"></div>
-            <div class="lp-stat">
-                <i data-lucide="layers"></i>
-                <div class="lp-stat-num">10</div>
-                <div class="lp-stat-label">Tranches QF</div>
-            </div>
-            <div class="lp-stat-divider"></div>
-            <div class="lp-stat">
-                <i data-lucide="calendar"></i>
-                <div class="lp-stat-num">2025</div>
-                <div class="lp-stat-label">Grille active</div>
-            </div>
-            <div class="lp-stat-divider"></div>
-            <div class="lp-stat">
-                <i data-lucide="users"></i>
-                <div class="lp-stat-num">+1000</div>
-                <div class="lp-stat-label">Simulations réalisées</div>
+        <!-- FEATURES CARDS -->
+        <section class="lp-features">
+            <div class="lp-features-grid">
+                <div class="lp-fcard">
+                    <div class="lp-fcard-icon indigo"><i data-lucide="search"></i></div>
+                    <h3>Consultation tarifaire</h3>
+                    <p>Retrouvez instantanément le tarif d'un usager selon son quotient familial.</p>
+                </div>
+                <div class="lp-fcard">
+                    <div class="lp-fcard-icon violet"><i data-lucide="line-chart"></i></div>
+                    <h3>Simulation financière</h3>
+                    <p>Modifiez les prix et visualisez l'impact budgétaire annuel en direct.</p>
+                </div>
+                <div class="lp-fcard">
+                    <div class="lp-fcard-icon emerald"><i data-lucide="droplets"></i></div>
+                    <h3>Audit des fluides</h3>
+                    <p>Comparaison semestrielle de l'eau, du gaz et de l'électricité par site.</p>
+                </div>
+                <div class="lp-fcard">
+                    <div class="lp-fcard-icon amber"><i data-lucide="file-spreadsheet"></i></div>
+                    <h3>Import Excel sécurisé</h3>
+                    <p>Chargez vos grilles tarifaires en un clic, validées automatiquement.</p>
+                </div>
             </div>
         </section>
 
-        <!-- FOOTER BANNER -->
+        <!-- CTA BOTTOM -->
+        <section class="lp-cta">
+            <div class="lp-cta-inner">
+                <h2>Prêt à simplifier votre gestion tarifaire ?</h2>
+                <p>Connectez-vous avec vos identifiants agents pour accéder à votre espace.</p>
+                <button class="lp-btn-primary" onclick="ouvrirLogin()">
+                    Accéder à l'outil <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
         <footer class="lp-footer">
-            <div class="lp-footer-icon"><i data-lucide="shield-check"></i></div>
-            <div>
-                <div class="lp-footer-title">Un outil d'aide à la décision au service des collectivités.</div>
-                <div class="lp-footer-sub">Pilotez vos tarifs, maîtrisez vos budgets, agissez pour vos usagers.</div>
+            <div class="lp-footer-brand">
+                <div class="lp-logo-icon sm"><i data-lucide="calculator"></i></div>
+                <span>Mairie Tarification</span>
             </div>
-            <div class="lp-footer-badges">
-                <div class="lp-footer-badge"><i data-lucide="lock"></i> Sécurité</div>
-                <div class="lp-footer-badge"><i data-lucide="check-square"></i> Fiable</div>
-                <div class="lp-footer-badge"><i data-lucide="zap"></i> Intuitif</div>
-                <div class="lp-footer-badge"><i data-lucide="trending-up"></i> Évolutif</div>
+            <div class="lp-footer-copy">© 2025 Mairie de Crosne · Outil interne · Version Bêta</div>
+            <div class="lp-footer-pills">
+                <span><i data-lucide="lock"></i> Sécurisé</span>
+                <span><i data-lucide="zap"></i> Rapide</span>
+                <span><i data-lucide="check-circle"></i> Fiable</span>
             </div>
         </footer>
     </div>
 
     <!-- MODAL DE CONNEXION -->
-    <div id="login-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(8px); z-index:10000; align-items:center; justify-content:center;">
+    <div id="login-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(12px); z-index:10000; align-items:center; justify-content:center;">
         <div class="login-card">
-            <button onclick="fermerLogin()" style="position:absolute; top:20px; right:20px; background:none; border:none; cursor:pointer; color:#64748b;"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
-            <div style="background: linear-gradient(135deg,#6366f1,#a855f7); width: 72px; height: 72px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 25px rgba(99,102,241,0.4);">
-                <i data-lucide="shield-lock" style="width: 36px; height: 36px; color: white;"></i>
+            <button onclick="fermerLogin()" style="position:absolute; top:18px; right:18px; background:#f1f5f9; border:none; cursor:pointer; color:#64748b; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:background 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+            <div style="width:56px; height:56px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:16px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: 0 8px 20px rgba(99,102,241,0.35);">
+                <i data-lucide="shield-lock" style="width:28px; height:28px; color:white;"></i>
             </div>
-            <h2 style="font-family:'Outfit',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:6px;">Mairie de Crosne</h2>
-            <p style="color:var(--text-muted); margin-bottom:32px; font-size:0.9rem;">Espace d'administration sécurisé</p>
+            <h2 style="font-family:'Outfit',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:4px; color:#0f172a;">Connexion</h2>
+            <p style="color:#94a3b8; margin-bottom:28px; font-size:0.875rem;">Espace réservé aux agents de la Mairie de Crosne</p>
             <form onsubmit="handleLogin(event)">
-                <div style="text-align:left; margin-bottom:16px;">
-                    <label style="font-size:0.75rem; font-weight:700; color:#475569; display:block; margin-bottom:8px; letter-spacing:0.05em;">UTILISATEUR</label>
-                    <input type="text" id="username" placeholder="admin" required style="margin-bottom:0;">
+                <div style="text-align:left; margin-bottom:14px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px; letter-spacing:0.08em; text-transform:uppercase;">Identifiant</label>
+                    <input type="text" id="username" placeholder="Votre identifiant" required style="margin-bottom:0; border:2px solid #f1f5f9;">
                 </div>
-                <div style="text-align:left; margin-bottom:28px;">
-                    <label style="font-size:0.75rem; font-weight:700; color:#475569; display:block; margin-bottom:8px; letter-spacing:0.05em;">MOT DE PASSE</label>
-                    <input type="password" id="password" placeholder="••••••••" required style="margin-bottom:0;">
+                <div style="text-align:left; margin-bottom:24px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px; letter-spacing:0.08em; text-transform:uppercase;">Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••" required style="margin-bottom:0; border:2px solid #f1f5f9;">
                 </div>
-                <button type="submit" class="btn-primary" style="width:100%; padding:16px; font-size:1rem;">
+                <button type="submit" style="width:100%; padding:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; border-radius:12px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s; box-shadow:0 8px 20px rgba(99,102,241,0.3);">
                     Se connecter
                 </button>
             </form>
-            <div id="loginError" style="color:#ef4444; font-size:0.85rem; margin-top:16px; display:none;">❌ Identifiants incorrects. Réessayez.</div>
+            <div id="loginError" style="color:#ef4444; font-size:0.85rem; margin-top:14px; display:none; background:#fef2f2; padding:10px; border-radius:8px;">❌ Identifiants incorrects. Réessayez.</div>
         </div>
     </div>
 
