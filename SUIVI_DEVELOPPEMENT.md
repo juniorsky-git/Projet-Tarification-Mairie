@@ -29,4 +29,11 @@
 L'outil de tarification n'est plus un simple calculateur Excel ; c'est une **Plateforme Web robuste**, sécurisée et prête à être déployée au sein de la mairie ou sur le Web.
 
 ---
+
+### 💾 6. Sauvegarde et Gestion de Version (Git)
+- **Archivage complet** : Synchronisation de tous les travaux sur le dépôt distant (GitHub/GitLab).
+- **Commit de référence** : `feat: Intégration complète PostgreSQL, Spring Security et modernisation UI`.
+- **Bénéfice** : Le code est en sécurité, versionné et prêt à être récupéré par n'importe quel autre développeur ou sur un serveur de production.
+
+---
 *Réalisé avec succès par Antigravity pour la Mairie.*
