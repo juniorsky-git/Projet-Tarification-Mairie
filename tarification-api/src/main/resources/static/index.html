@@ -303,17 +303,9 @@
                 <i data-lucide="search"></i>
                 <span>Consultation</span>
             </div>
-            <div class="nav-item" onclick="switchPage('simulation', this)">
-                <i data-lucide="line-chart"></i>
-                <span>Simulation</span>
-            </div>
             <div class="nav-item" onclick="switchPage('fluides-audit', this)">
                 <i data-lucide="droplets"></i>
                 <span>Audit Fluides</span>
-            </div>
-            <div class="nav-item" onclick="switchPage('gestion', this)">
-                <i data-lucide="file-spreadsheet"></i>
-                <span>Grilles Excel</span>
             </div>
             <div class="nav-item" onclick="switchPage('historique', this)">
                 <i data-lucide="history"></i>
@@ -342,10 +334,7 @@
     <!-- MAIN CONTENT -->
     <main>
         <header>
-            <div class="search-bar">
-                <i data-lucide="search" size="18" color="#64748b"></i>
-                <input type="number" id="quickSearchQf" placeholder="Rechercher un QF..." onkeypress="handleQuickSearch(event)">
-            </div>
+            <div></div>
             <div class="user-profile">
                 <div class="avatar">JD</div>
                 <div class="user-info">
@@ -364,12 +353,16 @@
                 <!-- Rempli par JS avec un style épuré -->
             </div>
 
+            <!-- CARD 1: Analyse Financière par pôle -->
             <div class="form-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <h3>Analyse détaillée par pôle</h3>
-                    <div style="width: 300px;">
+                    <div>
+                        <h3>Analyse financière par pôle</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Coûts, recettes et taux de couverture par pôle d'activité.</p>
+                    </div>
+                    <div style="width: 260px;">
                         <select id="selectPoleDetails" onchange="chargerDetailsPole()">
-                            <option value="">-- Choisir un pôle pour voir le détail --</option>
+                            <option value="">Choisir un pôle…</option>
                             <option value="Restauration">Restauration</option>
                             <option value="Accueil de Loisirs">Accueil de Loisirs</option>
                             <option value="Accueil periscolaire">Accueil périscolaire</option>
@@ -379,13 +372,67 @@
                         </select>
                     </div>
                 </div>
-                
                 <div id="poleDetailsResult">
-                    <div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border); border-radius: 8px;">
-                        Sélectionnez un pôle ci-dessus pour afficher le détail des charges et indicateurs.
+                    <div style="text-align: center; color: var(--text-secondary); padding: 40px; border: 1px dashed var(--border); border-radius: 8px; font-size: 0.85rem;">
+                        Sélectionnez un pôle pour afficher l'analyse financière.
                     </div>
                 </div>
             </div>
+
+            <!-- CARD 2: Diagnostic Énergie par pôle (Nouveau emplacement) -->
+            <div class="form-card" style="margin-top: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h3 id="titleEnergiePole">Diagnostic Énergie</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Audit des consommations fluides pour le pôle sélectionné.</p>
+                    </div>
+                </div>
+                <div id="poleEnergieResult">
+                    <div class="loading-spinner">Chargement du diagnostic global...</div>
+                </div>
+
+                <!-- GUIDE D'INTERPRÉTATION (REPOSITIONNÉ ICI) -->
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; animation: fadeIn 0.8s ease;">
+                    <div>
+                        <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="help-circle" style="width: 18px; height: 18px; color: var(--primary);"></i>
+                            Aide à l'interprétation de l'audit
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+                            Ce diagnostic compare en temps réel vos factures réelles avec les prévisions basées sur la grille tarifaire municipale 2025.
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                                <div style="font-weight: 700; font-size: 0.75rem; color: #15803d;">OPTIMALE</div>
+                                <div style="font-size: 0.65rem; color: #166534; margin-top: 4px;">Consommation exemplaire, inférieure aux prévisions.</div>
+                            </div>
+                            <div style="background: #eff6ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                                <div style="font-weight: 700; font-size: 0.75rem; color: #1d4ed8;">MAÎTRISÉE</div>
+                                <div style="font-size: 0.65rem; color: #1e40af; margin-top: 4px;">Dépenses conformes à la trajectoire budgétaire.</div>
+                            </div>
+                            <div style="background: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a;">
+                                <div style="font-weight: 700; font-size: 0.75rem; color: #b45309;">CONSO +</div>
+                                <div style="font-size: 0.65rem; color: #92400e; margin-top: 4px;">Légère dérive détectée. À surveiller.</div>
+                            </div>
+                            <div style="background: #fef2f2; padding: 12px; border-radius: 8px; border: 1px solid #fecaca;">
+                                <div style="font-weight: 700; font-size: 0.75rem; color: #b91c1c;">ANOMALIE</div>
+                                <div style="font-size: 0.65rem; color: #991b1b; margin-top: 4px;">Écart critique (> 50%). Vérifier les fuites ou compteurs.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: var(--primary-bg); border-radius: 12px; padding: 20px; border: 1px solid #dbeafe;">
+                        <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="info" style="width: 16px; height: 16px;"></i> Bon à savoir
+                        </h4>
+                        <ul style="margin: 0; padding-left: 16px; font-size: 0.78rem; color: #1e3a8a; line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                            <li>L'audit est <b>automatique</b> : chaque nouvelle facture importée met à jour ces indicateurs.</li>
+                            <li>Les montants sont affichés en <b>TTC</b>.</li>
+                            <li>Un point <b>rouge scintillant</b> en haut de page indique qu'au moins une anomalie a été détectée sur un pôle.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- PAGE : AUDIT FLUIDES (ISSUE #24) -->
@@ -558,6 +605,74 @@
                 </div>
             </div>
         </div>
+
+        <!-- PAGE : HISTORIQUE -->
+        <div id="page-historique" class="content-page">
+            <h1>Historique des actions</h1>
+            <p class="subtitle">Journal des opérations effectuées sur la plateforme.</p>
+            <div class="form-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Journal d&#39;activité</h3>
+                    <button class="btn-tab" onclick="viderHistorique()" style="color: #ef4444; border-color: #fecaca;">Vider le journal</button>
+                </div>
+                <div id="historiqueList">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 48px; font-size: 0.85rem;">
+                        <i data-lucide="inbox" style="width:32px;height:32px;opacity:0.3;margin-bottom:12px;"></i><br>
+                        Aucune action enregistrée pour le moment.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE : PARAMETRES (contient Grilles Excel) -->
+        <div id="page-parametres" class="content-page">
+            <h1>Param&#232;tres</h1>
+            <p class="subtitle">Configuration de la plateforme et gestion des grilles tarifaires.</p>
+
+            <!-- Section Grilles Excel intégrée -->
+            <div class="form-card">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <i data-lucide="file-spreadsheet" style="width:20px;height:20px;color:var(--accent);"></i>
+                    <h3>Grilles tarifaires Excel</h3>
+                </div>
+                <div style="border: 1.5px dashed var(--border); padding: 36px; border-radius: var(--radius); text-align: center; transition: border-color 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                    <i data-lucide="cloud-upload" style="width: 40px; height: 40px; color: var(--text-secondary); margin-bottom: 14px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 6px;">D&#233;posez votre fichier Excel ici</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.82rem;">Formats accept&#233;s : .xlsx, .xls</p>
+                    <input type="file" id="fichierExcel" accept=".xls,.xlsx" style="display: none;">
+                    <button class="btn-primary" onclick="document.getElementById(&#39;fichierExcel&#39;).click()">S&#233;lectionner un fichier</button>
+                    <button class="btn-primary" style="background: #10b981; margin-left: 10px;" onclick="uploaderFichier()">Charger maintenant</button>
+                </div>
+                <div id="uploadResultat" style="margin-top: 16px; font-weight: 500; font-size: 0.85rem;"></div>
+            </div>
+
+            <div class="form-card" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Grilles disponibles</h3>
+                    <button class="btn-tab" onclick="resetGrille()">R&#233;initialiser (2025)</button>
+                </div>
+                <div id="grilleActive" style="padding: 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
+                    <!-- Info grille active -->
+                </div>
+            </div>
+
+            <div class="form-card" style="margin-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <i data-lucide="info" style="width:18px;height:18px;color:var(--text-secondary);"></i>
+                    <h3>Informations syst&#232;me</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="padding: 14px 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
+                        <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;">Version</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Mairie Tarification v1.0 B&#234;ta</div>
+                    </div>
+                    <div style="padding: 14px 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
+                        <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600;">Collectivit&#233;</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Mairie de Crosne</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -630,9 +745,9 @@
             document.getElementById('page-' + pageId).classList.add('active');
             if (element) element.classList.add('active');
 
-            if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'dashboard') chargerDashboardData();
             if (pageId === 'fluides-audit') chargerAuditFluides();
+            if (pageId === 'historique') afficherHistorique();
             
             // Re-render icons
             lucide.createIcons();
@@ -1093,35 +1208,23 @@
                 const poles = await response.json();
                 
                 let html = poles.map(p => {
-                    let icon = "activity";
-                    if(p.nom.includes("Restauration")) icon = "utensils";
-                    if(p.nom.includes("Loisirs")) icon = "sun";
-                    if(p.nom.includes("periscolaire")) icon = "clock";
-                    
                     const couverturePct = (p.tauxCouverture * 100).toFixed(0);
                     const perfEnergie = p.performanceEnergie || 0;
                     
-                    let badgeColor = "#10b981"; // Vert par defaut
-                    let statusLabel = "Performance Optimale";
-                    if (perfEnergie > 20) { badgeColor = "#ef4444"; statusLabel = "Alerte Conso"; }
-                    else if (perfEnergie > 5) { badgeColor = "#f59e0b"; statusLabel = "Vigilance"; }
+                    // Point scintillant : Rouge si alerte, Vert sinon
+                    const dotClass = (perfEnergie > 15) ? 'red' : 'green';
 
                     return `
-                    <div class="stat-card" style="padding: 24px; border: 1px solid var(--border); box-shadow: none; background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="document.getElementById('poleSelect').value='${p.nom}'; document.getElementById('poleSelect').dispatchEvent(new Event('change'));">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-                            <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">${p.nom}</div>
-                            <div class="badge" style="background: ${badgeColor}15; color: ${badgeColor}; border: none; font-size: 0.6rem; padding: 2px 8px;">${statusLabel}</div>
-                        </div>
-                        
-                        <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; margin-bottom: 4px;">${p.depensesTotales.toLocaleString()} €</div>
-                        <div style="font-size: 0.9rem; color: var(--primary); font-weight: 700;">${couverturePct}% de couverture</div>
-                        
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px;">
-                            <div style="width: 100%; height: 4px; background: #f1f5f9; border-radius: 2px; overflow: hidden;">
-                                <div style="width: ${couverturePct}%; height: 100%; background: var(--primary); opacity: 0.8;"></div>
+                    <div class="stat-card" style="padding: 24px; border: 1px solid var(--border); box-shadow: none; background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')" title="Cliquer pour voir le détail">
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="pulse-dot ${dotClass}"></span>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">${p.nom}</div>
                             </div>
-                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 500; white-space: nowrap;">${p.nombreEnfants} inscrits</span>
+                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-left: 16px; margin-top: 4px;">${couverturePct}% <span style="font-size: 0.6rem; font-weight: 400; color: var(--text-muted);">de couverture</span></div>
                         </div>
+                        
+                        <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em;">${p.depensesTotales.toLocaleString()} €</div>
                     </div>
                 `;}).join('');
                 
@@ -1134,20 +1237,20 @@
 
         async function chargerDetailsPole() {
             const pole = document.getElementById("selectPoleDetails").value;
-            const zone = document.getElementById("poleDetailsResult");
+            const zoneFinance = document.getElementById("poleDetailsResult");
 
             if (!pole) {
-                zone.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border); border-radius: 8px;">Sélectionnez un pôle ci-dessus pour afficher le détail des charges et indicateurs.</div>`;
+                zoneFinance.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border); border-radius: 8px;">Sélectionnez un pôle ci-dessus pour afficher l'analyse financière.</div>`;
                 return;
             }
 
-            zone.innerHTML = `<div class="loading-spinner">Chargement en cours...</div>`;
+            zoneFinance.innerHTML = `<div class="loading-spinner">Analyse financière en cours...</div>`;
 
             try {
                 const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
                 const data = await response.json();
 
-                // Calcul du badge couleur pour le taux de couverture
+                // RENDU FINANCES
                 const couverturePct = (data.tauxCouverture * 100).toFixed(2);
                 let badgeClass = "badge-danger";
                 if (data.tauxCouverture >= 1.0) badgeClass = "badge-success";
@@ -1163,21 +1266,14 @@
                     `;
                 }
 
-                zone.innerHTML = `
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
-                        <button class="btn-tab active" onclick="basculerSousOnglet('finances', this)">Analyse Financière</button>
-                        <button class="btn-tab" onclick="basculerSousOnglet('energie', this)">Diagnostic Énergie</button>
-                    </div>
-
+                zoneFinance.innerHTML = `
                     <div id="sub-finances" class="sub-page active" style="display: block; animation: fadeIn 0.4s ease;">
                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 48px;">
-                            <!-- Indicateurs Financiers -->
                             <div style="display: flex; flex-direction: column; gap: 24px;">
                                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                     <div class="label" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; font-weight: 700;">Dépenses Totales Réelles</div>
                                     <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
                                 </div>
-
                                 <div style="padding-bottom: 24px; border-bottom: 1px solid #f1f5f9;">
                                     <div class="label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Recettes annuelles estimées</div>
                                     <div style="font-size: 2.25rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em;">${data.recettesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
@@ -1185,7 +1281,6 @@
                                         Taux de couverture : <span class="badge ${badgeClass}">${couverturePct}%</span>
                                     </div>
                                 </div>
-                                
                                 <div style="display: flex; gap: 32px;">
                                     <div style="flex: 1;">
                                         <div class="label" style="font-size: 0.7rem; color: var(--text-muted);">Suvention Ville</div>
@@ -1197,62 +1292,10 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Détail des charges -->
                             <div>
                                 <h4 style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">Répartition réelle des charges</h4>
                                 ${detailsHtml}
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="sub-energie" class="sub-page" style="display: none; animation: fadeIn 0.4s ease;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                            <div>
-                                <h3 style="margin-bottom: 4px;">Performance Énergétique</h3>
-                                <p style="font-size: 0.85rem; color: var(--text-muted);">Audit des consommations fluides pour ce pôle.</p>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-tab active" style="font-size: 0.7rem; padding: 6px 12px;" onclick="filtrerFluideDetail('Tous', this)">Tous</button>
-                                <button class="btn-tab" style="font-size: 0.7rem; padding: 6px 12px;" onclick="filtrerFluideDetail('Électricité', this)">Électricité</button>
-                                <button class="btn-tab" style="font-size: 0.7rem; padding: 6px 12px;" onclick="filtrerFluideDetail('Gaz', this)">Gaz</button>
-                                <button class="btn-tab" style="font-size: 0.7rem; padding: 6px 12px;" onclick="filtrerFluideDetail('Eau', this)">Eau</button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table style="width: 100%;">
-                                <thead>
-                                    <tr>
-                                        <th>Site / Compteur</th>
-                                        <th>Fluide</th>
-                                        <th>Consommation</th>
-                                        <th style="text-align: right;">Facturé Réel</th>
-                                        <th style="text-align: right;">Statut</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${data.detailsFluides.map(f => {
-                                        const p = f.pourcentageEcart;
-                                        let label = "MAÎTRISÉE";
-                                        let bS = "background: #3b82f615; color: #3b82f6;";
-                                        if (p < -15) { label = "OPTIMALE"; bS = "background: #10b98115; color: #10b981;"; }
-                                        else if (p > 50) { label = "ANOMALIE"; bS = "background: #ef444415; color: #ef4444;"; }
-                                        else if (p > 15) { label = "CONSO +"; bS = "background: #f59e0b15; color: #f59e0b;"; }
-
-                                        return `
-                                            <tr class="detail-fluide-row" data-fluide="${f.fluide}">
-                                                <td><div style="font-weight: 500;">${f.site}</div></td>
-                                                <td><span style="font-weight: 600; font-size: 0.85rem;">${f.fluide}</span></td>
-                                                <td>${f.consommation.toLocaleString()} ${f.unite}</td>
-                                                <td style="text-align: right; font-weight: 700;">${f.montantReel.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</td>
-                                                <td style="text-align: right;">
-                                                    <span class="badge" style="${bS} font-size: 0.65rem; border: none;">${label}</span>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 `;
@@ -1262,12 +1305,97 @@
             }
         }
 
-        function filtrerFluideDetail(type, btn) {
-            btn.parentElement.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.detail-fluide-row').forEach(row => {
-                row.style.display = (type === 'Tous' || row.dataset.fluide === type) ? 'table-row' : 'none';
-            });
+        // --- NOUVELLE LOGIQUE : DIAGNOSTIC ENERGIE AUTONOME ---
+        let rawEnergieGlobale = [];
+
+        async function initialiserDiagnosticEnergie() {
+            const zone = document.getElementById("poleEnergieResult");
+            try {
+                // Appel du nouvel endpoint d'audit complet
+                const response = await fetch("/api/analytique/fluides/audit");
+                rawEnergieGlobale = await response.json();
+                renderEnergieGlobale("Tous");
+            } catch (error) {
+                zone.innerHTML = `<div style="color: #ef4444; padding: 20px;">Erreur de chargement du diagnostic global.</div>`;
+            }
+        }
+
+        function renderEnergieGlobale(filtreType) {
+            const zone = document.getElementById("poleEnergieResult");
+            const normaliser = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const typeNorm = normaliser(filtreType);
+
+            let data = rawEnergieGlobale;
+            if (filtreType !== "Tous") {
+                data = rawEnergieGlobale.filter(f => normaliser(f.fluide) === typeNorm || normaliser(f.fluide).includes(typeNorm));
+            }
+
+            zone.innerHTML = `
+                <div id="sub-energie" class="sub-page active" style="display: block; animation: fadeIn 0.4s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h4 style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">Patrimoine complet - Audit Analytique (Réel vs Théorique)</h4>
+                        </div>
+                        <div id="btnGroupEnergie" style="display: flex; gap: 8px;">
+                            <button class="btn-tab ${filtreType==='Tous'?'active':''}" style="font-size: 0.7rem; padding: 6px 12px;" onclick="renderEnergieGlobale('Tous')">Tous</button>
+                            <button class="btn-tab ${filtreType==='Electricité'?'active':''}" style="font-size: 0.7rem; padding: 6px 12px;" onclick="renderEnergieGlobale('Electricité')">Électricité</button>
+                            <button class="btn-tab ${filtreType==='Gaz'?'active':''}" style="font-size: 0.7rem; padding: 6px 12px;" onclick="renderEnergieGlobale('Gaz')">Gaz</button>
+                            <button class="btn-tab ${filtreType==='Eau'?'active':''}" style="font-size: 0.7rem; padding: 6px 12px;" onclick="renderEnergieGlobale('Eau')">Eau</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Site / Compteur</th>
+                                    <th>Fluide</th>
+                                    <th>Consommation</th>
+                                    <th style="text-align: right;">Facturé Réel</th>
+                                    <th style="text-align: right;">Théorique (Tarif 2025)</th>
+                                    <th style="text-align: right;">Écart / Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.length > 0 ? data.map(f => {
+                                    const p = f.pourcentageEcart || 0;
+                                    let label = "MAÎTRISÉE";
+                                    let bS = "background: #3b82f615; color: #3b82f6;";
+                                    if (p < -15) { label = "OPTIMALE"; bS = "background: #10b98115; color: #10b981;"; }
+                                    else if (p > 50) { label = "ANOMALIE DÉTECTÉE"; bS = "background: #ef444415; color: #ef4444;"; }
+                                    else if (p > 15) { label = "CONSO +"; bS = "background: #f59e0b15; color: #f59e0b;"; }
+                                    
+                                    const fluideLabel = f.fluide === 'Electricite' ? 'Électricité' : f.fluide;
+                                    const reelStr = f.montantReel.toLocaleString('fr-FR', {style:'currency',currency:'EUR'});
+                                    const theoStr = f.montantTheorique.toLocaleString('fr-FR', {style:'currency',currency:'EUR'});
+                                    const signe = p > 0 ? '+' : '';
+
+                                    return `
+                                        <tr>
+                                            <td>
+                                                <div style="font-weight: 600; color: var(--text-main);">${f.site}</div>
+                                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">${f.periode || 'Données annuelles 2025'}</div>
+                                            </td>
+                                            <td><span style="font-weight: 500;">${fluideLabel}</span></td>
+                                            <td><div style="font-weight: 600;">${f.consommation.toLocaleString()} <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">${f.unite}</span></div></td>
+                                            <td style="text-align: right; font-weight: 600;">${reelStr}</td>
+                                            <td style="text-align: right; color: var(--text-secondary);">${theoStr}</td>
+                                            <td style="text-align: right;">
+                                                <div style="font-weight: 700; color: ${p > 20 ? '#ef4444' : (p < -10 ? '#10b981' : 'var(--text-main)')}; font-size: 0.85rem;">
+                                                    ${signe}${p.toFixed(1)}%
+                                                </div>
+                                                <span class="badge" style="${bS} font-size: 0.6rem; border: none; padding: 2px 6px; margin-top: 4px;">${label}</span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('') : `
+                                    <tr><td colspan="6" style="text-align: center; padding: 48px; color: var(--text-muted);">Aucune donnée d'audit disponible.</td></tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
         }
 
         function basculerSousOnglet(tabId, btn) {
@@ -1293,10 +1421,57 @@
             });
         }
 
+
+        // --- DETAIL POLE (clic sur stat card) ---
+        function ouvrirDetailPole(nomPole) {
+            // Scroll to details card
+            const card = document.getElementById('poleDetailsResult');
+            if (card) {
+                card.closest('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Set select and trigger load
+            const sel = document.getElementById('selectPoleDetails');
+            if (sel) {
+                sel.value = nomPole;
+                chargerDetailsPole();
+            }
+        }
+
+        // --- HISTORIQUE ---
+        function ajouterLog(action, detail) {
+            const logs = JSON.parse(localStorage.getItem('mairie_logs') || '[]');
+            logs.unshift({ action, detail, date: new Date().toLocaleString('fr-FR') });
+            if (logs.length > 100) logs.pop();
+            localStorage.setItem('mairie_logs', JSON.stringify(logs));
+        }
+
+        function afficherHistorique() {
+            const logs = JSON.parse(localStorage.getItem('mairie_logs') || '[]');
+            const zone = document.getElementById('historiqueList');
+            if (!zone) return;
+            if (logs.length === 0) {
+                zone.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:48px;font-size:0.85rem;"><i data-lucide="inbox" style="width:32px;height:32px;opacity:0.3;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;"></i>Aucune action enregistrée pour le moment.</div>';
+                lucide.createIcons();
+                return;
+            }
+            zone.innerHTML = logs.map(log => '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-soft);">' +
+                '<div><div style="font-weight:600;font-size:0.82rem;">' + log.action + '</div><div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;">' + (log.detail || '') + '</div></div>' +
+                '<div style="font-size:0.72rem;color:var(--text-secondary);white-space:nowrap;margin-left:16px;">' + log.date + '</div>' +
+                '</div>').join('');
+        }
+
+        function viderHistorique() {
+            if (confirm('Vider le journal d’activité ?')) {
+                localStorage.removeItem('mairie_logs');
+                afficherHistorique();
+            }
+        }
+
         window.onload = () => {
             lucide.createIcons();
             chargerGrilleActive();
             chargerDashboardData();
+            initialiserDiagnosticEnergie();
         };
     </script>
 </body>

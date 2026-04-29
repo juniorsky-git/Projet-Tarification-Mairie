@@ -47,6 +47,34 @@ public class AnalytiqueFluideService {
     }
 
     /**
+     * Analyse filtrée par pôle d'activité.
+     * @param pole Nom du pôle (ex: Restauration).
+     * @return Liste filtrée.
+     */
+    public List<AnalytiqueFluide> analyserParPole(String pole) {
+        List<AnalytiqueFluide> tous = analyserTout(FICHIER);
+        if (pole == null || pole.isEmpty()) return tous;
+
+        return tous.stream().filter(f -> {
+            String site = f.site().toUpperCase();
+            switch (pole) {
+                case "Restauration":
+                    return site.contains("RESTAURATION") || site.contains("GROUPE SCOLAIRE") || site.contains("CUISINE");
+                case "Accueil de Loisirs":
+                    return site.contains("CENTRE DE LOISIRS") || site.contains("ALSH") || site.contains("POULE");
+                case "Accueil periscolaire":
+                    return site.contains("MATERNELLE") || site.contains("ELEMENTAIRE") || site.contains("ECOLE");
+                case "Etudes surveillees":
+                    return site.contains("GROUPE SCOLAIRE") || site.contains("ELEMENTAIRE");
+                case "Espace Ados":
+                    return site.contains("ADJUST") || site.contains("ADOS") || site.contains("JEUNESSE");
+                default:
+                    return true;
+            }
+        }).toList();
+    }
+
+    /**
      * Effectue l'analyse complète de tous les fluides à partir d'un fichier Excel.
      * @param cheminExcel Le chemin absolu ou relatif vers le fichier .xlsx.
      * @return Une liste triée par montant réel décroissant.
@@ -55,7 +83,8 @@ public class AnalytiqueFluideService {
         List<AnalytiqueFluide> resultats = new ArrayList<>();
         logService.reinitialiser();
 
-        try (Workbook wb = WorkbookFactory.create(new File(cheminExcel))) {
+        try (FileInputStream fis = new FileInputStream(new File(cheminExcel));
+             Workbook wb = WorkbookFactory.create(fis)) {
             
             // Lancement séquentiel des analyses par type de fluide
             analyserGaz(wb, resultats);

@@ -65,8 +65,11 @@ public class DashboardController {
                         
                         if (p.distributionTranches() != null && serviceKey != null) {
                             double volumeMoyen = 1.0; 
-                            if (p.unitesAnnuelles() != null && p.nombreEnfants() != null && p.nombreEnfants() > 0) {
-                                volumeMoyen = (double) p.unitesAnnuelles() / p.nombreEnfants();
+                            Integer ne = p.nombreEnfants();
+                            Integer ua = p.unitesAnnuelles();
+                            
+                            if (ne != null && ne > 0 && ua != null) {
+                                volumeMoyen = (double) ua / ne;
                             }
 
                             // Agrégation des recettes par tranche de Quotient Familial (QF)
@@ -94,8 +97,8 @@ public class DashboardController {
                         r.ecart = recettes - p.depensesTotales();
                         r.distributionTranches = p.distributionTranches();
                         
-                        // Intégration du diagnostic fluides temps réel
-                        r.detailsFluides = analytiqueFluideService.analyserTout();
+                        // Intégration du diagnostic fluides filtré par pôle
+                        r.detailsFluides = analytiqueFluideService.analyserParPole(p.nom());
                         
                         return ResponseEntity.ok(r);
                     })
@@ -127,6 +130,14 @@ public class DashboardController {
             default: 
                 return null;
         }
+    }
+
+    /**
+     * Nouvel endpoint pour l'audit complet Réel vs Théorique.
+     */
+    @GetMapping("/analytique/fluides/audit")
+    public ResponseEntity<List<AnalytiqueFluide>> getAuditComplet() {
+        return ResponseEntity.ok(analytiqueFluideService.analyserTout());
     }
 
     /**

@@ -55,8 +55,10 @@ public class PolesController {
             double recettes = 0;
             String key = getServiceKey(p.nom());
             if (key != null && p.distributionTranches() != null) {
-                double vol = (p.nombreEnfants() != null && p.nombreEnfants() > 0) 
-                    ? (double) p.unitesAnnuelles() / p.nombreEnfants() : 1.0;
+                Integer ua = p.unitesAnnuelles();
+                Integer ne = p.nombreEnfants();
+                double vol = (ne != null && ne > 0 && ua != null) 
+                    ? (double) ua / ne : 1.0;
                 for (Map.Entry<String, Integer> entry : p.distributionTranches().entrySet()) {
                     double prix = tarifs.stream()
                         .filter(t -> t.getTranche().equalsIgnoreCase(entry.getKey()))
