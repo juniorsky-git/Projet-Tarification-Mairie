@@ -1,0 +1,766 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author> </Author>
+  <LastAuthor> </LastAuthor>
+  <Created>2009-02-24T10:52:46Z</Created>
+  <Version>11.9999</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <Colors>
+   <Color>
+    <Index>0</Index>
+    <RGB>#000000</RGB>
+   </Color>
+   <Color>
+    <Index>1</Index>
+    <RGB>#FFFFFF</RGB>
+   </Color>
+   <Color>
+    <Index>2</Index>
+    <RGB>#333333</RGB>
+   </Color>
+   <Color>
+    <Index>3</Index>
+    <RGB>#F0F0EF</RGB>
+   </Color>
+   <Color>
+    <Index>4</Index>
+    <RGB>#DAE3F6</RGB>
+   </Color>
+  </Colors>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>8445</WindowHeight>
+  <WindowWidth>10395</WindowWidth>
+  <WindowTopX>360</WindowTopX>
+  <WindowTopY>45</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s1">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:Color="#000000"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s2">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:Color="#000000"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s3">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:Color="#000000"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s4">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s5">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s6">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s7">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#,##0.00"/>
+  </Style>
+  <Style ss:ID="s8">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s9">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#F0F0EF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#0.00"/>
+  </Style>
+  <Style ss:ID="s10">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s11">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s12">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s13">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#,##0.00"/>
+  </Style>
+  <Style ss:ID="s14">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s15">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Color="#333333"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#0.00"/>
+  </Style>
+  <Style ss:ID="s16">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s17">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s18">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s19">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#,##0.00"/>
+  </Style>
+  <Style ss:ID="s20">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="Short Date"/>
+  </Style>
+  <Style ss:ID="s21">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Top"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="0"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#333333"/>
+   <Interior ss:Color="#DAE3F6" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#0.00"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Feuil1">
+  <Table ss:ExpandedColumnCount="69" ss:ExpandedRowCount="5" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultColumnWidth="60">
+   <Column ss:Index="1" ss:AutoFitWidth="0" ss:Width="99.75"/>
+   <Column ss:Index="2" ss:AutoFitWidth="0" ss:Width="52.5"/>
+   <Column ss:Index="3" ss:AutoFitWidth="0" ss:Width="43.5"/>
+   <Column ss:Index="4" ss:AutoFitWidth="0" ss:Width="43.5"/>
+   <Column ss:Index="5" ss:AutoFitWidth="0" ss:Width="50.25"/>
+   <Column ss:Index="6" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="7" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="8" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="9" ss:AutoFitWidth="0" ss:Width="50.25"/>
+   <Column ss:Index="10" ss:AutoFitWidth="0" ss:Width="30.0"/>
+   <Column ss:Index="11" ss:AutoFitWidth="0" ss:Width="300.0"/>
+   <Column ss:Index="12" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="13" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="14" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="15" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="16" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="17" ss:AutoFitWidth="0" ss:Width="97.5"/>
+   <Column ss:Index="18" ss:AutoFitWidth="0" ss:Width="64.5"/>
+   <Column ss:Index="19" ss:AutoFitWidth="0" ss:Width="99.75"/>
+   <Column ss:Index="20" ss:AutoFitWidth="0" ss:Width="56.25"/>
+   <Column ss:Index="21" ss:AutoFitWidth="0" ss:Width="60.0"/>
+   <Column ss:Index="22" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="23" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="24" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="25" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="26" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="27" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="28" ss:AutoFitWidth="0" ss:Width="77.25"/>
+   <Column ss:Index="29" ss:AutoFitWidth="0" ss:Width="70.5"/>
+   <Column ss:Index="30" ss:AutoFitWidth="0" ss:Width="69.75"/>
+   <Column ss:Index="31" ss:AutoFitWidth="0" ss:Width="125.25"/>
+   <Column ss:Index="32" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="33" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="34" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="35" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="36" ss:AutoFitWidth="0" ss:Width="56.25"/>
+   <Column ss:Index="37" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="38" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="39" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="40" ss:AutoFitWidth="0" ss:Width="125.25"/>
+   <Column ss:Index="41" ss:AutoFitWidth="0" ss:Width="37.5"/>
+   <Column ss:Index="42" ss:AutoFitWidth="0" ss:Width="125.25"/>
+   <Column ss:Index="43" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="44" ss:AutoFitWidth="0" ss:Width="120.0"/>
+   <Column ss:Index="45" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="46" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="47" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:Index="48" ss:AutoFitWidth="0" ss:Width="150.0"/>
+   <Column ss:Index="49" ss:AutoFitWidth="0" ss:Width="60.0"/>
+   <Column ss:Index="50" ss:AutoFitWidth="0" ss:Width="75.0"/>
+   <Column ss:Index="51" ss:AutoFitWidth="0" ss:Width="75.0"/>
+   <Column ss:Index="52" ss:AutoFitWidth="0" ss:Width="93.75"/>
+   <Column ss:Index="53" ss:AutoFitWidth="0" ss:Width="75.0"/>
+   <Column ss:Index="54" ss:AutoFitWidth="0" ss:Width="210.0"/>
+   <Column ss:Index="55" ss:AutoFitWidth="0" ss:Width="90.0"/>
+   <Column ss:Index="56" ss:AutoFitWidth="0" ss:Width="90.0"/>
+   <Column ss:Index="57" ss:AutoFitWidth="0" ss:Width="56.25"/>
+   <Column ss:Index="58" ss:AutoFitWidth="0" ss:Width="60.0"/>
+   <Column ss:Index="59" ss:AutoFitWidth="0" ss:Width="75.0"/>
+   <Column ss:Index="60" ss:AutoFitWidth="0" ss:Width="52.5"/>
+   <Column ss:Index="61" ss:AutoFitWidth="0" ss:Width="52.5"/>
+   <Column ss:Index="62" ss:AutoFitWidth="0" ss:Width="52.5"/>
+   <Column ss:Index="63" ss:AutoFitWidth="0" ss:Width="78.75"/>
+   <Column ss:Index="64" ss:AutoFitWidth="0" ss:Width="78.75"/>
+   <Column ss:Index="65" ss:AutoFitWidth="0" ss:Width="120.0"/>
+   <Column ss:Index="66" ss:AutoFitWidth="0" ss:Width="75.0"/>
+   <Column ss:Index="67" ss:AutoFitWidth="0" ss:Width="97.5"/>
+   <Column ss:Index="68" ss:AutoFitWidth="0" ss:Width="112.5"/>
+   <Column ss:Index="69" ss:AutoFitWidth="0" ss:Width="97.5"/>
+   <Row ss:Index="1" ss:AutoFitHeight="0" ss:Height="28.8">
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Type écriture</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Nb. ann/rej</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Exercice</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Budget</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° écriture</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° pièce</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° bordereau</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° ordre</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Date pièce</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Lot</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant HT</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant TVA</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant TTC</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Réf. dossier</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Date règlement</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant pour le C.A.</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Engagement</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Solde eng.</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Marché</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Reconduction</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Lot</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Tranche</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Ligne</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Avenant</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Mt révision HT</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Mt révision TVA</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Mt révision TTC</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Code contrat</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Code tiers</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé tiers</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Gestionnaire</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Fonction</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Nature</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Opération</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Pgm (opé)</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Service</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Antenne</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Chapitre</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé chapitre</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Cha. voté</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé chapitre voté</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Nomenclature</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé nomenclature</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Type dep.</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Objectif</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Code famille Nomemclature</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Libellé famille Nomenclature</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Ligne AGEC</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant réemploi ou réutilisation</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Taux minimum</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant matières recyclées</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Taux minimum</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Inscription</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Immobilisation</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° inventaire</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Programme</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Année d’AP</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Engagement AP</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">N° facture</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Nombre PJ</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Nombre CA</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Début Prestation</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Fin Prestation</Data></Cell>
+    <Cell ss:StyleID="s1"><Data ss:Type="String">Objet Prestation</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Prise en charge</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Acquittement du flux</Data></Cell>
+    <Cell ss:StyleID="s3"><Data ss:Type="String">Montant payé/encaissé</Data></Cell>
+    <Cell ss:StyleID="s2"><Data ss:Type="String">Génération du flux</Data></Cell>
+   </Row>
+   <Row ss:Index="2" ss:AutoFitHeight="0" ss:Height="22.400000000000002">
+    <Cell ss:StyleID="s4"><Data ss:Type="String">Mandat ordinaire</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2025</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">CR</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">418175.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">2681.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">386.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-11-12T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">ARFI</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">FAC. IY433882 DU 31/10/2025 CONTOURS DE MATELAS COCON BLEU SECURITE ENFANTS             </Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">309.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">61.8</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">370.8</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s8"><Data ss:Type="DateTime">2025-11-12T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">370.8</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">ME25006201</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">1480</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">WESCO</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">4221</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2188</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">6-MP</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s9"></Cell>
+    <Cell ss:StyleID="s7"></Cell>
+    <Cell ss:StyleID="s9"></Cell>
+    <Cell ss:StyleID="s7"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">20252347</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">1.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s6"></Cell>
+    <Cell ss:StyleID="s6"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-11-12T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-11-12T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">370.8</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-11-11T00:00:00.000</Data></Cell>
+   </Row>
+   <Row ss:Index="3" ss:AutoFitHeight="0" ss:Height="22.400000000000002">
+    <Cell ss:StyleID="s10"><Data ss:Type="String">Mandat ordinaire</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">2025</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">CR</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">420517.0</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">3049.0</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">446.0</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s12"><Data ss:Type="DateTime">2025-12-11T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">PGFI</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">FAC. FAC25COL0115364 DU        04/12/2025 PORTE CORBEILLE HAUTEUR REGLABLE                            </Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">351.0</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">70.2</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">421.2</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s14"><Data ss:Type="DateTime">2025-12-16T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">421.2</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">ME25007901</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">5370</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">MANUTAN COLLECTIVITES </Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">4221</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">2188</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">6-MP</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s15"></Cell>
+    <Cell ss:StyleID="s13"></Cell>
+    <Cell ss:StyleID="s15"></Cell>
+    <Cell ss:StyleID="s13"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">2025-2188-0208</Data></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">2025-2188-0208</Data></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s11"></Cell>
+    <Cell ss:StyleID="s10"><Data ss:Type="String">20252609</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">1.0</Data></Cell>
+    <Cell ss:StyleID="s11"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s12"></Cell>
+    <Cell ss:StyleID="s12"></Cell>
+    <Cell ss:StyleID="s10"></Cell>
+    <Cell ss:StyleID="s12"><Data ss:Type="DateTime">2025-12-16T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s12"><Data ss:Type="DateTime">2025-12-15T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s13"><Data ss:Type="Number">421.2</Data></Cell>
+    <Cell ss:StyleID="s12"><Data ss:Type="DateTime">2025-12-14T00:00:00.000</Data></Cell>
+   </Row>
+   <Row ss:Index="4" ss:AutoFitHeight="0" ss:Height="22.400000000000002">
+    <Cell ss:StyleID="s4"><Data ss:Type="String">Mandat ordinaire</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2025</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">CR</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">420778.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">3130.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">462.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-12-17T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">PGFI</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">FAC. 20251298839883 DU         11/12/2025 ADOUCISSEUR D AEAU POUR LAVE VAISSELLE MPE                  </Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">805.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">161.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">966.0</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s8"><Data ss:Type="DateTime">2025-12-22T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">966.0</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">ME25006601</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">9124</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">ADES EMATIKA </Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">4221</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2188</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">6-MP</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String"> </Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">21</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">IMMOBILISATIONS CORPORELLES</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s9"></Cell>
+    <Cell ss:StyleID="s7"></Cell>
+    <Cell ss:StyleID="s9"></Cell>
+    <Cell ss:StyleID="s7"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2025-2188-0223</Data></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">2025-2188-0223</Data></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s5"></Cell>
+    <Cell ss:StyleID="s4"><Data ss:Type="String">20252686</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">1.0</Data></Cell>
+    <Cell ss:StyleID="s5"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s6"></Cell>
+    <Cell ss:StyleID="s6"></Cell>
+    <Cell ss:StyleID="s4"></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-12-22T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-12-19T00:00:00.000</Data></Cell>
+    <Cell ss:StyleID="s7"><Data ss:Type="Number">966.0</Data></Cell>
+    <Cell ss:StyleID="s6"><Data ss:Type="DateTime">2025-12-18T00:00:00.000</Data></Cell>
+   </Row>
+   <Row ss:Index="5" ss:AutoFitHeight="0" ss:Height="22.400000000000002">
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"><Data ss:Type="String">TOTAL GENERAL</Data></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">1465.0</Data></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">293.0</Data></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">1758.0</Data></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s20"></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">1758.0</Data></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">0.0</Data></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s21"></Cell>
+    <Cell ss:StyleID="s19"></Cell>
+    <Cell ss:StyleID="s21"></Cell>
+    <Cell ss:StyleID="s19"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s17"></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+    <Cell ss:StyleID="s16"></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+    <Cell ss:StyleID="s19"><Data ss:Type="Number">1758.0</Data></Cell>
+    <Cell ss:StyleID="s18"></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.4921259845"/>
+    <Footer x:Margin="0.4921259845"/>
+    <PageMargins x:Bottom="0.984251969" x:Left="0.78740157499999996"
+     x:Right="0.78740157499999996" x:Top="0.984251969"/>
+   </PageSetup>
+   <Print>
+    <ValidPrinterInfo/>
+    <PaperSizeIndex>9</PaperSizeIndex>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>600</VerticalResolution>
+   </Print>
+   <Selected/>
+   <FreezePanes/>
+   <FrozenNoSplit/>
+   <SplitHorizontal>1</SplitHorizontal>
+   <TopRowBottomPane>1</TopRowBottomPane>
+   <SplitVertical>3</SplitVertical>
+   <LeftColumnRightPane>3</LeftColumnRightPane>
+   <ActivePane>0</ActivePane>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+    </Pane>
+    <Pane>
+     <Number>1</Number>
+    </Pane>
+    <Pane>
+     <Number>2</Number>
+    </Pane>
+    <Pane>
+     <Number>0</Number>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Service de gestion de la traçabilité et de l'audit.
@@ -80,6 +81,33 @@ public class LogService {
         } catch (Exception e) {
             System.err.println("Erreur LogService lors de l'écriture : " + e.getMessage());
         }
+    }
+
+    /**
+     * Lit le contenu des logs techniques pour l'affichage dans l'Historique.
+     * @return Une chaîne formatée contenant les derniers audits.
+     */
+    public String lireDerniersLogs() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            if (Files.exists(Paths.get("logs_audit/audit_electricite.log"))) {
+                sb.append("--- AUDIT ÉLECTRICITÉ ---\n");
+                List<String> lines = Files.readAllLines(Paths.get("logs_audit/audit_electricite.log"));
+                // On prend les 50 dernières lignes pour ne pas surcharger
+                int start = Math.max(0, lines.size() - 50);
+                for(int i=start; i<lines.size(); i++) sb.append(lines.get(i)).append("\n");
+            }
+            sb.append("\n");
+            if (Files.exists(Paths.get("logs_audit/audit_gaz.log"))) {
+                sb.append("--- AUDIT GAZ ---\n");
+                List<String> lines = Files.readAllLines(Paths.get("logs_audit/audit_gaz.log"));
+                int start = Math.max(0, lines.size() - 50);
+                for(int i=start; i<lines.size(); i++) sb.append(lines.get(i)).append("\n");
+            }
+        } catch (Exception e) {
+            return "Erreur lors de la lecture des logs techniques.";
+        }
+        return sb.toString();
     }
 
     // --- Méthodes Statiques d'utilité générale ---

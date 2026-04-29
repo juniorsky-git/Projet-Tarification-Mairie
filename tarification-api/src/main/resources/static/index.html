@@ -606,20 +606,36 @@
             </div>
         </div>
 
-        <!-- PAGE : HISTORIQUE -->
         <div id="page-historique" class="content-page">
-            <h1>Historique des actions</h1>
-            <p class="subtitle">Journal des opérations effectuées sur la plateforme.</p>
-            <div class="form-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3>Journal d&#39;activité</h3>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1>Historique et Traçabilité</h1>
+                    <p class="subtitle">Journal des opérations et preuves techniques d'audit.</p>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-primary" style="background: white; color: var(--primary); border: 1px solid var(--primary);" onclick="ouvrirLogsTechniques()">
+                        <i data-lucide="file-text" style="width:16px;height:16px;margin-right:8px;"></i>Consulter les preuves techniques
+                    </button>
                     <button class="btn-tab" onclick="viderHistorique()" style="color: #ef4444; border-color: #fecaca;">Vider le journal</button>
                 </div>
+            </div>
+            
+            <div class="form-card">
                 <div id="historiqueList">
-                    <div style="text-align: center; color: var(--text-secondary); padding: 48px; font-size: 0.85rem;">
-                        <i data-lucide="inbox" style="width:32px;height:32px;opacity:0.3;margin-bottom:12px;"></i><br>
-                        Aucune action enregistrée pour le moment.
+                    <!-- Zone des logs utilisateur -->
+                </div>
+            </div>
+
+            <!-- MODAL LOGS TECHNIQUES -->
+            <div id="modalLogsTechniques" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; padding: 40px; align-items:center; justify-content:center;">
+                <div class="login-card" style="width: 800px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h3 style="margin:0;">Preuves techniques d'audit (Dernière session)</h3>
+                        <button onclick="document.getElementById('modalLogsTechniques').style.display='none'" style="background:none; border:none; cursor:pointer; font-size:1.5rem;">&times;</button>
                     </div>
+                    <pre id="contentLogsTechniques" style="flex:1; background:#1e293b; color:#38bdf8; padding:20px; border-radius:8px; overflow-y:auto; font-family:'DM Mono', monospace; font-size:0.75rem; white-space:pre-wrap; line-height:1.4;">
+                        Chargement des logs techniques...
+                    </pre>
                 </div>
             </div>
         </div>
@@ -1165,7 +1181,22 @@
             }
         }
 
-        // --- API : GESTION EXCEL ---
+        async function ouvrirLogsTechniques() {
+            const modal = document.getElementById('modalLogsTechniques');
+            const content = document.getElementById('contentLogsTechniques');
+            modal.style.display = 'flex';
+            content.textContent = "Chargement des logs techniques en cours...";
+            
+            try {
+                const response = await fetch('/api/logs/audit');
+                const text = await response.text();
+                content.textContent = text || "Aucun log technique disponible pour le moment.";
+            } catch (error) {
+                content.textContent = "Erreur lors du chargement des logs : " + error;
+            }
+        }
+
+        // --- AUTH : LOGIN / LOGOUT ---
         async function uploaderFichier() {
             const input = document.getElementById("fichierExcel");
             const uploadResultat = document.getElementById("uploadResultat");

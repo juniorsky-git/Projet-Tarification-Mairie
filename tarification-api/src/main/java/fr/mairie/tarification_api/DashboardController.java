@@ -23,10 +23,12 @@ public class DashboardController {
 
     private final AnalytiqueFluideService analytiqueFluideService;
     private final DonneesBudgetaires budgetService;
+    private final LogService logService;
 
-    public DashboardController(AnalytiqueFluideService analytiqueFluideService, DonneesBudgetaires budgetService) {
+    public DashboardController(AnalytiqueFluideService analytiqueFluideService, DonneesBudgetaires budgetService, LogService logService) {
         this.analytiqueFluideService = analytiqueFluideService;
         this.budgetService = budgetService;
+        this.logService = logService;
     }
 
     /**
@@ -146,5 +148,13 @@ public class DashboardController {
     @GetMapping("/analytique/fluides/bi-semestriel")
     public ResponseEntity<List<RapportSemestrielFluide>> getRapportBiSemestriel() {
         return ResponseEntity.ok(analytiqueFluideService.analyserBiSemestriel());
+    }
+
+    /**
+     * Endpoint pour récupérer les logs techniques d'audit.
+     */
+    @GetMapping("/logs/audit")
+    public ResponseEntity<String> getLogsAudit() {
+        return ResponseEntity.ok(logService.lireDerniersLogs());
     }
 }
