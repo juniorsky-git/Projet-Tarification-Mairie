@@ -25,11 +25,27 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll() // On laisse passer le décor
+                .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.ico", "/*.png", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated() 
             )
-            .formLogin(withDefaults())
-            .logout(logout -> logout.permitAll());
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (request.getRequestURI().startsWith("/api/")) {
+                        response.sendError(401, "Session expirée");
+                    } else {
+                        response.sendRedirect("/");
+                    }
+                })
+            )
+            .formLogin(login -> login
+                .loginPage("/") // On utilise la landing page comme point d'entrée
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/")
+                .permitAll());
         
         return http.build();
     }

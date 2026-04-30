@@ -712,7 +712,11 @@
             document.getElementById('landing-page').style.display = 'none';
             fermerLogin();
             document.body.classList.add('authenticated');
+            
+            // Chargement complet des données
             chargerDashboardData();
+            chargerGrilleActive();
+            initialiserDiagnosticEnergie();
         }
 
         function ouvrirLogin() {
@@ -728,17 +732,31 @@
             if (modal) modal.style.display = 'none';
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
 
-            if (u === 'admin' && p === 'admin') {
-                localStorage.setItem('mairie_auth', 'true');
-                errorDiv.style.display = 'none';
-                afficherDashboard();
-            } else {
+            // On crée un formulaire standard pour Spring Security
+            const formData = new FormData();
+            formData.append('username', u);
+            formData.append('password', p);
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                });
+
+                if (response.ok || response.redirected) {
+                    localStorage.setItem('mairie_auth', 'true');
+                    errorDiv.style.display = 'none';
+                    afficherDashboard();
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
                 errorDiv.style.display = 'block';
                 const card = document.querySelector('.login-card');
                 if (card) {
@@ -748,7 +766,10 @@
             }
         }
 
-        function handleLogout() {
+        async function handleLogout() {
+            try {
+                await fetch('/logout', { method: 'POST' });
+            } catch (e) {}
             localStorage.removeItem('mairie_auth');
             location.reload();
         }
@@ -769,6 +790,18 @@
             lucide.createIcons();
         }
 
+        // --- GESTION DES REQUÊTES API AVEC AUTO-LOGIN ---
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                // Session expirée ou non connecté
+                localStorage.removeItem('mairie_auth');
+                ouvrirLogin();
+                throw new Error('Session expirée');
+            }
+            return response;
+        }
+
         let rawAuditData = [];
 
         async function chargerAuditFluides() {
@@ -776,7 +809,7 @@
             tbody.innerHTML = `<tr><td colspan="7" class="loading-spinner">Analyse des consommations semestrielles...</td></tr>`;
 
             try {
-                const response = await fetch('/api/analytique/fluides/bi-semestriel');
+                const response = await apiFetch('/api/analytique/fluides/bi-semestriel');
                 rawAuditData = await response.json();
                 
                 // On active l'onglet "Tous" par défaut
@@ -784,7 +817,9 @@
                 filtrerFluideAudit('tours', tabTous);
 
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="7" style="color: #ef4444; text-align: center; padding: 20px;">Erreur lors du chargement des données.</td></tr>`;
+                if (error.message !== 'Session expirée') {
+                    tbody.innerHTML = `<tr><td colspan="7" style="color: #ef4444; text-align: center; padding: 20px;">Erreur lors du chargement des données.</td></tr>`;
+                }
             }
         }
 
@@ -871,7 +906,7 @@
             filterZone.style.display = 'none';
 
             try {
-                const response = await fetch(`/api/tarif?qf=${qf}`);
+                const response = await apiFetch(`/api/tarif?qf=${qf}`);
                 if (!response.ok) {
                     zone.innerHTML = `<div class="form-card" style="color: #ef4444;">❌ Erreur : ${await response.text()}</div>`;
                     return;
@@ -881,7 +916,9 @@
                 renderTarifCards(data);
                 filterZone.style.display = 'flex';
             } catch (error) {
-                zone.innerHTML = `<div class="form-card" style="color: #ef4444;">❌ Erreur de communication serveur.</div>`;
+                if (error.message !== 'Session expirée') {
+                    zone.innerHTML = `<div class="form-card" style="color: #ef4444;">❌ Erreur de communication serveur.</div>`;
+                }
             }
         }
 
@@ -1011,7 +1048,7 @@
             try {
                 tbody.innerHTML = `<tr><td colspan="8" class="loading-spinner">Chargement des données de simulation...</td></tr>`;
                 
-                const response = await fetch("/api/simulation/restauration");
+                const response = await apiFetch("/api/simulation/restauration");
                 originalSimData = await response.json();
 
                 // Stocker le prix original et le facteur annuel (nb_repas × enfants)
@@ -1188,11 +1225,13 @@
             content.textContent = "Chargement des logs techniques en cours...";
             
             try {
-                const response = await fetch('/api/logs/audit');
+                const response = await apiFetch('/api/logs/audit');
                 const text = await response.text();
                 content.textContent = text || "Aucun log technique disponible pour le moment.";
             } catch (error) {
-                content.textContent = "Erreur lors du chargement des logs : " + error;
+                if (error.message !== 'Session expirée') {
+                    content.textContent = "Erreur lors du chargement des logs : " + error;
+                }
             }
         }
 
@@ -1220,22 +1259,24 @@
         }
 
         async function resetGrille() {
-            await fetch("/api/reset-grille", { method: "POST" });
+            await apiFetch("/api/reset-grille", { method: "POST" });
             chargerGrilleActive();
         }
 
         async function chargerGrilleActive() {
-            const response = await fetch("/api/grille-active");
-            const data = await response.text();
-            document.getElementById("grilleActive").innerHTML = `Grille active : <strong>${data}</strong>`;
-            const miniNom = document.getElementById("grilleActiveNom");
-            if (miniNom) miniNom.innerText = data;
+            try {
+                const response = await apiFetch("/api/grille-active");
+                const data = await response.text();
+                document.getElementById("grilleActive").innerHTML = `Grille active : <strong>${data}</strong>`;
+                const miniNom = document.getElementById("grilleActiveNom");
+                if (miniNom) miniNom.innerText = data;
+            } catch(e) {}
         }
 
         // --- DASHBOARD DATA ---
         async function chargerDashboardData() {
             try {
-                const response = await fetch("/api/poles");
+                const response = await apiFetch("/api/poles");
                 const poles = await response.json();
                 
                 let html = poles.map(p => {
@@ -1278,7 +1319,7 @@
             zoneFinance.innerHTML = `<div class="loading-spinner">Analyse financière en cours...</div>`;
 
             try {
-                const response = await fetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
+                const response = await apiFetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
                 const data = await response.json();
 
                 // RENDU FINANCES
@@ -1343,7 +1384,7 @@
             const zone = document.getElementById("poleEnergieResult");
             try {
                 // Appel du nouvel endpoint d'audit complet
-                const response = await fetch("/api/analytique/fluides/audit");
+                const response = await apiFetch("/api/analytique/fluides/audit");
                 rawEnergieGlobale = await response.json();
                 renderEnergieGlobale("Tous");
             } catch (error) {
@@ -1499,10 +1540,12 @@
         }
 
         window.onload = () => {
+            // On vérifie d'abord l'authentification
+            checkAuth();
+            
+            // Les données ne seront chargées que si checkAuth() appelle afficherDashboard()
+            // Cependant, on initialise les icônes lucide quoi qu'il arrive
             lucide.createIcons();
-            chargerGrilleActive();
-            chargerDashboardData();
-            initialiserDiagnosticEnergie();
         };
     </script>
 </body>
