@@ -13,7 +13,7 @@ public class AnalytiqueFluideService {
 
     private static final String FICHIER = new File("Donnees/Autres/CALC DEP(4).xlsx").exists() 
         ? "Donnees/Autres/CALC DEP(4).xlsx" 
-        : "../Donnees/Autres/CALC DEP(4).xlsx";
+        : new File("CALC DEP(4).xlsx").exists() ? "CALC DEP(4).xlsx" : "../Donnees/Autres/CALC DEP(4).xlsx";
 
     private static final double PRIX_EAU_M3 = 4.50; 
     private static final double ABO_EAU_SEMESTRE = 10.67;

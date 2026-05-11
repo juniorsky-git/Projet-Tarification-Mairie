@@ -61,10 +61,15 @@
 - **Action (Architecture Git)** : Création d'une nouvelle branche isolée (`feature/simulateur-impact-familles`) pour protéger le code principal pendant l'ajout de cette fonctionnalité majeure.
 - **Action (Interface & UI)** : Ajout d'un nouvel onglet indépendant dans la navigation (`index.html`). Conception d'une interface en grille avec un bloc "Profil Famille" et un curseur dynamique "Hypothèse d'augmentation" (de 0 à +20%).
 - **Action (Logique Métier & JavaScript)** :
-  - **Profilage** : Mise en place de champs de saisie libres permettant de modéliser n'importe quel comportement (Choix de la Tranche QF, nombre de repas cantine/mois, jours de périscolaire, etc.).
-  - **Liaison Backend** : Connexion à l'API Java existante (`/api/tarifs/complet`) pour extraire de manière sécurisée la véritable grille tarifaire 2025 qui sert de socle de calcul.
-  - **Moteur de calcul** : Développement d'un algorithme JavaScript (`calculerImpact()`) qui s'exécute en temps réel. Il croise les habitudes de consommation de la famille avec les tarifs unitaires de sa tranche, applique le multiplicateur de hausse globale, et génère le résultat final.
-- **Résultat (Visuel)** : L'outil affiche instantanément 3 indicateurs clés formatés financièrement : La Facture de Base Actuelle (2025), la Facture Simulée (augmentée), et l'Écart mensuel (Le surcoût réel pour les parents).
+  - **Profilage Dynamique** : Mise en place de champs de saisie libres (Cantine, Périscolaire, Loisirs, Études) et d'une projection annuelle ajustable (Nombre de mois).
+  - **Tranches Intelligentes** : Le menu déroulant des tranches QF est désormais **généré dynamiquement** à partir de la grille active. Si une tranche (ex: B2 ou H) est présente dans l'Excel, elle apparaît automatiquement dans le simulateur.
+  - **Liaison Backend & Synchronisation** : Connexion à l'API Java (`/api/tarifs/complet`) avec rafraîchissement automatique à chaque clic sur l'onglet. L'utilisateur voit en permanence le nom de la source utilisée ("Base de calcul : Grille 2025" ou nom du fichier importé).
+  - **Moteur de calcul** : Algorithme JavaScript (`calculerImpact()`) recalculant instantanément le surcoût mensuel et annuel dès qu'une valeur est modifiée.
+- **Résultat (Visuel)** : Interface haut de gamme avec cartes de résultats colorées (Vert pour aucun surcoût, Rouge pour une hausse) et formatage monétaire français.
 
-## 5. Contexte futur (Prochaine étape)
+## 5. Vérification et Robustesse (Audit technique)
+- **Validation des données** : Vérification que le simulateur utilise bien la grille active en mémoire dans le backend Java, garantissant que les tests "What-If" ne sont pas basés sur des données obsolètes.
+- **Blindage** : Ajout de valeurs par défaut et de sécurités sur les saisies (pas de valeurs négatives, détection automatique des tranches "Extérieurs").
+
+## 6. Contexte futur (Prochaine étape)
 - Stabilisation complète du code source du fichier principal de l'application afin de préparer le terrain pour le nouveau module demandé : **Les subventions (Compte 206) aux associations crosnoises** (comparatif alloué 2025/2026).
