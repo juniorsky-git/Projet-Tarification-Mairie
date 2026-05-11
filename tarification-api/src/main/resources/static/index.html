@@ -303,6 +303,14 @@
                 <i data-lucide="search"></i>
                 <span>Consultation</span>
             </div>
+            <div class="nav-item" onclick="switchPage('simulation', this)">
+                <i data-lucide="line-chart"></i>
+                <span>Simulation financière</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('impact-familles', this)">
+                <i data-lucide="users"></i>
+                <span>Impact Familles</span>
+            </div>
             <div class="nav-item" onclick="switchPage('fluides-audit', this)">
                 <i data-lucide="droplets"></i>
                 <span>Audit Fluides</span>
@@ -354,7 +362,8 @@
             </div>
 
             <!-- CARD 1: Analyse Financière par pôle -->
-            <div class="form-card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+            <div class="form-card" style="height: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
                         <h3>Analyse financière par pôle</h3>
@@ -380,7 +389,7 @@
             </div>
 
             <!-- CARD 2: Diagnostic Énergie par pôle (Nouveau emplacement) -->
-            <div class="form-card" style="margin-top: 24px;">
+            <div class="form-card" style="height: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
                         <h3 id="titleEnergiePole">Diagnostic Énergie</h3>
@@ -431,6 +440,7 @@
                         </ul>
                     </div>
                 </div>
+            </div>
             </div>
 
         </div>
@@ -553,8 +563,23 @@
                     </button>
                 </div>
             </div>
-            <div id="simBudgetSummary" style="display: none;">
-                <!-- Masqué car l'utilisateur veut enlever les cards -->
+            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Recettes totales</div>
+                    <div class="value" id="sim-recettes-totales" style="color: #10b981; font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Dépenses totales</div>
+                    <div class="value" id="sim-depenses-totales" style="font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Écart global</div>
+                    <div class="value" id="sim-ecart-global" style="font-size: 1.75rem;">...</div>
+                </div>
+                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
+                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Taux de couverture moyen</div>
+                    <div class="value" id="sim-taux-moyen" style="color: #10b981; font-size: 1.75rem;">...</div>
+                </div>
             </div>
 
             <div class="table-container">
@@ -575,6 +600,103 @@
                         <!-- Corps généré par JS -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- PAGE : IMPACT FAMILLES (TEST AUGMENTATIONS) -->
+        <div id="page-impact-familles" class="content-page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1>Simulateur d'Impact Familles</h1>
+                    <p class="subtitle">Testez virtuellement l'effet d'une augmentation tarifaire sur la facture mensuelle d'une famille type.</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-bottom: 24px;">
+                <!-- PARAMÉTRAGE FAMILLE -->
+                <div class="form-card">
+                    <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="user-cog" style="color: var(--primary); width: 20px;"></i> Profil Famille
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div>
+                            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Tranche Tarifaire (Quotient Familial)</label>
+                            <select id="impact-tranche" onchange="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit;">
+                                <option value="A">Tranche A (QF < 380)</option>
+                                <option value="B">Tranche B (QF 381 - 510)</option>
+                                <option value="C" selected>Tranche C (QF 511 - 650)</option>
+                                <option value="D">Tranche D (QF 651 - 800)</option>
+                                <option value="E">Tranche E (QF 801 - 960)</option>
+                                <option value="F">Tranche F (QF 961 - 1130)</option>
+                                <option value="G">Tranche G (QF 1131 - 1300)</option>
+                                <option value="H">Tranche H (QF > 1300)</option>
+                                <option value="Extérieur">Extérieurs</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Cantine (Repas/mois)</label>
+                                <input type="number" id="impact-repas" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Périscolaire M+S (Jours/mois)</label>
+                                <input type="number" id="impact-peri" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Mercredis (Journées/mois)</label>
+                                <input type="number" id="impact-loisirs" value="4" min="0" max="5" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Études (Forfaits/mois)</label>
+                                <input type="number" id="impact-etudes" value="0" min="0" max="1" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LEVIER D'AUGMENTATION -->
+                <div class="form-card" style="background: var(--primary-bg); border-color: #bfdbfe;">
+                    <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--primary);">
+                        <i data-lucide="trending-up" style="width: 20px;"></i> Hypothèse d'Augmentation globale
+                    </h3>
+                    <p style="font-size: 0.85rem; color: #1e40af; margin-bottom: 20px;">Définissez le pourcentage d'augmentation à simuler sur toute la grille tarifaire de la famille.</p>
+                    
+                    <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #93c5fd; text-align: center;">
+                        <label style="font-size: 0.9rem; font-weight: 700; color: var(--primary); display: block; margin-bottom: 12px;">Hausse Tarifaire Globale (%)</label>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+                            <input type="range" id="impact-slider" min="0" max="20" step="0.5" value="0" oninput="updateImpactSlider(this.value)" style="flex: 1; accent-color: var(--primary);">
+                            <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 1.2rem; color: #1d4ed8; width: 80px;">
+                                <span id="impact-slider-val">0.0</span>%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RÉSULTATS -->
+            <div class="form-card" style="padding: 32px;">
+                <h3 style="margin-bottom: 24px; text-align: center; color: var(--text-main);">Facture Mensuelle (Simulation)</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; text-align: center;">
+                    <!-- ACTUEL -->
+                    <div style="background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Facture Base Actuelle</div>
+                        <div id="impact-res-actuel" style="font-size: 2.5rem; font-weight: 800; color: var(--text-main);">0,00 €</div>
+                    </div>
+                    
+                    <!-- SIMULATION -->
+                    <div style="background: #fff; padding: 24px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1);">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Facture Simulée</div>
+                        <div id="impact-res-simule" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">0,00 €</div>
+                    </div>
+
+                    <!-- ÉCART -->
+                    <div style="background: #f0fdf4; padding: 24px; border-radius: 12px; border: 1px solid #bbf7d0; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: #047857;" id="impact-ecart-label">Surcoût pour la famille</div>
+                        <div id="impact-res-ecart" style="font-size: 2rem; font-weight: 800; color: #10b981;">0,00 € <span style="font-size: 0.9rem; font-weight: 500;">/mois</span></div>
+                        <div id="impact-res-ecart-an" style="font-size: 0.85rem; font-weight: 600; margin-top: 8px; color: #047857;">Aucun surcoût</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -783,6 +905,8 @@
             if (element) element.classList.add('active');
 
             if (pageId === 'dashboard') chargerDashboardData();
+            if (pageId === 'simulation') chargerSimulationRestauration();
+            if (pageId === 'impact-familles') chargerImpactFamilles();
             if (pageId === 'fluides-audit') chargerAuditFluides();
             if (pageId === 'historique') afficherHistorique();
             
@@ -1342,16 +1466,17 @@
                     <div id="sub-finances" class="sub-page active" style="display: block; animation: fadeIn 0.4s ease;">
                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 48px;">
                             <div style="display: flex; flex-direction: column; gap: 24px;">
-                                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                    <div class="label" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; font-weight: 700;">Dépenses Totales Réelles</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
+                                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px;">
+                                    <div class="label" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; font-weight: 700;">Taux de couverture</div>
+                                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);"><span class="badge ${badgeClass}" style="font-size: 1.4rem; padding: 6px 12px;">${couverturePct}%</span></div>
                                 </div>
-                                <div style="padding-bottom: 24px; border-bottom: 1px solid #f1f5f9;">
-                                    <div class="label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Recettes annuelles estimées</div>
-                                    <div style="font-size: 2.25rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em;">${data.recettesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
-                                    <div style="font-size: 0.9rem; margin-top: 12px; font-weight: 500;">
-                                        Taux de couverture : <span class="badge ${badgeClass}">${couverturePct}%</span>
-                                    </div>
+                                <div style="padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 8px;">
+                                    <div class="label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Dépenses Totales Réelles</div>
+                                    <div style="font-size: 2.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em;">${data.depensesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0})}</div>
+                                </div>
+                                <div style="padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;">
+                                    <div class="label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Recettes annuelles estimées</div>
+                                    <div style="font-size: 2.25rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em;">${data.recettesTotales.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0})}</div>
                                 </div>
                                 <div style="display: flex; gap: 32px;">
                                     <div style="flex: 1;">
@@ -1509,7 +1634,87 @@
             }
         }
 
-        // --- HISTORIQUE ---
+        // --- API : SIMULATION (HIFI - RESTAURATION + WHAT-IF) ---
+        // --- API : SIMULATEUR IMPACT FAMILLES ---
+        let impactGrilleComplete = [];
+
+        async function chargerImpactFamilles() {
+            try {
+                // On récupère la grille 2025 de référence
+                const response = await apiFetch("/api/tarifs/complet");
+                impactGrilleComplete = await response.json();
+                
+                // On déclenche un premier calcul avec les valeurs par défaut
+                calculerImpact();
+            } catch (error) {
+                console.error("Erreur chargement grille impact:", error);
+            }
+        }
+
+        function updateImpactSlider(val) {
+            document.getElementById('impact-slider-val').innerText = parseFloat(val).toFixed(1);
+            calculerImpact();
+        }
+
+        function calculerImpact() {
+            if (!impactGrilleComplete || impactGrilleComplete.length === 0) return;
+
+            const trancheCible = document.getElementById('impact-tranche').value;
+            const nbRepas = parseInt(document.getElementById('impact-repas').value) || 0;
+            const nbPeri = parseInt(document.getElementById('impact-peri').value) || 0;
+            const nbLoisirs = parseInt(document.getElementById('impact-loisirs').value) || 0;
+            const nbEtudes = parseInt(document.getElementById('impact-etudes').value) || 0;
+            const pourcentHausse = parseFloat(document.getElementById('impact-slider').value) || 0;
+            const coefHausse = 1 + (pourcentHausse / 100);
+
+            // Trouver les tarifs de la tranche sélectionnée
+            const tarifObj = impactGrilleComplete.find(t => t.tranche.toUpperCase() === trancheCible.toUpperCase() || 
+                                                           (trancheCible === 'Extérieur' && t.tranche.toLowerCase().includes('ext')));
+            
+            if (!tarifObj) return;
+
+            // Calcul Facture Actuelle (Base 2025)
+            // On utilise les getters fournis par Tarif.java (ex: repas, periscolaireMatinSoir, accueilJournee, etudesForfaitMensuel)
+            const pRepas = tarifObj.repas || 0;
+            const pPeri = tarifObj.periscolaireMatinSoir || 0;
+            const pLoisirs = tarifObj.accueilJournee || 0;
+            const pEtudes = tarifObj.etudesForfaitMensuel || 0;
+
+            const factureActuelle = (nbRepas * pRepas) + (nbPeri * pPeri) + (nbLoisirs * pLoisirs) + (nbEtudes * pEtudes);
+            
+            // Calcul Facture Simulée
+            const factureSimulee = factureActuelle * coefHausse;
+            const ecartMois = factureSimulee - factureActuelle;
+            const ecartAn = ecartMois * 10; // (environ 10 mois d'école)
+
+            // Affichage avec formatage
+            document.getElementById('impact-res-actuel').innerText = factureActuelle.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
+            document.getElementById('impact-res-simule').innerText = factureSimulee.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
+            
+            const divEcart = document.getElementById('impact-res-ecart');
+            const divEcartAn = document.getElementById('impact-res-ecart-an');
+            const labelEcart = document.getElementById('impact-ecart-label');
+            const parent = divEcart.parentElement;
+            
+            if (ecartMois > 0) {
+                divEcart.innerText = '+' + ecartMois.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'}) + ' /mois';
+                divEcart.style.color = '#dc2626';
+                divEcartAn.innerText = 'Soit +' + ecartAn.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'}) + ' / an';
+                divEcartAn.style.color = '#991b1b';
+                labelEcart.style.color = '#dc2626';
+                parent.style.background = '#fef2f2';
+                parent.style.borderColor = '#fecaca';
+            } else {
+                divEcart.innerText = '0,00 € /mois';
+                divEcart.style.color = '#10b981';
+                divEcartAn.innerText = 'Aucun surcoût';
+                divEcartAn.style.color = '#047857';
+                labelEcart.style.color = '#047857';
+                parent.style.background = '#f0fdf4';
+                parent.style.borderColor = '#bbf7d0';
+            }
+        }
+
         function ajouterLog(action, detail) {
             const logs = JSON.parse(localStorage.getItem('mairie_logs') || '[]');
             logs.unshift({ action, detail, date: new Date().toLocaleString('fr-FR') });
