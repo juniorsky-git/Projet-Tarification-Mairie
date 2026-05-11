@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body onload="checkAuth()">
+<body>
 
     <!-- ===== LANDING PAGE ===== -->
     <div id="landing-page">
@@ -311,9 +311,13 @@
                 <i data-lucide="users"></i>
                 <span>Impact Familles</span>
             </div>
+            <div class="nav-item" onclick="switchPage('diagnostic-energie', this)">
+                <i data-lucide="zap"></i>
+                <span>Diagnostic Énergie</span>
+            </div>
             <div class="nav-item" onclick="switchPage('fluides-audit', this)">
                 <i data-lucide="droplets"></i>
-                <span>Audit Fluides</span>
+                <span>Audit S1/S2</span>
             </div>
             <div class="nav-item" onclick="switchPage('historique', this)">
                 <i data-lucide="history"></i>
@@ -362,7 +366,7 @@
             </div>
 
             <!-- CARD 1: Analyse Financière par pôle -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start;">
             <div class="form-card" style="height: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
@@ -387,20 +391,25 @@
                     </div>
                 </div>
             </div>
+            </div>
+        </div>
 
-            <!-- CARD 2: Diagnostic Énergie par pôle (Nouveau emplacement) -->
-            <div class="form-card" style="height: 100%;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h3 id="titleEnergiePole">Diagnostic Énergie</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Audit des consommations fluides pour le pôle sélectionné.</p>
-                    </div>
+        <!-- PAGE : DIAGNOSTIC ÉNERGIE (RÉEL VS THÉORIQUE) -->
+        <div id="page-diagnostic-energie" class="content-page">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1>Diagnostic Énergie (Performance)</h1>
+                    <p class="subtitle">Analyse comparative des factures réelles par rapport aux prévisions budgétaires.</p>
                 </div>
+                <button class="btn-primary" onclick="initialiserDiagnosticEnergie()">Rafraîchir le diagnostic</button>
+            </div>
+
+            <div class="form-card">
                 <div id="poleEnergieResult">
                     <div class="loading-spinner">Chargement du diagnostic global...</div>
                 </div>
 
-                <!-- GUIDE D'INTERPRÉTATION (REPOSITIONNÉ ICI) -->
+                <!-- GUIDE D'INTERPRÉTATION -->
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; animation: fadeIn 0.8s ease;">
                     <div>
                         <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -441,8 +450,6 @@
                     </div>
                 </div>
             </div>
-            </div>
-
         </div>
 
         <!-- PAGE : AUDIT FLUIDES (ISSUE #24) -->
@@ -457,7 +464,7 @@
 
             <!-- ONGLETS DE FILTRAGE PAR FLUIDE -->
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="btn-tab active" id="tab-fluide-tous" onclick="filtrerFluideAudit('tours', this)">Tous les fluides</button>
+                <button class="btn-tab active" id="tab-fluide-tous" onclick="filtrerFluideAudit('Tous', this)">Tous les fluides</button>
                 <button class="btn-tab" onclick="filtrerFluideAudit('Eau', this)">Eau</button>
                 <button class="btn-tab" onclick="filtrerFluideAudit('Gaz', this)">Gaz</button>
                 <button class="btn-tab" onclick="filtrerFluideAudit('Electricité', this)">Électricité</button>
@@ -622,15 +629,15 @@
                         <div>
                             <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Tranche Tarifaire (Quotient Familial)</label>
                             <select id="impact-tranche" onchange="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit;">
-                                <option value="A">Tranche A (QF < 380)</option>
-                                <option value="B">Tranche B (QF 381 - 510)</option>
-                                <option value="C" selected>Tranche C (QF 511 - 650)</option>
-                                <option value="D">Tranche D (QF 651 - 800)</option>
-                                <option value="E">Tranche E (QF 801 - 960)</option>
-                                <option value="F">Tranche F (QF 961 - 1130)</option>
-                                <option value="G">Tranche G (QF 1131 - 1300)</option>
-                                <option value="H">Tranche H (QF > 1300)</option>
-                                <option value="Extérieur">Extérieurs</option>
+                                <option value="A">Tranche A — QF ≥ 18 000 €</option>
+                                <option value="B">Tranche B — QF 15 000 à 17 999 €</option>
+                                <option value="B2">Tranche B2 — QF 13 000 à 14 999 €</option>
+                                <option value="C" selected>Tranche C — QF 11 000 à 12 999 €</option>
+                                <option value="D">Tranche D — QF 9 000 à 10 999 €</option>
+                                <option value="E">Tranche E — QF 7 000 à 8 999 €</option>
+                                <option value="F">Tranche F — QF 5 000 à 6 999 €</option>
+                                <option value="F2">Tranche F2 — QF 3 000 à 4 999 €</option>
+                                <option value="G">Tranche G — QF 0 à 2 999 €</option>
                             </select>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -700,33 +707,7 @@
             </div>
         </div>
 
-        <!-- PAGE : GESTION DES GRILLES -->
-        <div id="page-gestion" class="content-page">
-            <h1>Gestion des grilles Excel</h1>
-            <p class="subtitle">Importez et gérez vos grilles tarifaires en toute sécurité.</p>
-
-            <div class="form-card">
-                <div style="border: 2px dashed var(--border); padding: 40px; border-radius: var(--radius); text-align: center;">
-                    <i data-lucide="cloud-upload" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
-                    <h3>Déposez votre fichier Excel ici</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 24px;">Formats acceptés : .xlsx, .xls</p>
-                    <input type="file" id="fichierExcel" accept=".xls,.xlsx" style="display: none;">
-                    <button class="btn-primary" onclick="document.getElementById('fichierExcel').click()">Sélectionner un fichier</button>
-                    <button class="btn-primary" style="background: #10b981; margin-left: 10px;" onclick="uploaderFichier()">Charger maintenant</button>
-                </div>
-                <div id="uploadResultat" style="margin-top: 20px; font-weight: 500;"></div>
-            </div>
-
-            <div class="form-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3>Grilles disponibles</h3>
-                    <button class="btn-primary" style="background: white; color: var(--text-main); border: 1px solid var(--border);" onclick="resetGrille()">Réinitialiser (2025)</button>
-                </div>
-                <div id="grilleActive" style="padding: 16px; background: #f8fafc; border-radius: 8px;">
-                    <!-- Info grille active -->
-                </div>
-            </div>
-        </div>
+        <!-- page-gestion supprimée : fonctionnalités consolidées dans page-parametres -->
 
         <div id="page-historique" class="content-page">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
@@ -835,10 +816,9 @@
             fermerLogin();
             document.body.classList.add('authenticated');
             
-            // Chargement complet des données
+            // Chargement des données du tableau de bord
             chargerDashboardData();
             chargerGrilleActive();
-            initialiserDiagnosticEnergie();
         }
 
         function ouvrirLogin() {
@@ -907,9 +887,11 @@
             if (pageId === 'dashboard') chargerDashboardData();
             if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'impact-familles') chargerImpactFamilles();
+            if (pageId === 'diagnostic-energie') initialiserDiagnosticEnergie();
             if (pageId === 'fluides-audit') chargerAuditFluides();
             if (pageId === 'historique') afficherHistorique();
-            
+            if (pageId === 'parametres') chargerGrilleActive();
+
             // Re-render icons
             lucide.createIcons();
         }
@@ -917,12 +899,25 @@
         // --- GESTION DES REQUÊTES API AVEC AUTO-LOGIN ---
         async function apiFetch(url, options = {}) {
             const response = await fetch(url, options);
+
+            // Cas 1 : Spring Security retourne explicitement 401
             if (response.status === 401) {
-                // Session expirée ou non connecté
                 localStorage.removeItem('mairie_auth');
                 ouvrirLogin();
                 throw new Error('Session expirée');
             }
+
+            // Cas 2 : Spring Security redirige vers /login (302 → 200 HTML)
+            // fetch suit automatiquement les redirects, on reçoit donc 200
+            // mais avec du HTML au lieu de JSON
+            const contentType = response.headers.get('Content-Type') || '';
+            if (contentType.includes('text/html')) {
+                // La session a expiré côté serveur, on force la reconnexion
+                localStorage.removeItem('mairie_auth');
+                ouvrirLogin();
+                throw new Error('Session expirée');
+            }
+
             return response;
         }
 
@@ -1480,7 +1475,7 @@
                                 </div>
                                 <div style="display: flex; gap: 32px;">
                                     <div style="flex: 1;">
-                                        <div class="label" style="font-size: 0.7rem; color: var(--text-muted);">Suvention Ville</div>
+                                        <div class="label" style="font-size: 0.7rem; color: var(--text-muted);">Subvention Ville</div>
                                         <div style="font-size: 1.1rem; font-weight: 700; color: ${data.ecart < 0 ? '#ef4444' : '#10b981'}">${data.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}</div>
                                     </div>
                                     <div style="flex: 1;">
@@ -1643,11 +1638,19 @@
                 // On récupère la grille 2025 de référence
                 const response = await apiFetch("/api/tarifs/complet");
                 impactGrilleComplete = await response.json();
-                
+
                 // On déclenche un premier calcul avec les valeurs par défaut
                 calculerImpact();
             } catch (error) {
                 console.error("Erreur chargement grille impact:", error);
+                // Afficher un message dans les zones résultat si l'API échoue
+                const zones = ['impact-res-actuel', 'impact-res-simule', 'impact-res-ecart'];
+                zones.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = 'N/A';
+                });
+                const ecartAn = document.getElementById('impact-res-ecart-an');
+                if (ecartAn) ecartAn.innerText = 'Grille tarifaire non chargée — vérifiez le serveur.';
             }
         }
 
@@ -1657,7 +1660,10 @@
         }
 
         function calculerImpact() {
-            if (!impactGrilleComplete || impactGrilleComplete.length === 0) return;
+            if (!impactGrilleComplete || impactGrilleComplete.length === 0) {
+                // Grille non encore chargée, on attend le retour API
+                return;
+            }
 
             const trancheCible = document.getElementById('impact-tranche').value;
             const nbRepas = parseInt(document.getElementById('impact-repas').value) || 0;
@@ -1744,13 +1750,10 @@
             }
         }
 
-        window.onload = () => {
-            // On vérifie d'abord l'authentification
+        // Initialisation : on attend que TOUTES les ressources soient chargées
+        // (y compris Lucide CDN) avant de démarrer l'application
+        window.onload = function() {
             checkAuth();
-            
-            // Les données ne seront chargées que si checkAuth() appelle afficherDashboard()
-            // Cependant, on initialise les icônes lucide quoi qu'il arrive
-            lucide.createIcons();
         };
     </script>
 </body>
