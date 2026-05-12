@@ -68,4 +68,54 @@ public class DonneesBudgetaires {
         });
         return distribution;
     }
+
+    /**
+     * Lit les recettes réelles depuis l'onglet 'recettes' du fichier 'Depenses recettes nf.xlsx'.
+     */
+    public Map<String, Double> chargerRecettesReelles() {
+        Map<String, Double> recettes = new java.util.HashMap<>();
+        try {
+            java.io.File file = new java.io.File("Depenses recettes nf.xlsx");
+            if (!file.exists()) {
+                file = new java.io.File("tarification-api/Depenses recettes nf.xlsx");
+            }
+            if (file.exists()) {
+                try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
+                     org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
+                     
+                    org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheet("recettes");
+                    if (sheet != null) {
+                        org.apache.poi.ss.usermodel.Row rowTotal = sheet.getRow(10); // Ligne 11 (index 10)
+                        if (rowTotal != null) {
+                            double restauration = getNumericCellValue(rowTotal.getCell(1)) + getNumericCellValue(rowTotal.getCell(2));
+                            double loisirs = getNumericCellValue(rowTotal.getCell(3)) + getNumericCellValue(rowTotal.getCell(4)) + getNumericCellValue(rowTotal.getCell(5));
+                            double scolaire = getNumericCellValue(rowTotal.getCell(6));
+                            double ados = getNumericCellValue(rowTotal.getCell(7));
+                            double sejours = getNumericCellValue(rowTotal.getCell(8));
+                            
+                            recettes.put("Restauration", restauration);
+                            recettes.put("Accueil de Loisirs", loisirs);
+                            // On map le scolaire sur l'accueil périscolaire et les études surveillées (50/50 pour l'instant)
+                            recettes.put("Accueil periscolaire", scolaire * 0.5);
+                            recettes.put("Etudes surveillees", scolaire * 0.5);
+                            recettes.put("Espace Ados", ados);
+                            recettes.put("Sejours", sejours);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return recettes;
+    }
+    
+    private double getNumericCellValue(org.apache.poi.ss.usermodel.Cell cell) {
+        if (cell == null) return 0.0;
+        try {
+            return cell.getNumericCellValue();
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
 }

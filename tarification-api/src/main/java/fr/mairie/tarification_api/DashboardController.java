@@ -45,6 +45,7 @@ public class DashboardController {
             
             // Chargement dynamique des données (Lecture Excel fraîche)
             List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques();
+            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles();
 
             return tousLesPoles.stream()
                     .filter(p -> {
@@ -60,38 +61,8 @@ public class DashboardController {
                         r.unitesAnnuelles = p.unitesAnnuelles();
                         r.detailsCharges = p.chargesDetaillees();
                         
-                        // --- LOGIQUE DE CALCUL DES RECETTES DYNAMIQUE ---
-                        double recettes = 0;
-                        List<Tarif> tarifs = DonneesTarifs.chargerTarifsReference();
-                        String serviceKey = getServiceKeyForPole(p.nom());
-                        
-                        if (p.distributionTranches() != null && serviceKey != null) {
-                            double volumeMoyen = 1.0; 
-                            Integer ne = p.nombreEnfants();
-                            Integer ua = p.unitesAnnuelles();
-                            
-                            if (ne != null && ne > 0 && ua != null) {
-                                volumeMoyen = (double) ua / ne;
-                            }
-
-                            // Agrégation des recettes par tranche de Quotient Familial (QF)
-                            for (Map.Entry<String, Integer> entry : p.distributionTranches().entrySet()) {
-                                String tranche = entry.getKey();
-                                Integer count = entry.getValue();
-                                
-                                double prixTranche = tarifs.stream()
-                                    .filter(t -> {
-                                        return t.getTranche().equalsIgnoreCase(tranche);
-                                    })
-                                    .findFirst()
-                                    .map(t -> {
-                                        return t.getPrix(serviceKey);
-                                    })
-                                    .orElse(0.0);
-                                
-                                recettes += (count * prixTranche * volumeMoyen);
-                            }
-                        }
+                        // --- UTILISATION DES RECETTES RÉELLES (COMPTABILITÉ) ---
+                        double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
                         
                         // Finalisation des indicateurs financiers
                         r.recettesTotales = recettes;

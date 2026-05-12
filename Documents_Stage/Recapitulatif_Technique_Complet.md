@@ -51,11 +51,50 @@ Cette approche garantit que l'interface ne tentera jamais de traiter du HTML com
 
 ---
 
-## 4. Revue de Code (Code Review) - 11 Mai 2026
+## 4. Intégration Financière Réelle et UX Avancée (12 Mai 2026)
+
+### 4.1. Bascule vers les Données Comptables Réelles
+**Objectif :** Remplacer les estimations théoriques par les flux financiers réels issus de la comptabilité de la Ville.
+*   **Méthodologie (Reverse Engineering) :** Analyse structurelle du fichier `Depenses recettes nf.xlsx` via scripts PowerShell pour identifier les "cellules cibles" (Ligne 11 du feuillet 'recettes').
+*   **Mapping Dynamique :** Implémentation d'un parser Java (`DonneesBudgetaires.java`) utilisant **Apache POI**.
+
+**Exemple de logique de lecture Excel :**
+```java
+// Extraction chirurgicale des totaux (Ligne 11)
+Row rowTotal = sheet.getRow(10); 
+double restauration = getNumericCellValue(rowTotal.getCell(1))   // RESTCOMM
+                    + getNumericCellValue(rowTotal.getCell(2));  // RESTSCOLL
+
+// Mapping sur les objets métiers du Dashboard
+recettes.put("Restauration", restauration);
+```
+
+*   **Synchronisation API :** Le `DashboardController` a été refondu pour injecter ces valeurs prioritaires.
+```java
+// On substitue l'ancien calcul simulé par la donnée comptable
+double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
+r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
+```
+
+### 4.2. Design Système "HiFi" et Typographie Financière
+**Objectif :** Rendre les chiffres de gros volumes (millions d'euros) plus percutants et lisibles.
+*   **Optimisation Typographique :** Utilisation de propriétés CSS avancées pour stabiliser les montants.
+```css
+.stat-card .value {
+    font-variant-numeric: tabular-nums; /* Alignement parfait des chiffres */
+    letter-spacing: 0.06em;           /* Aération des groupes de milliers */
+    font-weight: 800;
+}
+```
+*   **Hiérarchie Visuelle :** Refonte des "Stat Cards" pour centrer l'attention sur la dépense réelle (Chiffre Héros) tout en reléguant le taux de couverture en indicateur de performance secondaire.
+
+---
+
+## 5. Revue de Code (Code Review)
 J'ai identifié et résolu 13 points techniques, dont les plus notables :
-*   **Consolidation des Vues :** Suppression de la page `page-gestion` dont les IDs entraient en conflit avec `page-parametres`. Cette redondance provoquait l'échec de la mise à jour de la "Grille Active".
-*   **Correction Typographique Métier :** Correction du label `Suvention Ville` en `Subvention Ville` dans les templates littéraux du Dashboard.
-*   **Auto-chargement Intelligent :** Modification du `switchPage` pour déclencher `chargerGrilleActive()` uniquement lors de l'accès aux paramètres, réduisant la charge serveur au démarrage.
+*   **Consolidation des Vues :** Suppression de la page `page-gestion` dont les IDs entraient en conflit avec `page-parametres`.
+*   **Alignement API de Détail :** Mise à jour du `DashboardController` pour synchroniser les vues détaillées avec les recettes réelles de l'Excel.
+*   **Auto-chargement Intelligent :** Optimisation du cycle de vie des scripts pour éviter les surcharges serveur.
 
 ---
 

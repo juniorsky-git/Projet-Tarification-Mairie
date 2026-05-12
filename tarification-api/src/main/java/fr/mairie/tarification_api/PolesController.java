@@ -42,8 +42,10 @@ public class PolesController {
     @GetMapping
     public ResponseEntity<?> getAllPoles() {
         List<DepensePole> poles = budgetService.chargerPolesDynamiques();
-        List<Tarif> tarifs = DonneesTarifs.chargerTarifsReference();
         List<AnalytiqueFluide> fluides = analytiqueFluideService.analyserTout();
+        
+        // Chargement des VRAIES recettes depuis l'Excel (Fichier REC F 74 et 70)
+        Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles();
 
         List<Map<String, Object>> enrichis = poles.stream().map(p -> {
             Map<String, Object> map = new java.util.HashMap<>();
@@ -51,23 +53,12 @@ public class PolesController {
             map.put("depensesTotales", p.depensesTotales());
             map.put("nombreEnfants", p.nombreEnfants());
             
-            // Calcul Recettes Simplifié
-            double recettes = 0;
-            String key = getServiceKey(p.nom());
-            if (key != null && p.distributionTranches() != null) {
-                Integer ua = p.unitesAnnuelles();
-                Integer ne = p.nombreEnfants();
-                double vol = (ne != null && ne > 0 && ua != null) 
-                    ? (double) ua / ne : 1.0;
-                for (Map.Entry<String, Integer> entry : p.distributionTranches().entrySet()) {
-                    double prix = tarifs.stream()
-                        .filter(t -> t.getTranche().equalsIgnoreCase(entry.getKey()))
-                        .findFirst().map(t -> t.getPrix(key)).orElse(0.0);
-                    recettes += (entry.getValue() * prix * vol);
-                }
-            }
+            // Calcul du Taux de Couverture avec les Vraies Recettes
+            double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
             double couverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
+            
             map.put("tauxCouverture", couverture);
+            map.put("recettesTotales", recettes); // Ajouté pour future utilisation potentielle
 
             // Performance Fluides (Score moyen d'écart)
             double ecartMoyen = fluides.stream()
