@@ -640,22 +640,64 @@
                                 <option value="G">Tranche G — QF 0 à 2 999 €</option>
                             </select>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+                        <!-- PÔLES MUNICIPAUX EXHAUSTIFS -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            
+                            <!-- Pôle Restauration -->
                             <div>
-                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Cantine (Repas/mois)</label>
-                                <input type="number" id="impact-repas" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                                <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Pôle Restauration</h4>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Cantine (Repas/mois)</label>
+                                        <input type="number" id="impact-repas" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Pôle Enfance / Périscolaire -->
                             <div>
-                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Périscolaire M+S (Jours/mois)</label>
-                                <input type="number" id="impact-peri" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                                <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Pôle Enfance</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Périscolaire M+S (Jours)</label>
+                                        <input type="number" id="impact-peri" value="16" min="0" max="31" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Mercredis (Journées)</label>
+                                        <input type="number" id="impact-loisirs" value="4" min="0" max="5" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                    <div style="grid-column: span 2;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Études (Forfaits)</label>
+                                        <input type="number" id="impact-etudes" value="0" min="0" max="1" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Pôle Jeunesse / Ados -->
                             <div>
-                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Mercredis (Journées/mois)</label>
-                                <input type="number" id="impact-loisirs" value="4" min="0" max="5" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                                <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Pôle Jeunesse (Ados)</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Vacances (Jours)</label>
+                                        <input type="number" id="impact-ados-vac" value="0" min="0" max="10" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Sorties (Unité)</label>
+                                        <input type="number" id="impact-ados-sorties" value="0" min="0" max="5" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Pôle Scolaire / Séjours -->
                             <div>
-                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Études (Forfaits/mois)</label>
-                                <input type="number" id="impact-etudes" value="0" min="0" max="1" oninput="calculerImpact()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+                                <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 4px;">Pôle Scolaire / Séjours</h4>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Séjours / Classes (Nuits)</label>
+                                        <input type="number" id="impact-sejours" value="0" min="0" max="10" oninput="calculerImpact()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1406,16 +1448,30 @@
                     const dotClass = (perfEnergie > 15) ? 'red' : 'green';
 
                     return `
-                    <div class="stat-card" style="padding: 24px; border: 1px solid var(--border); box-shadow: none; background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')" title="Cliquer pour voir le détail">
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="pulse-dot ${dotClass}"></span>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">${p.nom}</div>
-                            </div>
-                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-left: 16px; margin-top: 4px;">${couverturePct}% <span style="font-size: 0.6rem; font-weight: 400; color: var(--text-muted);">de couverture</span></div>
-                        </div>
+                    <div class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: box-shadow 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
                         
-                        <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em;">${p.depensesTotales.toLocaleString()} €</div>
+                        <!-- Nom du pôle + pastille -->
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
+                            <span class="pulse-dot ${dotClass}" style="flex-shrink: 0;"></span>
+                            <div style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; line-height: 1.3;">${p.nom}</div>
+                        </div>
+
+                        <!-- CHIFFRE HÉROS : les dépenses -->
+                        <div style="margin-bottom: 8px; padding: 10px 0;">
+                            <div style="font-size: 1.7rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; line-height: 1.1;">
+                                ${p.depensesTotales.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<span style="font-size: 0.65em; font-weight: 600; color: var(--text-muted); margin-left: 6px; letter-spacing: 0;">€</span>
+                            </div>
+                            <div style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-top: 6px;">Dépenses réelles</div>
+                        </div>
+
+                        <!-- Séparateur -->
+                        <div style="border-top: 1px solid #f1f5f9; margin: 12px 0;"></div>
+
+                        <!-- Badge secondaire : taux de couverture -->
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.05rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums;">${couverturePct}%</span>
+                            <span style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600;">Taux de couverture</span>
+                        </div>
                     </div>
                 `;}).join('');
                 
@@ -1661,7 +1717,6 @@
 
         function calculerImpact() {
             if (!impactGrilleComplete || impactGrilleComplete.length === 0) {
-                // Grille non encore chargée, on attend le retour API
                 return;
             }
 
@@ -1670,30 +1725,35 @@
             const nbPeri = parseInt(document.getElementById('impact-peri').value) || 0;
             const nbLoisirs = parseInt(document.getElementById('impact-loisirs').value) || 0;
             const nbEtudes = parseInt(document.getElementById('impact-etudes').value) || 0;
+            const nbAdosVac = parseInt(document.getElementById('impact-ados-vac').value) || 0;
+            const nbAdosSorties = parseInt(document.getElementById('impact-ados-sorties').value) || 0;
+            const nbSejours = parseInt(document.getElementById('impact-sejours').value) || 0;
+            
             const pourcentHausse = parseFloat(document.getElementById('impact-slider').value) || 0;
             const coefHausse = 1 + (pourcentHausse / 100);
 
-            // Trouver les tarifs de la tranche sélectionnée
             const tarifObj = impactGrilleComplete.find(t => t.tranche.toUpperCase() === trancheCible.toUpperCase() || 
                                                            (trancheCible === 'Extérieur' && t.tranche.toLowerCase().includes('ext')));
             
             if (!tarifObj) return;
 
-            // Calcul Facture Actuelle (Base 2025)
-            // On utilise les getters fournis par Tarif.java (ex: repas, periscolaireMatinSoir, accueilJournee, etudesForfaitMensuel)
+            // Tarifs unitaires 2025
             const pRepas = tarifObj.repas || 0;
             const pPeri = tarifObj.periscolaireMatinSoir || 0;
             const pLoisirs = tarifObj.accueilJournee || 0;
             const pEtudes = tarifObj.etudesForfaitMensuel || 0;
+            const pAdosVac = tarifObj.adosVacJourneeRepas || 0;
+            const pAdosSorties = tarifObj.adosSortieJournee || 0;
+            const pSejours = tarifObj.sejour5Jours || 0; // On prend le tarif 5 jours comme base
 
-            const factureActuelle = (nbRepas * pRepas) + (nbPeri * pPeri) + (nbLoisirs * pLoisirs) + (nbEtudes * pEtudes);
+            const factureActuelle = (nbRepas * pRepas) + (nbPeri * pPeri) + (nbLoisirs * pLoisirs) + 
+                                    (nbEtudes * pEtudes) + (nbAdosVac * pAdosVac) + 
+                                    (nbAdosSorties * pAdosSorties) + (nbSejours * pSejours);
             
-            // Calcul Facture Simulée
             const factureSimulee = factureActuelle * coefHausse;
             const ecartMois = factureSimulee - factureActuelle;
-            const ecartAn = ecartMois * 10; // (environ 10 mois d'école)
+            const ecartAn = ecartMois * 10; 
 
-            // Affichage avec formatage
             document.getElementById('impact-res-actuel').innerText = factureActuelle.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
             document.getElementById('impact-res-simule').innerText = factureSimulee.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
             
