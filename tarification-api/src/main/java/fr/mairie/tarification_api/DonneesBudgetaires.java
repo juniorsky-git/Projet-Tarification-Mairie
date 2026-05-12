@@ -70,36 +70,50 @@ public class DonneesBudgetaires {
     }
 
     /**
-     * Lit les recettes réelles depuis l'onglet 'recettes' du fichier 'Depenses recettes nf.xlsx'.
+     * Algorithme de récupération dynamique des recettes depuis le tableau synthétique de l'Excel.
      */
     public Map<String, Double> chargerRecettesReelles() {
         Map<String, Double> recettes = new java.util.HashMap<>();
         try {
             java.io.File file = new java.io.File("Depenses recettes nf.xlsx");
-            if (!file.exists()) {
-                file = new java.io.File("tarification-api/Depenses recettes nf.xlsx");
-            }
+            if (!file.exists()) file = new java.io.File("../Depenses recettes nf.xlsx");
+            if (!file.exists()) file = new java.io.File("tarification-api/Depenses recettes nf.xlsx");
+            
             if (file.exists()) {
                 try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
                      org.apache.poi.ss.usermodel.Workbook workbook = org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
-                     
+                    
                     org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheet("recettes");
                     if (sheet != null) {
-                        org.apache.poi.ss.usermodel.Row rowTotal = sheet.getRow(10); // Ligne 11 (index 10)
-                        if (rowTotal != null) {
-                            double restauration = getNumericCellValue(rowTotal.getCell(1)) + getNumericCellValue(rowTotal.getCell(2));
-                            double loisirs = getNumericCellValue(rowTotal.getCell(3)) + getNumericCellValue(rowTotal.getCell(4)) + getNumericCellValue(rowTotal.getCell(5));
-                            double scolaire = getNumericCellValue(rowTotal.getCell(6));
-                            double ados = getNumericCellValue(rowTotal.getCell(7));
-                            double sejours = getNumericCellValue(rowTotal.getCell(8));
-                            
-                            recettes.put("Restauration", restauration);
-                            recettes.put("Accueil de Loisirs", loisirs);
-                            // On map le scolaire sur l'accueil périscolaire et les études surveillées (50/50 pour l'instant)
-                            recettes.put("Accueil periscolaire", scolaire * 0.5);
-                            recettes.put("Etudes surveillees", scolaire * 0.5);
-                            recettes.put("Espace Ados", ados);
-                            recettes.put("Sejours", sejours);
+                        // 1. Localiser le début du tableau synthétique
+                        int rowStart = -1;
+                        int colStart = -1;
+                        for (int r = 0; r < 50; r++) {
+                            org.apache.poi.ss.usermodel.Row row = sheet.getRow(r);
+                            if (row == null) continue;
+                            for (int c = 0; c < 10; c++) {
+                                org.apache.poi.ss.usermodel.Cell cell = row.getCell(c);
+                                if (cell != null && cell.toString().contains("Tableau synthetique des recettes")) {
+                                    rowStart = r;
+                                    colStart = c;
+                                    break;
+                                }
+                            }
+                            if (rowStart != -1) break;
+                        }
+
+                        // 2. Extraire les données de la ligne "Total" (située 4 lignes plus bas)
+                        if (rowStart != -1) {
+                            org.apache.poi.ss.usermodel.Row rowTotal = sheet.getRow(rowStart + 4);
+                            if (rowTotal != null) {
+                                recettes.put("Restauration", getNumericCellValue(rowTotal.getCell(colStart + 1)));
+                                recettes.put("Accueil de Loisirs", getNumericCellValue(rowTotal.getCell(colStart + 2)));
+                                recettes.put("Accueil periscolaire", getNumericCellValue(rowTotal.getCell(colStart + 3)));
+                                recettes.put("Etudes surveillees", getNumericCellValue(rowTotal.getCell(colStart + 4)));
+                                recettes.put("Espace Ados", getNumericCellValue(rowTotal.getCell(colStart + 5)));
+                                // Séjours + Classes de découverte
+                                recettes.put("Sejours", getNumericCellValue(rowTotal.getCell(colStart + 6)) + getNumericCellValue(rowTotal.getCell(colStart + 7)));
+                            }
                         }
                     }
                 }

@@ -58,15 +58,23 @@ Cette approche garantit que l'interface ne tentera jamais de traiter du HTML com
 *   **Méthodologie (Reverse Engineering) :** Analyse structurelle du fichier `Depenses recettes nf.xlsx` via scripts PowerShell pour identifier les "cellules cibles" (Ligne 11 du feuillet 'recettes').
 *   **Mapping Dynamique :** Implémentation d'un parser Java (`DonneesBudgetaires.java`) utilisant **Apache POI**.
 
-**Exemple de logique de lecture Excel :**
-```java
-// Extraction chirurgicale des totaux (Ligne 11)
-Row rowTotal = sheet.getRow(10); 
-double restauration = getNumericCellValue(rowTotal.getCell(1))   // RESTCOMM
-                    + getNumericCellValue(rowTotal.getCell(2));  // RESTSCOLL
+**Fonctionnement de l'algorithme (Extraction en 3 étapes) :**
+1.  **Le Radar 📡 :** Le code scanne les 50 premières lignes pour détecter le mot-clé *"Tableau synthetique des recettes"*. Cela crée un **point d'ancrage dynamique**.
+2.  **Le Saut 🎯 :** Une fois l'ancrage trouvé, l'algorithme "saute" de 4 lignes vers le bas pour atteindre automatiquement la ligne des **Totaux**.
+3.  **L'Extraction Chirurgicale 💉 :** Les valeurs sont extraites colonne par colonne. Pour le pôle **Séjours**, l'algorithme réalise une auto-sommation des colonnes "Séjours" et "Classes de découverte".
 
-// Mapping sur les objets métiers du Dashboard
-recettes.put("Restauration", restauration);
+**Illustration du code source :**
+```java
+// Recherche du tableau par mot-clé dans les 50 premières lignes
+if (cell.toString().contains("Tableau synthetique des recettes")) {
+    rowStart = r; // Point d'ancrage trouvé
+}
+
+// Extraction des données de la ligne "Total" relative au point d'ancrage
+Row rowTotal = sheet.getRow(rowStart + 4);
+recettes.put("Restauration", getNumericCellValue(rowTotal.getCell(colStart + 1)));
+recettes.put("Accueil de Loisirs", getNumericCellValue(rowTotal.getCell(colStart + 2)));
+// ... suite du mapping dynamique
 ```
 
 *   **Synchronisation API :** Le `DashboardController` a été refondu pour injecter ces valeurs prioritaires.
@@ -105,6 +113,32 @@ J'ai identifié et résolu 13 points techniques, dont les plus notables :
 *   **Précision des Calculs :** Certifiée conforme Grille 2025 (Pôles A-G).
 
 ---
-*Ce rapport constitue une preuve technique des travaux de maintenance et d'évolution logicielle réalisés pour le compte de la Mairie de Crosne.*
+
+## 6. Systèmes de Rapports Maîtres (Aide à la Décision)
+**Évolution Majeure :** Passage d'un export client vers un moteur de rendu PDF Backend (`Apache PDFBox`).
+*   **Contenu du Rapport :** Synthèse budgétaire consolidée, analyse granulaire des charges par pôle, et **Audit Énergétique exhaustif**.
+*   **Utilité Agent :** Permet la production instantanée du dossier de commission de tarification, certifié par les données réelles de l'Excel.
+
+## 8. Workflow de Développement & Logique de Résolution (12 Mai 2026)
+Cette section détaille la démarche intellectuelle appliquée pour finaliser le système de rapport maître.
+
+### 8.1. Phase de Diagnostic (Le "Radar") 📡
+*   **Analyse du Besoin** : L'agent municipal ne peut se contenter d'une capture d'écran. Il a besoin d'un document PDF autonome, structuré, capable de servir de pièce officielle en commission.
+*   **Identification des Blocages** : L'ancien service de rapport était "orphelin" (issu d'une version pré-refactorisation) et ne pointait plus vers les bonnes sources de données (conflit entre `CALC DEP (3)` et `CALC DEP(4)`).
+
+### 8.2. Phase d'Action (L'Implémentation) 🛠️
+*   **Migration HiFi** : Création de `RapportDecisifService.java`. J'ai choisi d'utiliser **Apache PDFBox** pour sa précision chirurgicale sur la mise en page (bandeaux institutionnels, gestion des sauts de page).
+*   **Unification Backend** : Plutôt que de recalculer côté client, le rapport interroge directement le `Calculateur` et l' `AnalytiqueFluideService` pour garantir une "Source de Vérité" unique.
+
+### 8.3. Phase de Blindage (Résolution des Erreurs) 🛡️
+*   **Problématique constatée** : Lors des tests, la génération a échoué avec une erreur 500 liée à l'absence des fichiers Excel dans le contexte d'exécution de l'API.
+*   **Logique de Correction** :
+    1.  **Chemins Adaptatifs** : Implémentation d'une logique de recherche de fichiers à triple détente (`local` -> `parent` -> `root`) pour que l'appli fonctionne quel que soit le dossier de lancement.
+    2.  **Modularité Résiliente** : Modification du `RapportController` pour utiliser des blocs `try-catch` isolés. Si l'audit des fluides est indisponible, le rapport est généré partiellement au lieu de bloquer l'agent.
+
+---
+
+*Ce document constitue une preuve technique des travaux de maintenance et d'évolution logicielle réalisés pour le compte de la Mairie de Crosne.*
 
 **Signé :** Séri-khane YOLOU, Développeur en charge du projet.
+**Date de clôture :** 12 Mai 2026

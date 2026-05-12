@@ -319,6 +319,10 @@
                 <i data-lucide="droplets"></i>
                 <span>Audit S1/S2</span>
             </div>
+            <div class="nav-item" onclick="switchPage('rapports', this)">
+                <i data-lucide="file-text"></i>
+                <span>Rapports Maîtres</span>
+            </div>
             <div class="nav-item" onclick="switchPage('historique', this)">
                 <i data-lucide="history"></i>
                 <span>Historique</span>
@@ -568,6 +572,10 @@
                     <button onclick="resetSimulation()" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">
                         Réinitialiser (Excel)
                     </button>
+                    <button onclick="genererRapportPDF()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                        Exporter PDF
+                    </button>
                 </div>
             </div>
             <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
@@ -609,6 +617,47 @@
                 </table>
             </div>
         </div>
+        
+        <!-- PAGE : RAPPORTS MAÎTRES (GÉNÉRATION BACKEND) -->
+        <div id="page-rapports" class="content-page">
+            <div style="margin-bottom: 24px;">
+                <h1>Centre de Rapports Officiels</h1>
+                <p class="subtitle">Générez et téléchargez les documents de synthèse pour les commissions de tarification.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div class="form-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="width: 48px; height: 48px; background: #e0f2fe; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                            <i data-lucide="file-check" style="color: #0369a1;"></i>
+                        </div>
+                        <h3 style="margin-bottom: 8px;">Rapport Décisionnel Complet</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
+                            Document officiel consolidé incluant la synthèse budgétaire, le détail analytique par pôle et l'audit énergétique des fluides municipaux.
+                        </p>
+                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 3px solid #0ea5e9; font-size: 0.8rem; color: #64748b; margin-bottom: 20px;">
+                            <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
+                            Format PDF professionnel optimisé pour l'impression A4.
+                        </div>
+                    </div>
+                    <button onclick="telechargerRapportBackend()" class="btn-primary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="download"></i>
+                        Générer et Télécharger (.pdf)
+                    </button>
+                </div>
+
+                <div class="form-card" style="opacity: 0.6; cursor: not-allowed;">
+                    <div style="width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="table" style="color: #64748b;"></i>
+                    </div>
+                    <h3 style="margin-bottom: 8px;">Export de Données (XLSX)</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
+                        Extraction brute des calculs de simulation vers un tableur pour analyse externe approfondie.
+                    </p>
+                    <span class="badge" style="background: #f1f5f9; color: #64748b;">Prochainement</span>
+                </div>
+            </div>
+        </div>
 
         <!-- PAGE : IMPACT FAMILLES (TEST AUGMENTATIONS) -->
         <div id="page-impact-familles" class="content-page">
@@ -617,6 +666,10 @@
                     <h1>Simulateur d'Impact Familles</h1>
                     <p class="subtitle">Testez virtuellement l'effet d'une augmentation tarifaire sur la facture mensuelle d'une famille type.</p>
                 </div>
+                <button onclick="genererRapportPDF()" class="btn-primary" style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="printer" style="width: 18px; height: 18px;"></i>
+                    Exporter PDF
+                </button>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-bottom: 24px;">
@@ -1810,12 +1863,137 @@
             }
         }
 
+        async function telechargerRapportBackend() {
+            try {
+                const btn = event.currentTarget;
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="loading-spinner" style="padding:0; margin-right:8px;"></i> Génération en cours...';
+
+                const response = await fetch("/api/rapport/complet", {
+                    headers: {
+                        "Authorization": "Basic " + btoa("admin:mairie91")
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "Rapport_Decisionnel_Crosne_2025.pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    ajouterLog("Génération Rapport", "Rapport décisionnel complet généré via le serveur.");
+                } else {
+                    alert("Erreur lors de la génération du rapport.");
+                }
+                
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Erreur rapport:", error);
+                alert("Impossible de contacter le serveur.");
+            }
+        }
+
+        function genererRapportPDF() {
+            const reportArea = document.getElementById('report-print-area');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            // Récupération des données globales (Dashboard)
+            const recTotales = document.getElementById('sim-recettes-totales')?.textContent || 'N/A';
+            const depTotales = document.getElementById('sim-depenses-totales')?.textContent || 'N/A';
+            const ecartGlobal = document.getElementById('sim-ecart-global')?.textContent || 'N/A';
+            const tauxMoyen = document.getElementById('sim-taux-moyen')?.textContent || 'N/A';
+
+            let html = `
+                <div class="report-header">
+                    <div class="report-title">Mairie de Crosne - Rapport de Simulation</div>
+                    <div class="report-meta">Édité le ${dateStr}<br>Outil d'aide à la décision tarifaire</div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Synthèse Budgétaire (Projection 2025)</div>
+                    <div class="report-grid">
+                        <div class="report-metric">
+                            <div class="report-metric-label">Recettes Projetées</div>
+                            <div class="report-metric-value">${recTotales}</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-label">Dépenses Réelles</div>
+                            <div class="report-metric-value">${depTotales}</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-label">Écart Global</div>
+                            <div class="report-metric-value">${ecartGlobal}</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-label">Taux de Couverture</div>
+                            <div class="report-metric-value">${tauxMoyen}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Détail par Tranche QF (Restauration)</div>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Tranche</th>
+                                <th>Prix Unit.</th>
+                                <th>Coût Moyen</th>
+                                <th>Enfants</th>
+                                <th>Recettes</th>
+                                <th>Dépenses</th>
+                                <th>Taux Couv.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            if (window.originalSimData) {
+                window.originalSimData.forEach(t => {
+                    html += `
+                        <tr>
+                            <td><b>${t.codeTranche}</b></td>
+                            <td>${t.prixFacture.toFixed(2)} €</td>
+                            <td>${t.coutMoyen.toFixed(2)} €</td>
+                            <td>${t.nombreEnfants}</td>
+                            <td>${t.recetteAnnuelle.toLocaleString('fr-FR')} €</td>
+                            <td>${t.depenseAnnuelle.toLocaleString('fr-FR')} €</td>
+                            <td>${(t.tauxCouverture * 100).toFixed(1)} %</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html += `<tr><td colspan="7">Aucune donnée de simulation disponible.</td></tr>`;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-footer">
+                    © 2025 Ville de Crosne - Document de travail interne confidentiel.
+                </div>
+            `;
+
+            reportArea.innerHTML = html;
+            window.print();
+        }
+
         // Initialisation : on attend que TOUTES les ressources soient chargées
         // (y compris Lucide CDN) avant de démarrer l'application
         window.onload = function() {
             checkAuth();
         };
     </script>
+    <div id="report-print-area" style="display: none;"></div>
 </body>
 
 </html>

@@ -15,7 +15,9 @@ public class Calculateur {
 
     private static final String FICHIER = new File("Donnees/Autres/CALC DEP (3).xlsx").exists() 
         ? "Donnees/Autres/CALC DEP (3).xlsx" 
-        : "../Donnees/Autres/CALC DEP (3).xlsx";
+        : new File("../Donnees/Autres/CALC DEP (3).xlsx").exists() 
+            ? "../Donnees/Autres/CALC DEP (3).xlsx"
+            : "CALC DEP (3).xlsx"; // fallback au cas où
     
     private static final String ONGLET_SYNTHESE = "syntheses charges";
 
