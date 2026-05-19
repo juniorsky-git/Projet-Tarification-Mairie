@@ -3,10 +3,12 @@ package fr.mairie.tarification_api;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Service de gestion de la traçabilité et de l'audit.
@@ -59,26 +61,58 @@ public class LogService {
 
     /**
      * Exporte les buffers de log vers des fichiers physiques dans le dossier 'logs_audit/'.
-     * Utilise l'option APPEND pour conserver l'historique des sessions.
      */
-    public void sauvegarderFichiers() {
+    public synchronized void sauvegarderFichiers() {
         try {
-            // Création du dossier s'il n'existe pas
             Files.createDirectories(Paths.get("logs_audit"));
 
-            // Écriture pour l'électricité
-            Files.write(Paths.get("logs_audit/audit_electricite.log"), 
-                        logElec.toString().getBytes(StandardCharsets.UTF_8), 
-                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            // On vérifie si on a quelque chose à écrire pour éviter les accès disque inutiles
+            if (logElec.length() > 50) {
+                Files.write(Paths.get("logs_audit/audit_electricite.log"), 
+                            logElec.toString().getBytes(StandardCharsets.UTF_8), 
+                            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            }
 
-            // Écriture pour le gaz
-            Files.write(Paths.get("logs_audit/audit_gaz.log"), 
-                        logGaz.toString().getBytes(StandardCharsets.UTF_8), 
-                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            if (logGaz.length() > 50) {
+                Files.write(Paths.get("logs_audit/audit_gaz.log"), 
+                            logGaz.toString().getBytes(StandardCharsets.UTF_8), 
+                            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            }
+            
+            // On vide les buffers après écriture pour ne pas réécrire 10 fois la même chose
+            logElec.setLength(0);
+            logGaz.setLength(0);
 
-            System.out.println("✅ Audit complété. Historique conservé dans 'logs_audit/'.");
         } catch (Exception e) {
             System.err.println("Erreur LogService lors de l'écriture : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Lit le contenu des logs techniques de manière ultra-rapide (lecture par la fin).
+     */
+    public String lireDerniersLogs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(lireFinFichier("logs_audit/audit_electricite.log", "ÉLECTRICITÉ"));
+        sb.append("\n");
+        sb.append(lireFinFichier("logs_audit/audit_gaz.log", "GAZ"));
+        return sb.toString();
+    }
+
+    private String lireFinFichier(String chemin, String titre) {
+        Path path = Paths.get(chemin);
+        if (!Files.exists(path)) return "--- AUCUN AUDIT " + titre + " ---\n";
+
+        try (java.util.stream.Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
+            StringBuilder temp = new StringBuilder("--- DERNIERS AUDITS " + titre + " ---\n");
+            // On ne garde que les 40 dernières lignes pour la performance
+            Object[] lastLines = lines.skip(Math.max(0, Files.lines(path).count() - 40)).toArray();
+            for (Object line : lastLines) {
+                temp.append(line).append("\n");
+            }
+            return temp.toString();
+        } catch (Exception e) {
+            return "--- ERREUR DE LECTURE " + titre + " ---\n";
         }
     }
 

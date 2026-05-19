@@ -31,8 +31,7 @@ public class SimulationCalculateur {
     public List<SimulationLigne> lireSimulationRestauration() {
         List<SimulationLigne> lignes = new ArrayList<>();
 
-        try (InputStream inp = new FileInputStream(fichierExcel);
-             Workbook wb = new XSSFWorkbook(inp)) {
+        try (Workbook wb = WorkbookFactory.create(new java.io.File(fichierExcel))) {
 
             Sheet sheet = wb.getSheet(ONGLET_SIMULATION);
             if (sheet == null) {
@@ -76,8 +75,7 @@ public class SimulationCalculateur {
     }
 
     public double lireNombreEnfantsTotal() {
-        try (InputStream inp = new FileInputStream(fichierExcel);
-             Workbook wb = new XSSFWorkbook(inp)) {
+        try (Workbook wb = WorkbookFactory.create(new java.io.File(fichierExcel))) {
             Sheet sheet = wb.getSheet(ONGLET_SIMULATION);
             if (sheet != null) {
                 Row row = sheet.getRow(16); // Excel ligne 17 (Total)
@@ -93,8 +91,7 @@ public class SimulationCalculateur {
 
     public Map<String, Double> lireDepensesReellesRestauration() {
         Map<String, Double> detail = new LinkedHashMap<>();
-        try (InputStream inp = new FileInputStream(fichierExcel);
-             Workbook wb = new XSSFWorkbook(inp)) {
+        try (Workbook wb = WorkbookFactory.create(new java.io.File(fichierExcel))) {
             Sheet sheet = wb.getSheet(ONGLET_SIMULATION);
             if (sheet != null) {
                 Row row = sheet.getRow(33); // Excel ligne 34
@@ -117,8 +114,7 @@ public class SimulationCalculateur {
     // Helper method
     private Map<String, Double> lireTotalGeneral(int rowIndex, String[] etiquettes, int[] colonnes, int colonneTotal) {
         Map<String, Double> detail = new LinkedHashMap<>();
-        try (InputStream inp = new FileInputStream(fichierExcel);
-             Workbook wb = new XSSFWorkbook(inp)) {
+        try (Workbook wb = WorkbookFactory.create(new java.io.File(fichierExcel))) {
             Sheet sheet = wb.getSheet(ONGLET_SIMULATION);
             if (sheet != null) {
                 Row row = sheet.getRow(rowIndex);

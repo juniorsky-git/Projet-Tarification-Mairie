@@ -1,0 +1,88 @@
+Restauration - Données pole enfance;;;;;;;;;;;;;;
+Tranches;;Px repas facturé;Nombre d'enfants;cout moyen de repas;DEPENSE ann. en repas;RECETTE ann. en repas;Ecarts;Taux de couverture;;;;;;
+;;;;;;;;;;;;;;
+EXT;;5,54 €;11;4,42 €;6 806,80 €;8 531,60 €;1 724,80 €;125,34 %;;;;;;
+Plus de 18 000€;A;5,13 €;429;4,42 €;265 465,20 €;308 107,80 €;42 642,60 €;116,06 %;;;;;;
+15 000 à 17 999 €;B;4,53 €;90;4,42 €;55 692,00 €;57 078,00 €;1 386,00 €;102,49 %;;;;;;
+13 000€ à 14 999 €;B2;4,00 €;90;4,42 €;55 692,00 €;50 400,00 €;-5 292,00 €;90,50 %;;;;;;
+11 000€ à 12 999 €;C;3,86 €;79;4,42 €;48 885,20 €;42 691,60 €;-6 193,60 €;87,33 %;;;;;;
+9 000 à 10 999 €;D;3,25 €;79;4,42 €;48 885,20 €;35 945,00 €;-12 940,20 €;73,53 %;;;;;;
+7 000€ à 8 999 €;E;2,70 €;90;4,42 €;55 692,00 €;34 020,00 €;-21 672,00 €;61,09 %;;;;;;
+5 000€ à 6 999 €;F;2,00 €;79;4,42 €;48 885,20 €;22 120,00 €;-26 765,20 €;45,25 %;;;;;;
+3 000€ à 4 999 €;F2;1,45 €;57;4,42 €;35 271,60 €;11 571,00 €;-23 700,60 €;32,81 %;;;;;;
+Moins de 3 000 €;G;1,32 €;124;4,42 €;76 731,20 €;22 915,20 €;-53 816,00 €;29,86 %;;;;;;
+Total;;;1128;;698 006,40 €;593 380,20 €;-104 626,20 €;85,01 %;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+RESTAURATION;Depenses reelles;;;;;;;TOTAL;;;;;;
+;DEP. SCOLAREST 2025;;PERSONNEL;Mat et equip;FLUIDES;;;;;;;;;
+;Elements;Montant;Charges;Depenses alimentation;Eau;Electricité;Gaz;;;;;;;
+;"""vide""";555 834,84;0;0;0;0;0;555 834,84;;;;;;
+;RESTCOMM;106 439,01;0;7 464,25;0;0;0;113 903,26;;;;;;
+;RESTGAV;175 209,09;518 185,07;18 104,64;0;7464,25;8159;727 122,05;;;;;;
+;RESTMICH;96 397,29;435 474,22;0,00;0;18104,64;0;549 976,15;;;;;;
+;rest JP1;0;97 360,35;0;0;0;0;97 360,35;;;;;;
+;BRASSENS;0;0;0;0;0;0;0,00;;;;;;
+;SAND;0;0;0;0;0;0;0,00;;;;;;
+;CURIE;0;0;0;0;0;0;0,00;;;;;;
+;REST SCOLAIRE;0;0;0;0;0;0;0,00;;;;;;
+;Total général;933 880,23;1 051 019,64;25 568,89;0,00;25 568,89;8 159,00;650 267,00;;;;;;
+;*Gaz de Gavroche comprend une partie de cl petit prince d'un montant de :;;;16318;;;;;;;;;;
+;De manière approximative, on le divise sur 2;;;8159;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+ACCUEIL DE LOISIRS;DEPENSES REELLES;;;;;;;;;;;;;
+;Personnel;;Matrériel et fournitures;;;Activités;;;;Locaux;;;;
+;NOMBRE;CHARGES;Matrériel;Fournitures pédagogique (papier, peinture);Matériel sportif;prestation (spectacle,ateliers..);alimentation;Transport (bus, carburant, chaufeur,amendes);Droits d'entrées( musés/parc…);Electricité;EAU;Restauration;Autres;Total
+;MDJ;102 776,17;0,00;0;0;0,00;0,00;0,00;0,00;8 903,76;6 949,77;27471,64;;146 101,34
+;p'tit prince;661 314,33;0,00;0;0;0,00;0,00;0,00;0,00;14 309,21;6 192,83;;;681 816,37
+;CLGAV;;1 154,91;7 011,49;478,61;2 016,62;12 318,96;8 749,60;6 237,20;0,00;0,00;;115,44;38 082,83
+;CLJP1;0;0,00;1 636,40;0;650,00;5 392,09;0,00;0,00;0,00;0,00;;;7 678,49
+;CLLMICH;664 758,87;1 022,56;6 143,02;0;2 223,08;7 009,79;5 803,39;12 609,07;0,00;0,00;;4 834,47;704 404,25
+;Total général;1 428 849,37;2 177,47;14 790,91;478,61;4 889,70;24 720,84;14 552,99;18 846,27;23 212,97;13 142,60;27 471,64;4 949,91;1 578 083,28
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+ETUDES SURVEILLEES;DEPENSES REELLES;;;;;;;;;;;;;
+;Personnel;;Matrériel;;;;;;;;;;;
+;NOMBRE;CHARGES;Fournitures scolaire;Matériel (photocopieuse..) ;Total;;;;;;;;;
+;personnel;58 598,14;;0,00;58 598,14;;;;;;;;;
+;;;0,00;;;;;;;;;;;
+;Total général;58 598,14;0;0,00;58 598,14;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+ESPACE ADOS;DEPENSES REELLES;;;;;;;;;;;;;
+;Personnel;;Locaux;;Matreriel;;;Alimentation;;Sorties;;;;
+;Elements;Charges de personnel;Electricité;GAZ;Matreriel;Fournitures;Petit materiel;Alimentation;Autres;Transport (bus, carburant, chaufeur);Droits d'entrées( musés/parc…);TOTAL;;
+;ESPACE ADOS;119 794,89;10918,975;426,00;0,00;1 265,87;467,86;59,24;327,01;4 016,42;0,00;137 276,27;;
+;Total général;119 794,89;10 918,98;426,00;0,00;1 265,87;467,86;59,24;327,01;4 016,42;0,00;137 276,27;;
+;Elec club ados et regroupé avec celle de maison petite enfance, donc j'ai du faire la moyenne : diviser par 2;;;;21837,95;;;;;;;;;
+;;;;;0;;;;;;;;;
+;;;;;10918,975;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+SEJOURS;DEPENSES REELLES;;;;;;;;;;;;;
+;Personnel;;Transport;;Hebergement;Restauration;Materiel;;;TOTAL;;;;
+;NOMBRE;CHARGES;BUS/MINI BUS;PEAGE / PARKING;CENTRE DE VACANCES;Restauration; matériel;Fournitures;Autres;;;;;
+;Esapce ADOS;;1 934,41;147,60;21 765,91;179,91;83,79;;;24 111,62;;;;
+;Curie ;;29 454,00;;;;;;;29 454,00;;;;
+;Bressens ;;9 900,00;;22 575,00;175,55;;;;32 650,55;;;;
+;"""VIDE""";;3 868,82;;16 429,03;;;298,96;314,73;20 911,54;;;;
+;Total général;0,00;45 157,23;147,60;60 769,94;355,46;83,79;298,96;314,73;107 127,71;;;;
+;*Curie: montant d'hebergement inclue transport;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+ACCUEILS PERISCOLAIRE;DEPENSES REELLES;;;;;;;;;;;;;
+;Personnel;;FOURNITURES ;Restauration;Locaux;;;TOTAL;;;;;;
+;Elements;Charges personnel;FOURNITURES (papier, feutres, peinture);Restaration;Eau;Electricité;Gaz;;;;;;;
+;JP1;171 094,89;;5810,47;2539,03;9726,13;16055;205 225,52;;;;;;
+;Petit Prince;0,00;;;;;4,42;4,42;;;;;;
+;JP2;157 998,90;;;;;;157 998,90;;;;;;
+;Georg sand;268 883,59;;;;;;268 883,59;;;;;;
+;Total général;597 977,38;0,00;5 810,47;2 539,03;9 726,13;16 059,42;632 112,43;;;;;;

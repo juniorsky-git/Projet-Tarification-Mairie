@@ -592,4 +592,26 @@ Le fichier `src/main/resources/static/index.html` a été copié vers `target/cl
 
 ### 7. Règle de Travail Instaurée
 
-À partir de cette étape, toute modification de code — même mineure — est documentée de manière exhaustive selon le schéma : problème identifié → lecture du code avant modification → analyse → décision architecturale → étapes atomiques réalisées → fichiers touchés ET fichiers non touchés → résultat obtenu. Cette règle s'applique sans exception.
+---
+
+## Etape 24 : Integration du Systeme de Rapports Maitres (12/05/2026)
+
+### 1. Objectif Metier
+Passer d'une simple "vue dashboard" a un outil capable de generer des documents officiels pour les commissions de tarification. L'agent municipal a besoin d'un PDF structure, incluant la page de garde de la ville, pour presenter les decisions aux elus.
+
+### 2. Architecture Technique (Backend PDF Engine)
+- **Technologie** : Re-integration et modernisation de `PdfExportService.java` (devenu `RapportDecisifService.java`) utilisant **Apache PDFBox**.
+- **Logique de Fusion** : Le rapport ne se contente plus de lire un seul pôle. Il agrege :
+    - La synthese budgetaire (via `Calculateur`).
+    - Les recettes reelles (via `DonneesBudgetaires`).
+    - L'audit energetique complet (via `AnalytiqueFluideService`).
+- **Endpoint API** : Creation de `/api/rapport/complet` pour permettre le telechargement securise depuis le front-end.
+
+### 3. Logique de Resolution des Erreurs (Workflow "Blindage")
+Une erreur de generation a ete detectee lors du premier test (Error 500).
+- **Analyse** : Le serveur ne trouvait pas les fichiers Excel car le chemin relatif change selon que l'appli est lancee depuis le dossier racine ou le dossier `tarification-api`.
+- **Solution** : Mise en place de "chemins adaptatifs" avec test de l'existence du fichier (`../Donnees/...` ou `./Donnees/...`).
+- **Resilience** : Le `RapportController` a ete modifie pour isoler chaque section dans un `try-catch`. Si l'audit des fluides est indisponible, le PDF est genere avec les donnees budgetaires uniquement, garantissant la continuite du service pour l'agent.
+
+### 4. Resultat Final
+Un onglet "Rapports Maitres" centralise desormais la production de documents de synthese institutionnels. Le projet passe ainsi du statut de "calculateur" a celui de "systeme d'information decisionnel".

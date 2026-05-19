@@ -23,10 +23,12 @@ public class DashboardController {
 
     private final AnalytiqueFluideService analytiqueFluideService;
     private final DonneesBudgetaires budgetService;
+    private final LogService logService;
 
-    public DashboardController(AnalytiqueFluideService analytiqueFluideService, DonneesBudgetaires budgetService) {
+    public DashboardController(AnalytiqueFluideService analytiqueFluideService, DonneesBudgetaires budgetService, LogService logService) {
         this.analytiqueFluideService = analytiqueFluideService;
         this.budgetService = budgetService;
+        this.logService = logService;
     }
 
     /**
@@ -36,13 +38,16 @@ public class DashboardController {
      * @return Une réponse JSON contenant tous les indicateurs et le détail des fluides.
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashboard(@RequestParam String pole) {
+    public ResponseEntity<?> getDashboard(
+            @RequestParam String pole,
+            @RequestParam(required = false, defaultValue = "A") String source) {
         try {
             // Décodage sécurisé du paramètre URL
             String decodedPole = URLDecoder.decode(pole, StandardCharsets.UTF_8).replace("+", " ").trim();
-            
-            // Chargement dynamique des données (Lecture Excel fraîche)
-            List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques();
+
+            // Chargement dynamique depuis la source active (A ou B)
+            List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques(source);
+            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
 
             return tousLesPoles.stream()
                     .filter(p -> {
@@ -58,35 +63,8 @@ public class DashboardController {
                         r.unitesAnnuelles = p.unitesAnnuelles();
                         r.detailsCharges = p.chargesDetaillees();
                         
-                        // --- LOGIQUE DE CALCUL DES RECETTES DYNAMIQUE ---
-                        double recettes = 0;
-                        List<Tarif> tarifs = DonneesTarifs.chargerTarifsReference();
-                        String serviceKey = getServiceKeyForPole(p.nom());
-                        
-                        if (p.distributionTranches() != null && serviceKey != null) {
-                            double volumeMoyen = 1.0; 
-                            if (p.unitesAnnuelles() != null && p.nombreEnfants() != null && p.nombreEnfants() > 0) {
-                                volumeMoyen = (double) p.unitesAnnuelles() / p.nombreEnfants();
-                            }
-
-                            // Agrégation des recettes par tranche de Quotient Familial (QF)
-                            for (Map.Entry<String, Integer> entry : p.distributionTranches().entrySet()) {
-                                String tranche = entry.getKey();
-                                Integer count = entry.getValue();
-                                
-                                double prixTranche = tarifs.stream()
-                                    .filter(t -> {
-                                        return t.getTranche().equalsIgnoreCase(tranche);
-                                    })
-                                    .findFirst()
-                                    .map(t -> {
-                                        return t.getPrix(serviceKey);
-                                    })
-                                    .orElse(0.0);
-                                
-                                recettes += (count * prixTranche * volumeMoyen);
-                            }
-                        }
+                        // --- UTILISATION DES RECETTES RÉELLES (COMPTABILITÉ) ---
+                        double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
                         
                         // Finalisation des indicateurs financiers
                         r.recettesTotales = recettes;
@@ -94,8 +72,8 @@ public class DashboardController {
                         r.ecart = recettes - p.depensesTotales();
                         r.distributionTranches = p.distributionTranches();
                         
-                        // Intégration du diagnostic fluides temps réel
-                        r.detailsFluides = analytiqueFluideService.analyserTout();
+                        // Intégration du diagnostic fluides filtré par pôle
+                        r.detailsFluides = analytiqueFluideService.analyserParPole(p.nom());
                         
                         return ResponseEntity.ok(r);
                     })
@@ -127,5 +105,29 @@ public class DashboardController {
             default: 
                 return null;
         }
+    }
+
+    /**
+     * Nouvel endpoint pour l'audit complet Réel vs Théorique.
+     */
+    @GetMapping("/analytique/fluides/audit")
+    public ResponseEntity<List<AnalytiqueFluide>> getAuditComplet() {
+        return ResponseEntity.ok(analytiqueFluideService.analyserTout());
+    }
+
+    /**
+     * Nouvel endpoint pour l'Issue #24 : Audit bi-semestriel des consommations
+     */
+    @GetMapping("/analytique/fluides/bi-semestriel")
+    public ResponseEntity<List<RapportSemestrielFluide>> getRapportBiSemestriel() {
+        return ResponseEntity.ok(analytiqueFluideService.analyserBiSemestriel());
+    }
+
+    /**
+     * Endpoint pour récupérer les logs techniques d'audit.
+     */
+    @GetMapping("/logs/audit")
+    public ResponseEntity<String> getLogsAudit() {
+        return ResponseEntity.ok(logService.lireDerniersLogs());
     }
 }
