@@ -362,8 +362,24 @@
 
         <!-- PAGE : DASHBOARD -->
         <div id="page-dashboard" class="content-page active">
-            <h1>Tableau de bord</h1>
-            <p class="subtitle">Résumé budgétaire réel par pôle d'activité.</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                <div>
+                    <h1>Tableau de bord</h1>
+                    <p class="subtitle">Résumé budgétaire réel par pôle d'activité.</p>
+                </div>
+                <!-- SÉLECTEUR DE SOURCE BUDGÉTAIRE -->
+                <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 16px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                        <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">Source budgétaire</span>
+                        <span id="source-badge" style="font-size: 0.7rem; font-weight: 600; color: var(--primary); background: var(--primary-bg); padding: 2px 8px; border-radius: 20px;">Source A — Classique</span>
+                    </div>
+                    <select id="budgetSourceSelect" onchange="changerSourceBudget()"
+                        style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 0.82rem; font-weight: 600; color: var(--text-main); background: #fff; cursor: pointer; min-width: 280px;">
+                        <option value="A" selected>📂 Source A — CALC DEP(4) + Depenses recettes nf</option>
+                        <option value="B">📂 Source B — VF_REC_DEP.xlsx (Hybride)</option>
+                    </select>
+                </div>
+            </div>
 
             <div id="dashboardBudgetSummary" class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;">
                 <!-- Rempli par JS avec un style épuré -->
@@ -1017,6 +1033,9 @@
             location.reload();
         }
 
+        // --- VARIABLE GLOBALE SOURCE BUDGÉTAIRE ---
+        let currentSource = 'A'; // 'A' = Source classique, 'B' = VF_REC_DEP (hybride)
+
         // --- NAVIGATION ---
         function switchPage(pageId, element) {
             document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
@@ -1025,7 +1044,7 @@
             document.getElementById('page-' + pageId).classList.add('active');
             if (element) element.classList.add('active');
 
-            if (pageId === 'dashboard') chargerDashboardData();
+            if (pageId === 'dashboard') { chargerDashboardData(); }
             if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'impact-familles') chargerImpactFamilles();
             if (pageId === 'diagnostic-energie') initialiserDiagnosticEnergie();
@@ -1533,10 +1552,62 @@
             } catch(e) {}
         }
 
+        /**
+         * Met à jour la source budgétaire active et recharge le tableau de bord.
+         */
+        function changerSourceBudget() {
+            currentSource = document.getElementById('budgetSourceSelect').value;
+            const badge = document.getElementById('source-badge');
+            if (badge) {
+                badge.textContent = currentSource === 'B'
+                    ? 'Source B — VF_REC_DEP (Hybride)'
+                    : 'Source A — Classique';
+                badge.style.color = currentSource === 'B' ? '#059669' : 'var(--primary)';
+                badge.style.background = currentSource === 'B' ? '#f0fdf4' : 'var(--primary-bg)';
+            }
+
+            // Mettre à jour les options du sélecteur de pôle
+            const sel = document.getElementById('selectPoleDetails');
+            if (sel) {
+                const ancienneSelection = sel.value;
+                sel.innerHTML = '<option value="">Choisir un pôle…</option>';
+                const polesA = [
+                    ['Restauration', 'Restauration'],
+                    ['Accueil de Loisirs', 'Accueil de Loisirs'],
+                    ['Accueil periscolaire', 'Accueil périscolaire'],
+                    ['Etudes surveillees', 'Études surveillées'],
+                    ['Espace Ados', 'Espace Ados'],
+                    ['Sejours', 'Séjours']
+                ];
+                const polesB = [
+                    ['Restauration', 'Restauration'],
+                    ['Scolaire', 'Scolaire 🆕'],
+                    ['Accueil de Loisirs', 'Accueil de Loisirs'],
+                    ['Accueil periscolaire', 'Accueil périscolaire (repli A)'],
+                    ['Etudes surveillees', 'Études surveillées (repli A)'],
+                    ['Espace Ados', 'Espace Ados (repli A)'],
+                    ['Sejours', 'Séjours (repli A)']
+                ];
+                const poles = currentSource === 'B' ? polesB : polesA;
+                poles.forEach(([val, label]) => {
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = label;
+                    if (val === ancienneSelection) opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            }
+
+            // Vider le détail et recharger le dashboard
+            document.getElementById('poleDetailsResult').innerHTML =
+                '<div style="text-align: center; color: var(--text-secondary); padding: 40px; border: 1px dashed var(--border); border-radius: 8px; font-size: 0.85rem;">Sélectionnez un pôle pour afficher l\'analyse financière.</div>';
+            chargerDashboardData();
+        }
+
         // --- DASHBOARD DATA ---
         async function chargerDashboardData() {
             try {
-                const response = await apiFetch("/api/poles");
+                const response = await apiFetch(`/api/poles?source=${currentSource}`);
                 const poles = await response.json();
                 
                 let html = poles.map(p => {
@@ -1593,7 +1664,7 @@
             zoneFinance.innerHTML = `<div class="loading-spinner">Analyse financière en cours...</div>`;
 
             try {
-                const response = await apiFetch(`/api/dashboard?pole=${encodeURIComponent(pole)}`);
+                const response = await apiFetch(`/api/dashboard?pole=${encodeURIComponent(pole)}&source=${currentSource}`);
                 const data = await response.json();
 
                 // RENDU FINANCES

@@ -38,14 +38,16 @@ public class DashboardController {
      * @return Une réponse JSON contenant tous les indicateurs et le détail des fluides.
      */
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getDashboard(@RequestParam String pole) {
+    public ResponseEntity<?> getDashboard(
+            @RequestParam String pole,
+            @RequestParam(required = false, defaultValue = "A") String source) {
         try {
             // Décodage sécurisé du paramètre URL
             String decodedPole = URLDecoder.decode(pole, StandardCharsets.UTF_8).replace("+", " ").trim();
-            
-            // Chargement dynamique des données (Lecture Excel fraîche)
-            List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques();
-            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles();
+
+            // Chargement dynamique depuis la source active (A ou B)
+            List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques(source);
+            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
 
             return tousLesPoles.stream()
                     .filter(p -> {
