@@ -770,6 +770,7 @@
 body {
     margin: 0;
     font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
     background-color: var(--bg-main);
     color: var(--text-main);
     display: flex;
@@ -818,7 +819,7 @@ nav {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     margin: 0 12px 4px;
     border-radius: 12px;
 }
@@ -920,12 +921,13 @@ header {
 }
 
 h1 {
-    font-size: 1.875rem;
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 8px;
 }
 
 .subtitle {
+    font-size: 0.95rem;
     color: var(--text-muted);
     margin-bottom: 32px;
 }
@@ -1028,7 +1030,7 @@ th {
     background-color: var(--bg-alt);
     text-align: left;
     padding: 18px 24px;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -1039,7 +1041,7 @@ th {
 td {
     padding: 20px 24px;
     border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
