@@ -1081,7 +1081,7 @@
 
             const titleEl = document.getElementById('al-synth-title');
             if (titleEl) {
-                titleEl.textContent = "Tableau synthétique - tarif mensuel avec augmentation de " + (pct * 100).toFixed(1).replace('.', ',') + " %";
+                titleEl.textContent = "Tableau Synthétique -- Tarif mensuel avec augmentation (" + (pct * 100).toFixed(1).replace('.', ',') + " %)";
             }
 
             // Initialise les totaux par tranche
@@ -1176,7 +1176,7 @@
 
             // En-tête du document
             const titre = vueSynth
-                ? 'Tableau Synthétique — Toutes les Tranches · Accueil de Loisirs'
+                ? `Tableau Synthétique -- Tarif mensuel avec augmentation (${pct.toFixed(1).replace('.', ',')} %)`
                 : `Simulation d'Impact Tarifaire — Tranche ${tranche} · Accueil de Loisirs`;
             const sstitre = vueSynth
                 ? `Montant mensuel = Tarif unitaire × Qté mensuelle de référence · Hausse appliquée : +${pct.toFixed(1).replace('.', ',')} %`
