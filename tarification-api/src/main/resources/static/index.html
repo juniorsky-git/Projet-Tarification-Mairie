@@ -684,15 +684,23 @@
                     <h1>Simulateur d'Impact Tarifaire — Accueil de Loisirs</h1>
                     <p class="subtitle">Calculez le surcoût mensuel pour une famille selon sa tranche de QF et un scénario de hausse de la grille 2025.</p>
                 </div>
-                <!-- TOGGLE VUE -->
-                <div style="display: flex; gap: 5px; background: #f1f5f9; border-radius: 10px; padding: 5px; flex-shrink: 0; align-self: flex-start; margin-top: 8px;">
-                    <button id="al-btn-detail" onclick="switchVueImpact('detail')"
-                        style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: var(--primary); color: white; transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 6px;">
-                        <i data-lucide="list" style="width: 15px; height: 15px;"></i> Vue Détail
-                    </button>
-                    <button id="al-btn-synthetique" onclick="switchVueImpact('synthetique')"
-                        style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: transparent; color: var(--text-muted); transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 6px;">
-                        <i data-lucide="table-2" style="width: 15px; height: 15px;"></i> Vue Synthétique
+                <!-- BOUTONS DROITE : toggle vue + export PDF -->
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; margin-top: 8px;">
+                    <!-- Toggle Vue -->
+                    <div style="display: flex; gap: 5px; background: #f1f5f9; border-radius: 10px; padding: 5px;">
+                        <button id="al-btn-detail" onclick="switchVueImpact('detail')"
+                            style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: var(--primary); color: white; transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="list" style="width: 15px; height: 15px;"></i> Vue Détail
+                        </button>
+                        <button id="al-btn-synthetique" onclick="switchVueImpact('synthetique')"
+                            style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: transparent; color: var(--text-muted); transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="table-2" style="width: 15px; height: 15px;"></i> Vue Synthétique
+                        </button>
+                    </div>
+                    <!-- Export PDF -->
+                    <button onclick="exporterImpactPDF()"
+                        style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: #0f172a; color: white; transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 7px;">
+                        <i data-lucide="file-down" style="width: 15px; height: 15px;"></i> Exporter en PDF
                     </button>
                 </div>
             </div>
@@ -816,8 +824,8 @@
                             <p style="margin: 5px 0 0; font-size: 0.82rem; color: var(--text-muted);">Montant = Tarif unitaire × Quantité mensuelle de référence × (1 + hausse %)</p>
                         </div>
                         <div style="display: flex; gap: 10px; flex-shrink: 0;">
-                            <span style="background: #fef2f2; color: #b91c1c; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">🔴 Tarif le plus élevé</span>
-                            <span style="background: #f0fdf4; color: #15803d; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">🟢 Tarif le plus bas</span>
+                            <span style="background: #fef2f2; color: #b91c1c; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"> Tarif le plus élevé</span>
+                            <span style="background: #f0fdf4; color: #15803d; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;"> Tarif le plus bas</span>
                         </div>
                     </div>
                     <div style="overflow-x: auto;">
@@ -994,9 +1002,9 @@
                 totalBase   += base;
                 totalSimule += simule;
 
-                // Séparateur de groupe
+                // Séparateur de groupe — bande colorée visible
                 if (p.groupe !== derniereGroupe) {
-                    tbody += `<tr style="background: #f8fafc;"><td colspan="6" style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); padding: 8px 16px;">${p.groupe}</td></tr>`;
+                    tbody += `<tr style="background: #4338ca;"><td colspan="6" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81;">${p.groupe}</td></tr>`;
                     derniereGroupe = p.groupe;
                 }
 
@@ -1065,9 +1073,9 @@
             let derniereGroupe = null;
 
             AL_PRESTATIONS.forEach(p => {
-                // Séparateur de groupe
+                // Séparateur de groupe — bande colorée visible
                 if (p.groupe !== derniereGroupe) {
-                    tbody += `<tr style="background: #f8fafc;"><td colspan="${2 + tranches.length}" style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); padding: 7px 16px;">${p.groupe}</td></tr>`;
+                    tbody += `<tr style="background: #4338ca;"><td colspan="${2 + tranches.length}" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81;">${p.groupe}</td></tr>`;
                     derniereGroupe = p.groupe;
                 }
 
@@ -1112,6 +1120,81 @@
             document.getElementById('al-synth-tbody').innerHTML = tbody;
             // Sync le curseur synth avec le curseur détail
             document.getElementById('al-slider-synth').value = document.getElementById('al-slider').value;
+        }
+
+        function exporterImpactPDF() {
+            const vueSynth = document.getElementById('al-vue-synthetique').style.display !== 'none';
+            const pct    = parseFloat(document.getElementById('al-slider').value);
+            const tranche = document.getElementById('al-tranche') ? document.getElementById('al-tranche').value : '';
+            const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            // Orientation selon la vue
+            const pageSize = vueSynth ? 'A4 landscape' : 'A4 portrait';
+            let styleEl = document.getElementById('print-page-style-if');
+            if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'print-page-style-if'; document.head.appendChild(styleEl); }
+            styleEl.textContent = `@page { size: ${pageSize}; margin: 12mm 14mm; }`;
+
+            // En-tête du document
+            const titre = vueSynth
+                ? 'Tableau Synthétique — Toutes les Tranches · Accueil de Loisirs'
+                : `Simulation d'Impact Tarifaire — Tranche ${tranche} · Accueil de Loisirs`;
+            const sstitre = vueSynth
+                ? `Montant mensuel = Tarif unitaire × Qté mensuelle de référence · Hausse appliquée : +${pct.toFixed(1).replace('.', ',')} %`
+                : `Grille tarifaire 2025 · Hausse simulée : +${pct.toFixed(1).replace('.', ',')} % · Fréquences mensuelles de référence`;
+
+            // Récupérer le tableau actif
+            const tableId = vueSynth ? 'al-synth-table' : 'al-detail-table';
+            const tableEl = document.getElementById(tableId);
+
+            // KPI Cards (seulement pour la vue détail)
+            let kpiHTML = '';
+            if (!vueSynth) {
+                const base    = document.getElementById('al-total-base').textContent;
+                const simule  = document.getElementById('al-total-simule').textContent;
+                const mensuel = document.getElementById('al-surcout-mensuel').textContent;
+                const annuel  = document.getElementById('al-surcout-annuel').textContent;
+                kpiHTML = `
+                    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;">
+                        <div style="border:1px solid #e2e8f0; border-radius:6px; padding:10px; text-align:center;">
+                            <div style="font-size:8px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Facture base / mois</div>
+                            <div style="font-size:16px; font-weight:800; color:#1e293b;">${base}</div>
+                        </div>
+                        <div style="border:2px solid #4f46e5; border-radius:6px; padding:10px; text-align:center;">
+                            <div style="font-size:8px; font-weight:700; color:#4f46e5; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Facture simulée / mois</div>
+                            <div style="font-size:16px; font-weight:800; color:#4f46e5;">${simule}</div>
+                        </div>
+                        <div style="border:1px solid #fde68a; background:#fefce8; border-radius:6px; padding:10px; text-align:center;">
+                            <div style="font-size:8px; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Surcoût mensuel</div>
+                            <div style="font-size:16px; font-weight:800; color:#b45309;">${mensuel}</div>
+                        </div>
+                        <div style="border:1px solid #bbf7d0; background:#f0fdf4; border-radius:6px; padding:10px; text-align:center;">
+                            <div style="font-size:8px; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">Surcoût annuel estimé</div>
+                            <div style="font-size:16px; font-weight:800; color:#059669;">${annuel}</div>
+                        </div>
+                    </div>`;
+            }
+
+            // Construire l'aire d'impression
+            const printArea = document.getElementById('impact-print-area');
+            printArea.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
+                    <div>
+                        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#4f46e5; margin-bottom:4px;">Mairie de Crosne · Outil de Tarification</div>
+                        <div style="font-size:17px; font-weight:800; color:#0f172a; letter-spacing:-.02em;">${titre}</div>
+                        <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
+                    </div>
+                    <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}<br>Grille tarifaire 2025</div>
+                </div>
+                ${kpiHTML}
+                ${tableEl.outerHTML}
+                <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:8px; font-size:8px; color:#94a3b8; display:flex; justify-content:space-between;">
+                    <span>Document généré automatiquement par l'outil de tarification de la Mairie de Crosne</span>
+                    <span>Grille 2025 · Usage interne</span>
+                </div>`;
+
+            printArea.style.display = 'block';
+            window.print();
+            setTimeout(() => { printArea.style.display = 'none'; printArea.innerHTML = ''; }, 800);
         }
 
         // --- AUTHENTIFICATION & LANDING ---
@@ -2273,6 +2356,8 @@
         };
     </script>
     <div id="report-print-area" style="display: none;"></div>
+    <div id="impact-print-area" style="display: none; font-family: 'DM Sans', sans-serif;"></div>
 </body>
+
 
 </html>

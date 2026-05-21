@@ -1212,3 +1212,111 @@ tr:last-child td {
         padding-top: 20px;
     }
 }
+
+/* ===================== IMPRESSION IMPACT FAMILLES ===================== */
+#impact-print-area {
+    display: none;
+}
+
+@media print {
+    /* Si la zone impact est active, masquer TOUT le reste */
+    #impact-print-area[style*="block"] ~ * { display: none !important; }
+
+    body aside,
+    body main > header,
+    body main .content-page,
+    #landing-page,
+    #login-modal,
+    #report-print-area {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        overflow: visible !important;
+        height: auto !important;
+        display: block !important;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    main {
+        overflow: visible !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    #impact-print-area {
+        display: block !important;
+        padding: 0;
+        background: white;
+        color: #0f172a;
+        font-family: 'DM Sans', sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Tableau dans la zone d'impression */
+    #impact-print-area table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 4px;
+        font-size: 9pt;
+    }
+
+    #impact-print-area th {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 6px 9px !important;
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #475569 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    #impact-print-area td {
+        border: 1px solid #e2e8f0 !important;
+        padding: 5px 9px !important;
+        font-size: 9pt !important;
+        font-weight: 500;
+    }
+
+    /* Bandes de groupe (fond indigo vif) */
+    #impact-print-area tr[style*="background: #4338ca"] td,
+    #impact-print-area tr[style*="background: rgb(67, 56, 202)"] td {
+        background: #4338ca !important;
+        color: white !important;
+        font-weight: 800 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Cellules max (rouge pâle) */
+    #impact-print-area td[style*="background: #fef2f2"] {
+        background: #fef2f2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Cellules min (vert pâle) */
+    #impact-print-area td[style*="background: #f0fdf4"] {
+        background: #f0fdf4 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Ligne TOTAL */
+    #impact-print-area tr[style*="background: #f1f5f9"] td {
+        background: #f1f5f9 !important;
+        font-weight: 800 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Supprimer les min-width sur les th pour l'impression */
+    #impact-print-area th[style*="min-width"] {
+        min-width: auto !important;
+    }
+}
