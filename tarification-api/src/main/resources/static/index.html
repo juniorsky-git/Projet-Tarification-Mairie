@@ -289,9 +289,9 @@
 
     <!-- SIDEBAR -->
     <aside>
-        <div class="logo">
-            <i data-lucide="calculator"></i>
-            <span>Tarification</span>
+        <div class="logo" style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px;">
+            <img src="Crosne-LOGO.png" alt="Logo Crosne" style="height: 36px; width: auto; object-fit: contain;">
+            <span style="font-size: 1.15rem; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">Tarification</span>
         </div>
 
         <nav>
@@ -769,7 +769,7 @@
                 <!-- TABLEAU DÉTAIL PAR PRESTATION -->
                 <div class="form-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0;">Détail par prestation</h3>
+                        <h3 id="al-detail-title" style="margin: 0;">Détail par prestation</h3>
                         <span style="font-size: 0.75rem; color: var(--text-muted);">Grille tarifaire 2025 — Fréquences mensuelles de référence</span>
                     </div>
                     <div class="table-container" style="margin: 0;">
@@ -820,7 +820,7 @@
                 <div class="form-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 style="margin: 0;">Tableau synthétique — Facture mensuelle · Toutes les tranches</h3>
+                            <h3 id="al-synth-title" style="margin: 0;">Tableau synthétique — Facture mensuelle · Toutes les tranches</h3>
                             <p style="margin: 5px 0 0; font-size: 0.82rem; color: var(--text-muted);">Montant = Tarif unitaire × Quantité mensuelle de référence × (1 + hausse %)</p>
                         </div>
                         <div style="display: flex; gap: 10px; flex-shrink: 0;">
@@ -962,19 +962,19 @@
 
         // Définition des 15 prestations avec leur libellé, clé tarifaire et quantité mensuelle de référence.
         const AL_PRESTATIONS = [
-            { groupe: "Mercredis",                label: "Journée avec repas (mercredi)",         cle: "journeeAvecRepas",         qte: 4 },
-            { groupe: "Mercredis",                label: "1/2 journée avec repas (mercredi)",     cle: "demiJourneeAvecRepas",     qte: 4 },
-            { groupe: "Périscolaire",             label: "Matin et soir",                          cle: "matinEtSoir",              qte: 16 },
-            { groupe: "Périscolaire",             label: "Matin ou soir",                          cle: "matinOuSoir",              qte: 16 },
-            { groupe: "Post-études",              label: "Post-études sans goûter",               cle: "postEtudes",              qte: 16 },
-            { groupe: "5 jours consécutifs",      label: "Journée avec repas (5 j)",              cle: "journeeAvecRepas5j",       qte: 5 },
-            { groupe: "5 jours consécutifs",      label: "Journée sans repas (5 j)",              cle: "journeeSansRepas5j",       qte: 5 },
-            { groupe: "5 jours consécutifs",      label: "1/2 journée avec repas (5 j)",          cle: "demiJourneeAvecRepas5j",   qte: 5 },
-            { groupe: "5 jours consécutifs",      label: "1/2 journée sans repas (5 j)",          cle: "demiJourneeSansRepas5j",   qte: 5 },
-            { groupe: "Sorties / Stages",         label: "Sortie 1/2 journée IDF / Stage",        cle: "sortieDemi",              qte: 1 },
-            { groupe: "Sorties / Stages",         label: "Sortie journée / Stage",                cle: "sortieJournee",           qte: 1 },
-            { groupe: "Séjours",                  label: "Séjour 5 jours",                        cle: "sejour5j",               qte: 1 },
-            { groupe: "Séjours",                  label: "Séjour 6 jours",                        cle: "sejour6j",               qte: 1 }
+            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "Journée avec repas (mercredi)",         cle: "journeeAvecRepas",         qte: 4, inTotal: true },
+            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "1/2 journée avec repas (mercredi)",     cle: "demiJourneeAvecRepas",     qte: 4, inTotal: false },
+            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin et soir",                          cle: "matinEtSoir",              qte: 16, inTotal: true },
+            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin ou soir",                          cle: "matinOuSoir",              qte: 16, inTotal: false },
+            { supergroupe: "Temps scolaire", groupe: "Post-études",              label: "Post-études sans goûter",               cle: "postEtudes",              qte: 16, inTotal: true },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée avec repas (5 j)",              cle: "journeeAvecRepas5j",       qte: 5, inTotal: true },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée sans repas (5 j)",              cle: "journeeSansRepas5j",       qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée avec repas (5 j)",          cle: "demiJourneeAvecRepas5j",   qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée sans repas (5 j)",          cle: "demiJourneeSansRepas5j",   qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie 1/2 journée IDF / Stage",        cle: "sortieDemi",              qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie journée / Stage",                cle: "sortieJournee",           qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 5 jours",                        cle: "sejour5j",               qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 6 jours",                        cle: "sejour6j",               qte: 1, inTotal: false }
         ];
 
         function calculerImpactLoisirs() {
@@ -987,8 +987,14 @@
 
             let totalBase   = 0;
             let totalSimule = 0;
+            let derniereSupergroupe = null;
             let derniereGroupe = null;
             let tbody = '';
+
+            const titleEl = document.getElementById('al-detail-title');
+            if (titleEl) {
+                titleEl.textContent = "Simulation d'impact tarifaire - Tranche " + tranche;
+            }
 
             AL_PRESTATIONS.forEach(p => {
                 const tarifBase   = tarifs[p.cle];
@@ -999,24 +1005,32 @@
                 const simule      = tarifSim  * p.qte;
                 const surcout     = simule - base;
 
-                totalBase   += base;
-                totalSimule += simule;
+                if (p.inTotal) {
+                    totalBase   += base;
+                    totalSimule += simule;
+                }
+
+                if (p.supergroupe !== derniereSupergroupe) {
+                    tbody += `<tr style="background: #1e293b;"><td colspan="6" style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 12px 16px; border-left: 4px solid #0f172a;">${p.supergroupe}</td></tr>`;
+                    derniereSupergroupe = p.supergroupe;
+                }
 
                 // Séparateur de groupe — bande colorée visible
                 if (p.groupe !== derniereGroupe) {
-                    tbody += `<tr style="background: #4338ca;"><td colspan="6" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81;">${p.groupe}</td></tr>`;
+                    tbody += `<tr style="background: #4338ca;"><td colspan="6" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81; padding-left: 30px;">${p.groupe}</td></tr>`;
                     derniereGroupe = p.groupe;
                 }
 
                 const surcoutColor = surcout > 0 ? '#b45309' : '#059669';
+                const styleGris = !p.inTotal ? 'opacity: 0.5; color: #94a3b8; font-style: italic;' : '';
                 tbody += `
-                    <tr>
-                        <td style="padding-left: 24px;">${p.label}</td>
+                    <tr style="${styleGris}">
+                        <td style="padding-left: 40px;">${p.label}</td>
                         <td style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">${p.qte}</td>
                         <td style="text-align: right; font-variant-numeric: tabular-nums;">${fmt(tarifBase)}</td>
                         <td style="text-align: right; font-variant-numeric: tabular-nums;">${fmt(base)}</td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--primary); font-weight: 600;">${fmt(simule)}</td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: ${surcoutColor};">${surcout > 0 ? '+' : ''}${fmt(surcout)}</td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; color: ${p.inTotal ? 'var(--primary)' : 'inherit'}; font-weight: 600;">${fmt(simule)}</td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: ${p.inTotal ? surcoutColor : 'inherit'};">${surcout > 0 ? '+' : ''}${fmt(surcout)}</td>
                     </tr>`;
             });
 
@@ -1024,7 +1038,7 @@
             const surcoutTotal = totalSimule - totalBase;
             tbody += `
                 <tr style="font-weight: 800; border-top: 2px solid #cbd5e1; background: #f1f5f9;">
-                    <td colspan="3" style="padding: 14px 16px; font-size: 0.9rem;">TOTAL MENSUEL</td>
+                    <td colspan="3" style="padding: 14px 16px; font-size: 0.9rem;">TOTAL MENSUEL <span style="font-size:0.7rem;font-weight:500;color:var(--text-muted);">(Prestations sélectionnées)</span></td>
                     <td style="text-align: right; font-variant-numeric: tabular-nums; font-size: 1rem;">${fmt(totalBase)}</td>
                     <td style="text-align: right; font-variant-numeric: tabular-nums; font-size: 1rem; color: var(--primary);">${fmt(totalSimule)}</td>
                     <td style="text-align: right; font-variant-numeric: tabular-nums; font-size: 1rem; color: ${surcoutTotal > 0 ? '#b45309' : '#059669'};">${surcoutTotal > 0 ? '+' : ''}${fmt(surcoutTotal)}</td>
@@ -1036,7 +1050,7 @@
             document.getElementById('al-total-base').textContent    = fmt(totalBase);
             document.getElementById('al-total-simule').textContent   = fmt(totalSimule);
             document.getElementById('al-surcout-mensuel').textContent = (surcoutTotal >= 0 ? '+' : '') + fmt(surcoutTotal);
-            document.getElementById('al-surcout-annuel').textContent  = (surcoutTotal >= 0 ? '+' : '') + fmt(surcoutTotal * 12);
+            document.getElementById('al-surcout-annuel').textContent  = (surcoutTotal >= 0 ? '+' : '') + fmt(surcoutTotal * 9.5);
         }
 
         function switchVueImpact(vue) {
@@ -1065,17 +1079,28 @@
             const fmt    = (v) => v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac';
             const tranches = ['A', 'B', 'B2', 'C', 'D', 'E', 'F', 'F2', 'G'];
 
+            const titleEl = document.getElementById('al-synth-title');
+            if (titleEl) {
+                titleEl.textContent = "Tableau synthétique - tarif mensuel avec augmentation de " + (pct * 100).toFixed(1).replace('.', ',') + " %";
+            }
+
             // Initialise les totaux par tranche
             const totaux = {};
             tranches.forEach(t => { totaux[t] = 0; });
 
             let tbody = '';
+            let derniereSupergroupe = null;
             let derniereGroupe = null;
 
             AL_PRESTATIONS.forEach(p => {
+                if (p.supergroupe !== derniereSupergroupe) {
+                    tbody += `<tr style="background: #1e293b;"><td colspan="${2 + tranches.length}" style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 12px 16px; border-left: 4px solid #0f172a;">${p.supergroupe}</td></tr>`;
+                    derniereSupergroupe = p.supergroupe;
+                }
+
                 // Séparateur de groupe — bande colorée visible
                 if (p.groupe !== derniereGroupe) {
-                    tbody += `<tr style="background: #4338ca;"><td colspan="${2 + tranches.length}" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81;">${p.groupe}</td></tr>`;
+                    tbody += `<tr style="background: #4338ca;"><td colspan="${2 + tranches.length}" style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; padding: 10px 16px; border-left: 4px solid #312e81; padding-left: 30px;">${p.groupe}</td></tr>`;
                     derniereGroupe = p.groupe;
                 }
 
@@ -1084,33 +1109,48 @@
                     const tarif = AL_TARIFS_2025[t][p.cle];
                     return (tarif !== null && tarif !== undefined) ? tarif * p.qte * coef : null;
                 });
+                
+                const origVals = tranches.map(t => {
+                    const tarif = AL_TARIFS_2025[t][p.cle];
+                    return (tarif !== null && tarif !== undefined) ? tarif * p.qte : null;
+                });
+
                 const validVals = vals.filter(v => v !== null);
                 const minVal = validVals.length > 1 ? Math.min(...validVals) : null;
                 const maxVal = validVals.length > 1 ? Math.max(...validVals) : null;
 
-                let cells = `<td style="padding-left: 24px; font-size: 0.88rem;">${p.label}</td>`;
-                cells += `<td style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">${p.qte}</td>`;
+                const styleGris = !p.inTotal ? 'opacity: 0.6; color: #64748b; font-style: italic;' : '';
+                let cells = `<td style="padding-left: 40px; font-size: 0.88rem; ${styleGris}">${p.label}</td>`;
+                cells += `<td style="text-align: center; background: #cbd5e1; color: #334155; font-size: 0.85rem; font-weight: 700;">${p.qte}</td>`;
 
                 tranches.forEach((t, i) => {
                     const montant     = vals[i];
+                    const origMontant = origVals[i];
                     const borderLeft  = i === 0 ? 'border-left: 2px solid #c7d2fe;' : '';
                     if (montant === null) {
                         cells += `<td style="text-align: right; color: #cbd5e1; ${borderLeft}">&mdash;</td>`;
                         return;
                     }
-                    totaux[t] += montant;
+                    if (p.inTotal) {
+                        totaux[t] += montant;
+                    }
                     let bg = '';
                     if (minVal !== null && maxVal !== null && minVal !== maxVal) {
                         if (montant === maxVal) bg = 'background: #fef2f2;';
                         else if (montant === minVal) bg = 'background: #f0fdf4;';
                     }
-                    cells += `<td style="text-align: right; font-variant-numeric: tabular-nums; font-size: 0.88rem; font-weight: 500; ${bg} ${borderLeft}">${fmt(montant)}</td>`;
+                    const surcout = montant - origMontant;
+                    const surcoutStr = surcout > 0 ? '+' + fmt(surcout) : fmt(surcout);
+                    const textColor = surcout > 0 ? '#b45309' : '#059669';
+                    cells += `<td style="text-align: right; font-variant-numeric: tabular-nums; font-size: 0.88rem; font-weight: 500; ${bg} ${borderLeft} ${styleGris}">
+                                ${fmt(montant)} <span style="color: ${p.inTotal ? textColor : 'inherit'}; font-size: 0.75rem;">/ ${surcoutStr}</span>
+                              </td>`;
                 });
                 tbody += `<tr>${cells}</tr>`;
             });
 
             // Ligne TOTAL
-            let totalCells = `<td colspan="2" style="padding: 14px 16px; font-weight: 800; font-size: 0.92rem;">TOTAL MENSUEL</td>`;
+            let totalCells = `<td colspan="2" style="padding: 14px 16px; font-weight: 800; font-size: 0.92rem;">TOTAL MENSUEL<br><span style="font-size:0.7rem;font-weight:500;color:var(--text-muted);">(Prestations sélectionnées)</span></td>`;
             tranches.forEach((t, i) => {
                 const borderLeft = i === 0 ? 'border-left: 2px solid #c7d2fe;' : '';
                 totalCells += `<td style="text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 1rem; color: var(--primary); ${borderLeft}">${fmt(totaux[t])}</td>`;
@@ -1178,10 +1218,13 @@
             const printArea = document.getElementById('impact-print-area');
             printArea.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
-                    <div>
-                        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#4f46e5; margin-bottom:4px;">Mairie de Crosne · Outil de Tarification</div>
-                        <div style="font-size:17px; font-weight:800; color:#0f172a; letter-spacing:-.02em;">${titre}</div>
-                        <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="Crosne-LOGO.png" style="height:45px; width:auto; object-fit:contain;" alt="Logo Mairie">
+                        <div>
+                            <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#4f46e5; margin-bottom:4px;">Mairie de Crosne · Outil de Tarification</div>
+                            <div style="font-size:17px; font-weight:800; color:#0f172a; letter-spacing:-.02em;">${titre}</div>
+                            <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
+                        </div>
                     </div>
                     <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}<br>Grille tarifaire 2025</div>
                 </div>
@@ -1189,7 +1232,7 @@
                 ${tableEl.outerHTML}
                 <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:8px; font-size:8px; color:#94a3b8; display:flex; justify-content:space-between;">
                     <span>Document généré automatiquement par l'outil de tarification de la Mairie de Crosne</span>
-                    <span>Grille 2025 · Usage interne</span>
+                    <span>Grille 2025 · Pour validation - Le Maire / Le Directeur Général des Services</span>
                 </div>`;
 
             printArea.style.display = 'block';
