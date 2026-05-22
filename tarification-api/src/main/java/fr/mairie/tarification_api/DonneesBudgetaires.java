@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service de gestion des données budgétaires dynamiques.
@@ -82,13 +84,16 @@ public class DonneesBudgetaires {
     private List<DepensePole> chargerPolesDynamiquesSourceA() {
         List<DepensePole> poles = new ArrayList<>();
         Calculateur.SyntheseGlobale sg = calculateur.getSynthese();
+        Map<String, Integer> effectifsJson = chargerEffectifsJson();
 
         for (String nom : POLES_SOURCE_A) {
             double total = sg.totauxDepenses.getOrDefault(nom, 0.0);
             Map<String, Double> charges = sg.depenses.getOrDefault(nom, Map.of());
 
-            double effectifTotal = sg.effectifs.values().stream()
-                    .mapToDouble(Double::doubleValue).sum();
+            double effectifTotal = effectifsJson.containsKey(nom) 
+                ? effectifsJson.get(nom) 
+                : sg.effectifs.values().stream().mapToDouble(Double::doubleValue).sum();
+
             double coutUnitaire = (effectifTotal > 0) ? (total / effectifTotal) : 0;
 
             poles.add(new DepensePole(
@@ -181,6 +186,8 @@ public class DonneesBudgetaires {
                 return poles;
             }
 
+            Map<String, Integer> effectifsJson = chargerEffectifsJson();
+
             try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
                  org.apache.poi.ss.usermodel.Workbook workbook =
                          org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
@@ -189,12 +196,9 @@ public class DonneesBudgetaires {
                 if (dep == null) return poles;
 
                 // --- RESTAURATION (RE) ---
-                // Total : ligne 21 (index 20), colonne 22 (index 21)
-                // Détails : lignes 4 à 20 (index 3..19), colonne 22 (index 21)
-                // Effectif : ligne 22 (index 21), colonne 3 (index 2)
                 {
                     double total    = getCellByIndex(dep, 20, 21);
-                    int effectif    = (int) getCellByIndex(dep, 21, 2);
+                    int effectif    = effectifsJson.getOrDefault(POLE_RESTAURATION, (int) getCellByIndex(dep, 21, 2));
                     double coutUnit = effectif > 0 ? total / effectif : 0;
                     Map<String, Double> charges = lireCharges(dep, 3, 19, 0, 21);
                     poles.add(new DepensePole(
@@ -204,12 +208,9 @@ public class DonneesBudgetaires {
                 }
 
                 // --- SCOLAIRE (SC) ---
-                // Total : ligne 46 (index 45), colonne 11 (index 10)
-                // Détails : lignes 30 à 45 (index 29..44), colonne 11 (index 10)
-                // Effectif : ligne 47 (index 46), colonne 11 (index 10)
                 {
                     double total    = getCellByIndex(dep, 45, 10);
-                    int effectif    = (int) getCellByIndex(dep, 46, 10);
+                    int effectif    = effectifsJson.getOrDefault(POLE_SCOLAIRE, (int) getCellByIndex(dep, 46, 10));
                     double coutUnit = effectif > 0 ? total / effectif : 0;
                     Map<String, Double> charges = lireCharges(dep, 29, 44, 0, 10);
                     poles.add(new DepensePole(
@@ -219,12 +220,9 @@ public class DonneesBudgetaires {
                 }
 
                 // --- ACCUEIL DE LOISIRS / CENTRE DE LOISIRS (CL) ---
-                // Total : ligne 65 (index 64), colonne 7 (index 6)
-                // Détails : lignes 53 à 64 (index 52..63), colonne 7 (index 6)
-                // Effectif : ligne 66 (index 65), colonne 7 (index 6)
                 {
                     double total    = getCellByIndex(dep, 64, 6);
-                    int effectif    = (int) getCellByIndex(dep, 65, 6);
+                    int effectif    = effectifsJson.getOrDefault(POLE_LOISIRS, (int) getCellByIndex(dep, 65, 6));
                     double coutUnit = effectif > 0 ? total / effectif : 0;
                     Map<String, Double> charges = lireCharges(dep, 52, 63, 0, 6);
                     poles.add(new DepensePole(
@@ -290,6 +288,33 @@ public class DonneesBudgetaires {
     // =========================================================================
     // UTILITAIRES
     // =========================================================================
+
+    /**
+     * Lit les données annuelles JSON pour écraser les effectifs lus dans l'Excel.
+     */
+    private Map<String, Integer> chargerEffectifsJson() {
+        Map<String, Integer> effectifs = new HashMap<>();
+        try {
+            java.io.File file = trouverFichier("Donnees/consommations_2025.json");
+            if (file == null) return effectifs;
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(file);
+            JsonNode polesNode = root.path("poles");
+            
+            if (polesNode.isObject()) {
+                polesNode.fieldNames().forEachRemaining(poleName -> {
+                    JsonNode poleInfo = polesNode.get(poleName);
+                    if (poleInfo.has("total")) {
+                        effectifs.put(poleName, poleInfo.get("total").asInt());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            System.err.println("[WARN] Fichier consommations_2025.json introuvable ou invalide. Repli sur Excel.");
+        }
+        return effectifs;
+    }
 
     /**
      * Lit les charges détaillées d'une section Excel.

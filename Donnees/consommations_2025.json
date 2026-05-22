@@ -1,0 +1,56 @@
+{
+  "annee": 2025,
+  "poles": {
+    "Restauration": {
+      "total": 109936,
+      "details": {
+        "global": 109936,
+        "restaurant_club_ado": 1017
+      }
+    },
+    "Etudes surveillees": {
+      "total": 23576,
+      "details": {
+        "global": 23576
+      }
+    },
+    "Accueil periscolaire": {
+      "total": 29070,
+      "details": {
+        "JP1": 4225,
+        "Louis_Mich_matin_soir": 11732,
+        "Ptit_prince_matin_soir": 13113
+      }
+    },
+    "Accueil de Loisirs": {
+      "total": 30870,
+      "details": {
+        "Louis_Mich_vacances_mercredi": 10312,
+        "Ptit_prince_mercredi": 4007,
+        "Louis_Mich_mercredi": 4345,
+        "Ptit_prince_vacances": 6231,
+        "Louis_Mich_vacances": 5975
+      }
+    },
+    "Espace Ados": {
+      "total": 3364,
+      "details": {
+        "Vacances": 1902,
+        "Soir_et_mercredi": 1462
+      }
+    },
+    "Sejours": {
+      "total": 82,
+      "details": {
+        "global": 82
+      }
+    },
+    "Scolaire": {
+      "total": 137,
+      "details": {
+        "Classe_deco_Curie": 50,
+        "Classe_deco_Brassens": 87
+      }
+    }
+  }
+}
