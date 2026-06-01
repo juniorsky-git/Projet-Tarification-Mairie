@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf — génération de PDF natif côté client -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
@@ -1166,13 +1168,13 @@
             const vueSynth = document.getElementById('al-vue-synthetique').style.display !== 'none';
             const pct    = parseFloat(document.getElementById('al-slider').value);
             const tranche = document.getElementById('al-tranche') ? document.getElementById('al-tranche').value : '';
-            const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-
-            // Orientation selon la vue
-            const pageSize = vueSynth ? 'A4 landscape' : 'A4 portrait';
-            let styleEl = document.getElementById('print-page-style-if');
-            if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'print-page-style-if'; document.head.appendChild(styleEl); }
-            styleEl.textContent = `@page { size: ${pageSize}; margin: 12mm 14mm; }`;
+            const now    = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+            // Nom du fichier dynamique : ex. Impact-Familles_Tranche-C_+5pct_2026-06-01.pdf
+            const pctLabel = pct > 0 ? `_+${pct.toFixed(1).replace('.', ',')}pct` : '_sans-hausse';
+            const vueLabel = vueSynth ? 'Vue-Synthetique' : `Tranche-${tranche}`;
+            const dateLabel = now.toISOString().slice(0, 10);
+            const nomFichier = `Impact-Familles_${vueLabel}${pctLabel}_${dateLabel}.pdf`;
 
             // En-tête du document
             const titre = vueSynth
@@ -1214,30 +1216,54 @@
                     </div>`;
             }
 
-            // Construire l'aire d'impression
+            // Construire le contenu du document à exporter
             const printArea = document.getElementById('impact-print-area');
             printArea.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <img src="Crosne-LOGO.png" style="height:45px; width:auto; object-fit:contain;" alt="Logo Mairie">
-                        <div>
-                            <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#4f46e5; margin-bottom:4px;">Mairie de Crosne · Outil de Tarification</div>
-                            <div style="font-size:17px; font-weight:800; color:#0f172a; letter-spacing:-.02em;">${titre}</div>
-                            <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
+                <div style="font-family:'DM Sans',Arial,sans-serif; padding:0;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <img src="Crosne-LOGO.png" style="height:45px; width:auto; object-fit:contain;" alt="Logo Mairie">
+                            <div>
+                                <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#4f46e5; margin-bottom:4px;">Mairie de Crosne · Outil de Tarification</div>
+                                <div style="font-size:17px; font-weight:800; color:#0f172a; letter-spacing:-.02em;">${titre}</div>
+                                <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
+                            </div>
                         </div>
+                        <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}<br>Grille tarifaire 2025</div>
                     </div>
-                    <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}<br>Grille tarifaire 2025</div>
-                </div>
-                ${kpiHTML}
-                ${tableEl.outerHTML}
-                <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:8px; font-size:8px; color:#94a3b8; display:flex; justify-content:space-between;">
-                    <span>Document généré automatiquement par l'outil de tarification de la Mairie de Crosne</span>
-                    <span>Grille 2025 · Pour validation - Le Maire / Le Directeur Général des Services</span>
+                    ${kpiHTML}
+                    ${tableEl.outerHTML}
+                    <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:8px; font-size:8px; color:#94a3b8; display:flex; justify-content:space-between;">
+                        <span>Document généré automatiquement par l'outil de tarification de la Mairie de Crosne</span>
+                        <span>Grille 2025 · Pour validation - Le Maire / Le Directeur Général des Services</span>
+                    </div>
                 </div>`;
 
             printArea.style.display = 'block';
-            window.print();
-            setTimeout(() => { printArea.style.display = 'none'; printArea.innerHTML = ''; }, 800);
+
+            // Feedback visuel sur le bouton pendant la génération
+            const btn = document.querySelector('[onclick="exporterImpactPDF()"]');
+            if (btn) { btn.textContent = '⏳ Génération...'; btn.disabled = true; }
+
+            // Options html2pdf
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     nomFichier,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: vueSynth ? 'landscape' : 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css'] }
+            };
+
+            html2pdf().set(opt).from(printArea).save().then(() => {
+                printArea.style.display = 'none';
+                printArea.innerHTML = '';
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="file-down" style="width:15px;height:15px;"></i> Exporter en PDF';
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }
+            });
         }
 
         // --- AUTHENTIFICATION & LANDING ---
