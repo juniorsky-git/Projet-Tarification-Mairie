@@ -39,13 +39,7 @@ public class Calculateur {
         }
         
         SyntheseGlobale sg = new SyntheseGlobale();
-        File f = new File(FICHIER);
-        if (!f.exists()) {
-            System.err.println("CRITIQUE : Fichier source manquant à : " + f.getAbsolutePath());
-            return sg;
-        }
-        
-        try (FileInputStream fis = new FileInputStream(f);
+        try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream(FICHIER);
              Workbook wb = WorkbookFactory.create(fis)) {
 
             Sheet s = wb.getSheet(ONGLET_SYNTHESE);

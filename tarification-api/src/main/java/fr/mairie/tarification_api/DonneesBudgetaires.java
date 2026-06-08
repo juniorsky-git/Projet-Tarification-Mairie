@@ -109,10 +109,7 @@ public class DonneesBudgetaires {
     private Map<String, Double> chargerRecettesReellesSourceA() {
         Map<String, Double> recettes = new HashMap<>();
         try {
-            java.io.File file = trouverFichier("Depenses recettes nf.xlsx");
-            if (file == null) return recettes;
-
-            try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
+            try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("Depenses recettes nf.xlsx");
                  org.apache.poi.ss.usermodel.Workbook workbook =
                          org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
 
@@ -180,15 +177,9 @@ public class DonneesBudgetaires {
     private List<DepensePole> chargerPolesDepuisVfRecDep() {
         List<DepensePole> poles = new ArrayList<>();
         try {
-            java.io.File file = trouverFichier("VF_REC_DEP.xlsx");
-            if (file == null) {
-                // Si le fichier n'existe pas, on retourne des pôles vides (le repli Source A prendra le relais)
-                return poles;
-            }
-
             Map<String, Integer> effectifsJson = chargerEffectifsJson();
 
-            try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
+            try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("VF_REC_DEP.xlsx");
                  org.apache.poi.ss.usermodel.Workbook workbook =
                          org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
 
@@ -247,10 +238,7 @@ public class DonneesBudgetaires {
         Map<String, Double> recettes = new HashMap<>(chargerRecettesReellesSourceA());
 
         try {
-            java.io.File file = trouverFichier("VF_REC_DEP.xlsx");
-            if (file == null) return recettes; // repli total sur Source A
-
-            try (java.io.FileInputStream fis = new java.io.FileInputStream(file);
+            try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("VF_REC_DEP.xlsx");
                  org.apache.poi.ss.usermodel.Workbook workbook =
                          org.apache.poi.ss.usermodel.WorkbookFactory.create(fis)) {
 
@@ -295,11 +283,9 @@ public class DonneesBudgetaires {
     private Map<String, Integer> chargerEffectifsJson() {
         Map<String, Integer> effectifs = new HashMap<>();
         try {
-            java.io.File file = trouverFichier("Donnees/consommations_2025.json");
-            if (file == null) return effectifs;
-
+            java.io.InputStream is = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("Donnees/consommations_2025.json");
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(file);
+            JsonNode root = mapper.readTree(is);
             JsonNode polesNode = root.path("poles");
             
             if (polesNode.isObject()) {

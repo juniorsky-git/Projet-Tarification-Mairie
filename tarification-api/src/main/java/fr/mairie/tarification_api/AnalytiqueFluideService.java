@@ -69,7 +69,7 @@ public class AnalytiqueFluideService {
         List<AnalytiqueFluide> resultats = new ArrayList<>();
         logService.reinitialiser();
 
-        try (FileInputStream fis = new FileInputStream(new File(cheminExcel));
+        try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream(cheminExcel);
              Workbook wb = WorkbookFactory.create(fis)) {
             
             analyserGaz(wb, resultats);
@@ -111,7 +111,7 @@ public class AnalytiqueFluideService {
 
     public List<RapportSemestrielFluide> analyserBiSemestriel(String cheminExcel) {
         List<RapportSemestrielFluide> resultats = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(new File(cheminExcel));
+        try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream(cheminExcel);
              Workbook wb = WorkbookFactory.create(fis)) {
             analyserBiSemestrielEau(wb, resultats);
             analyserBiSemestrielGaz(wb, resultats);
