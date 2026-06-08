@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new User(
             user.getUsername(),
             user.getPassword(),
-            new ArrayList<>() // On pourra ajouter les rôles (ADMIN/AGENT) ici plus tard
+            java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRole()))
         );
     }
 }
