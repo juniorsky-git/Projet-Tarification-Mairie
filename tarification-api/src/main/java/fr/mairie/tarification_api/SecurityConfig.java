@@ -45,7 +45,12 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutSuccessUrl("/")
-                .permitAll());
+                .permitAll())
+            .rememberMe(remember -> remember
+                .key("cle-secrete-mairie")
+                .alwaysRemember(true)
+                .tokenValiditySeconds(86400 * 30)
+            );
         
         return http.build();
     }

@@ -28,11 +28,16 @@ public class AnalytiqueFluideService {
     @org.springframework.beans.factory.annotation.Autowired
     private LogService logService;
 
+    private List<AnalytiqueFluide> cacheTous = null;
+
     /**
      * Point d'entrée principal (compatibilité dashboard).
      */
     public List<AnalytiqueFluide> analyserTout() {
-        return analyserTout(FICHIER, true); 
+        if (cacheTous == null) {
+            cacheTous = analyserTout(FICHIER, true); 
+        }
+        return cacheTous;
     }
 
     /**
@@ -40,7 +45,7 @@ public class AnalytiqueFluideService {
      */
     public List<AnalytiqueFluide> analyserParPole(String pole) {
         // Pour le Dashboard, on ne sauvegarde PAS les logs sur le disque à chaque clic
-        List<AnalytiqueFluide> tous = analyserTout(FICHIER, false);
+        List<AnalytiqueFluide> tous = analyserTout();
         if (pole == null || pole.isEmpty()) return tous;
 
         return tous.stream().filter(f -> {
@@ -105,8 +110,13 @@ public class AnalytiqueFluideService {
         }
     }
 
+    private List<RapportSemestrielFluide> cacheBi = null;
+
     public List<RapportSemestrielFluide> analyserBiSemestriel() {
-        return analyserBiSemestriel(FICHIER);
+        if (cacheBi == null) {
+            cacheBi = analyserBiSemestriel(FICHIER);
+        }
+        return cacheBi;
     }
 
     public List<RapportSemestrielFluide> analyserBiSemestriel(String cheminExcel) {

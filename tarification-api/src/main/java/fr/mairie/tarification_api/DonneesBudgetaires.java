@@ -106,7 +106,10 @@ public class DonneesBudgetaires {
         return poles;
     }
 
+    private Map<String, Double> cacheRecettesSourceA = null;
+
     private Map<String, Double> chargerRecettesReellesSourceA() {
+        if (cacheRecettesSourceA != null) return cacheRecettesSourceA;
         Map<String, Double> recettes = new HashMap<>();
         try {
             try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("Depenses recettes nf.xlsx");
@@ -135,6 +138,7 @@ public class DonneesBudgetaires {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        cacheRecettesSourceA = recettes;
         return recettes;
     }
 
@@ -174,7 +178,10 @@ public class DonneesBudgetaires {
      *   - DEPENSES SC  : ligne 28 (header: 29), total: ligne 46 col 11, détails: L30-45 col 11, effectif: L47 col 11
      *   - DEPENSES CL  : ligne 51 (header: 52), total: ligne 65 col 7,  détails: L53-64 col 7,  effectif: L66 col 7
      */
+    private List<DepensePole> cachePolesSourceB = null;
+
     private List<DepensePole> chargerPolesDepuisVfRecDep() {
+        if (cachePolesSourceB != null) return cachePolesSourceB;
         List<DepensePole> poles = new ArrayList<>();
         try {
             Map<String, Integer> effectifsJson = chargerEffectifsJson();
@@ -225,6 +232,7 @@ public class DonneesBudgetaires {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        cachePolesSourceB = poles;
         return poles;
     }
 
@@ -233,7 +241,10 @@ public class DonneesBudgetaires {
      * - Pour RE, SC, CL : lire depuis VF_REC_DEP.xlsx onglet "REC" (tableau synthétique)
      * - Pour les pôles manquants : repli sur Source A (Depenses recettes nf.xlsx)
      */
+    private Map<String, Double> cacheRecettesSourceB = null;
+
     private Map<String, Double> chargerRecettesReellesHybride() {
+        if (cacheRecettesSourceB != null) return cacheRecettesSourceB;
         // Démarrer avec toutes les recettes Source A (base de repli)
         Map<String, Double> recettes = new HashMap<>(chargerRecettesReellesSourceA());
 
@@ -270,6 +281,7 @@ public class DonneesBudgetaires {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        cacheRecettesSourceB = recettes;
         return recettes;
     }
 
@@ -277,10 +289,13 @@ public class DonneesBudgetaires {
     // UTILITAIRES
     // =========================================================================
 
+    private Map<String, Integer> cacheEffectifsJson = null;
+
     /**
      * Lit les données annuelles JSON pour écraser les effectifs lus dans l'Excel.
      */
     private Map<String, Integer> chargerEffectifsJson() {
+        if (cacheEffectifsJson != null) return cacheEffectifsJson;
         Map<String, Integer> effectifs = new HashMap<>();
         try {
             java.io.InputStream is = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream("Donnees/consommations_2025.json");
@@ -299,6 +314,7 @@ public class DonneesBudgetaires {
         } catch (Exception e) {
             System.err.println("[WARN] Fichier consommations_2025.json introuvable ou invalide. Repli sur Excel.");
         }
+        cacheEffectifsJson = effectifs;
         return effectifs;
     }
 

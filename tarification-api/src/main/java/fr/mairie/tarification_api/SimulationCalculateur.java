@@ -36,7 +36,10 @@ public class SimulationCalculateur {
         }
     }
 
+    private List<SimulationLigne> cacheSimulationRestauration = null;
+
     public List<SimulationLigne> lireSimulationRestauration() {
+        if (cacheSimulationRestauration != null) return cacheSimulationRestauration;
         List<SimulationLigne> lignes = new ArrayList<>();
 
         try (java.io.InputStream fis = fr.mairie.tarification_api.outils.ResourceHelper.getExcelInputStream(fichierExcel);
@@ -80,6 +83,7 @@ public class SimulationCalculateur {
             System.err.println("[SimulationCalculateur] Erreur lecture Excel POI : " + e.getMessage());
             e.printStackTrace();
         }
+        cacheSimulationRestauration = lignes;
         return lignes;
     }
 
