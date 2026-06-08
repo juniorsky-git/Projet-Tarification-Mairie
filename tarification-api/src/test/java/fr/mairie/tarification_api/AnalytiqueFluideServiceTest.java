@@ -8,14 +8,12 @@ import java.util.List;
 @SpringBootTest
 class AnalytiqueFluideServiceTest {
 
-    private final AnalytiqueFluideService service = new AnalytiqueFluideService();
-
     @Test
     void testCalculEvolutionEtAlertes() {
-        // Simuler les valeurs pour tester la logique de RapportSemestrielFluide
+        // Tester la logique de calcul d'évolution semestrielle
         double s1 = 100.0;
         double s2 = 150.0;
-        
+
         double delta = ((s2 - s1) / s1) * 100;
         boolean alerte = Math.abs(delta) > 20;
 
@@ -27,18 +25,19 @@ class AnalytiqueFluideServiceTest {
     void testCasS1Zero() {
         double s1 = 0.0;
         double s2 = 50.0;
-        
-        // Logique implémentée dans le service : si S1=0, delta=0 (on ne peut pas diviser par zéro)
+
+        // Si S1=0, delta=0 pour éviter NaN
         double delta = s1 > 0 ? ((s2 - s1) / s1) * 100 : 0;
-        
+
         assertEquals(0.0, delta, "Si S1 est à zéro, l'évolution doit être ramenée à 0 pour éviter NaN");
     }
-    
+
     @Test
-    void testFichierInexistant() {
-        // On vérifie que le service ne plante pas si le fichier est absent
-        List<RapportSemestrielFluide> resultats = service.analyserBiSemestriel("chemin/imaginaire.xlsx");
-        assertNotNull(resultats);
-        assertTrue(resultats.isEmpty(), "Une liste vide devrait être retournée si le fichier est absent");
+    void testBiSemestrielRetourneListeNonNull() {
+        // Le service lit maintenant fluides.json (zéro Excel)
+        // En contexte de test, fluides.json est dans le classpath → la liste peut être vide mais jamais null
+        AnalytiqueFluideService service = new AnalytiqueFluideService();
+        List<RapportSemestrielFluide> resultats = service.analyserBiSemestriel();
+        assertNotNull(resultats, "La liste ne doit jamais être null");
     }
 }
