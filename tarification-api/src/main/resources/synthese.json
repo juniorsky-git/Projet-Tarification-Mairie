@@ -1,0 +1,157 @@
+{
+  "depenses": {
+    "Restauration": {
+      "Prestataire SCOLAREST": 713752.4699999999,
+      "Alimentation": 1451.91,
+      "Eau": 8159,
+      "Gaz": 8159,
+      "Electricité": 30563.489999999998,
+      "Personnel": 1051019.6400000001
+    },
+    "Accueil de Loisirs": {
+      "Prestataire SCOLAREST": 27471.64,
+      "Alimentation": 35623.060000000005,
+      "Eau": 26601.975,
+      "Electricité": 16884.2325,
+      "Matériel": 2177.4700000000003,
+      "Fournitures": 14790.91,
+      "Materiel sportif": 478.61,
+      "Activités , ateliers": 4889.7,
+      "Droits d'entrée": 18846.27,
+      "Carburant": 14552.99,
+      "Personnel": 1428849.37,
+      "Autres": 4949.91
+    },
+    "Accueil periscolaire": {
+      "Alimentation": 5810.47,
+      "Eau": 18594.03,
+      "Gaz": 16186.5,
+      "Electricité": 20288.4025,
+      "Personnel": 597977.3800000001
+    },
+    "Espace Ados": {
+      "Alimentation": 59.24,
+      "Eau": 3499.27,
+      "Gaz": 426,
+      "Electricité": 10918.975,
+      "Fournitures": 1265.87,
+      "Petit matériel": 467.86,
+      "Carburant": 4016.42,
+      "Personnel": 119794.89,
+      "Autres": 327.01
+    },
+    "Sejours": {
+      "Alimentation": 355.46000000000004,
+      "Matériel": 83.78999999999999,
+      "Fournitures": 298.96,
+      "Carburant": 45304.83,
+      "Hebergement": 60769.94,
+      "Autres": 314.73
+    },
+    "Etudes surveillees": {
+      "Personnel": 58598.14
+    }
+  },
+  "totauxDepenses": {
+    "Restauration": 1813105.51,
+    "Accueil de Loisirs": 1596116.1375,
+    "Accueil periscolaire": 658856.7825000001,
+    "Etudes surveillees": 58598.14,
+    "Espace Ados": 140775.535,
+    "Sejours": 107127.71
+  },
+  "effectifs": {
+    "EXT": 11,
+    "A": 429,
+    "B": 90,
+    "B2": 90,
+    "C": 79,
+    "D": 79,
+    "E": 90,
+    "F": 79,
+    "F2": 57,
+    "G": 124
+  },
+  "tarifs": {
+    "EXT": {
+      "Restauration": 5.54,
+      "Accueil de Loisirs": 14.96,
+      "Accueil periscolaire": 4.48,
+      "Etudes surveillees": 16.12,
+      "Espace Ados": 8.19,
+      "Sejours": 70
+    },
+    "A": {
+      "Restauration": 5.13,
+      "Accueil de Loisirs": 13.855,
+      "Accueil periscolaire": 4.165,
+      "Etudes surveillees": 14.493333333333334,
+      "Espace Ados": 6.942,
+      "Sejours": 56
+    },
+    "B": {
+      "Restauration": 4.53,
+      "Accueil de Loisirs": 12.254999999999999,
+      "Accueil periscolaire": 3.66,
+      "Etudes surveillees": 13.020000000000001,
+      "Espace Ados": 7.005,
+      "Sejours": 49
+    },
+    "B2": {
+      "Restauration": 4,
+      "Accueil de Loisirs": 10.4,
+      "Accueil periscolaire": 3.1399999999999997,
+      "Etudes surveillees": 11.686666666666666,
+      "Espace Ados": 5.573333333333333,
+      "Sejours": 42
+    },
+    "C": {
+      "Restauration": 3.86,
+      "Accueil de Loisirs": 10.4,
+      "Accueil periscolaire": 3.1399999999999997,
+      "Etudes surveillees": 11.686666666666666,
+      "Espace Ados": 5.573333333333333,
+      "Sejours": 42
+    },
+    "D": {
+      "Restauration": 3.25,
+      "Accueil de Loisirs": 8.785,
+      "Accueil periscolaire": 2.635,
+      "Etudes surveillees": 10.496666666666664,
+      "Espace Ados": 4.101666666666667,
+      "Sejours": 35
+    },
+    "E": {
+      "Restauration": 2.7,
+      "Accueil de Loisirs": 7.325,
+      "Accueil periscolaire": 2.2,
+      "Etudes surveillees": 9.429999999999998,
+      "Espace Ados": 3.2566666666666664,
+      "Sejours": 28
+    },
+    "F": {
+      "Restauration": 2,
+      "Accueil de Loisirs": 5.41,
+      "Accueil periscolaire": 1.62,
+      "Etudes surveillees": 8.423333333333334,
+      "Espace Ados": 2.4483333333333333,
+      "Sejours": 21
+    },
+    "F2": {
+      "Restauration": 1.45,
+      "Accueil de Loisirs": 5.41,
+      "Accueil periscolaire": 1.62,
+      "Etudes surveillees": 8.423333333333334,
+      "Espace Ados": 2.4483333333333333,
+      "Sejours": 21
+    },
+    "G": {
+      "Restauration": 1.32,
+      "Accueil de Loisirs": 4.1,
+      "Accueil periscolaire": 1.065,
+      "Etudes surveillees": 7.496666666666666,
+      "Espace Ados": 1.6383333333333334,
+      "Sejours": 14
+    }
+  }
+}

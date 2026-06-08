@@ -36,4 +36,40 @@ public class ResourceHelper {
         
         throw new java.io.FileNotFoundException("Fichier introuvable sur le disque ni dans le classpath: " + nomFichier);
     }
+
+    public static File getExcelFile(String nomFichier) throws Exception {
+        File file = new File(nomFichier);
+        if (file.exists()) return file;
+        
+        file = new File("tarification-api/" + nomFichier);
+        if (file.exists()) return file;
+        
+        file = new File("Donnees/Autres/" + nomFichier);
+        if (file.exists()) return file;
+        
+        file = new File("src/main/resources/" + nomFichier);
+        if (file.exists()) return file;
+
+        String baseName = new File(nomFichier).getName();
+        ClassPathResource cpr = new ClassPathResource(baseName);
+        if (!cpr.exists()) {
+            cpr = new ClassPathResource(nomFichier);
+        }
+        
+        if (cpr.exists()) {
+            File tempFile = File.createTempFile("excel_", "_" + baseName);
+            tempFile.deleteOnExit();
+            try (InputStream in = cpr.getInputStream();
+                 java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
+                 byte[] buffer = new byte[8192];
+                 int bytesRead;
+                 while ((bytesRead = in.read(buffer)) != -1) {
+                     out.write(buffer, 0, bytesRead);
+                 }
+            }
+            return tempFile;
+        }
+        
+        throw new java.io.FileNotFoundException("Fichier introuvable sur le disque ni dans le classpath: " + nomFichier);
+    }
 }

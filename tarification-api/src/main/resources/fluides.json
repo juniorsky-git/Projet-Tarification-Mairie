@@ -1,0 +1,936 @@
+{
+  "eau": [
+    {
+      "site": "98-7886111853 BÂTIMENT BÂTIMENT SYNDICAT ET FNACA - 31, AV. JEAN JAURES",
+      "conso": 2,
+      "reel": 31.509999999999998,
+      "consoS1": 0,
+      "consoS2": 2,
+      "reelS1": 10.67,
+      "reelS2": 20.84
+    },
+    {
+      "site": "98-1088208481 BÂTIMENT AMICALE LAÏQUE (ANCIENNEMENT CROIX ROUGE) - 8, RUE A. FOUDRIER",
+      "conso": 1,
+      "reel": 26.43,
+      "consoS1": 0,
+      "consoS2": 1,
+      "reelS1": 10.67,
+      "reelS2": 15.76
+    },
+    {
+      "site": "98-6036027075 BÂTIMENT BAINS DOUCHES ET ESPACE RENE FALLET - 29 TER, AV. J. JAURES",
+      "conso": 145,
+      "reel": 758.4499999999999,
+      "consoS1": 0,
+      "consoS2": 145,
+      "reelS1": 10.67,
+      "reelS2": 747.78
+    },
+    {
+      "site": "98-2468097228 BÂTIMENT POLICE MUNICIPALE - 33 BIS, AV. J. JAURES",
+      "conso": 0,
+      "reel": 54.02,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 54.02,
+      "reelS2": 0
+    },
+    {
+      "site": "98-2685548103 BÂTIMENT MAIRIE (GUICHET UNIQUE) - 35, AV. J. JAURES",
+      "conso": 112,
+      "reel": 590.65,
+      "consoS1": 0,
+      "consoS2": 112,
+      "reelS1": 10.67,
+      "reelS2": 579.98
+    },
+    {
+      "site": "98-6291864853 BÂTIMENT MAISON DES ASSOCIATIONS 1901 ET MAISON DES JEUNES - 28, RUE COLBERT",
+      "conso": 1086,
+      "reel": 5530.99,
+      "consoS1": 0,
+      "consoS2": 1086,
+      "reelS1": 0,
+      "reelS2": 5530.99
+    },
+    {
+      "site": "98-5042184611 BÂTIMENT SERVICES TECHNIQUES - 13/15, RUE DES INVESTISSEURS",
+      "conso": 413,
+      "reel": 2905.8999999999996,
+      "consoS1": 0,
+      "consoS2": 413,
+      "reelS1": 403.28,
+      "reelS2": 2502.62
+    },
+    {
+      "site": "98-8729053769 BÂTIMENT ANCIENNEMENT RESTOS DU CŒUR - 3, RUE A. FOUDRIER",
+      "conso": 1,
+      "reel": 21.38,
+      "consoS1": 0,
+      "consoS2": 1,
+      "reelS1": 5.62,
+      "reelS2": 15.76
+    },
+    {
+      "site": "98-7497055393 BÂTIMENT ANCIENNEMENT SERVICE SCOLAIRE - JEUNESSE - CITOYENNETE - 8/10, RUE RYMAROV",
+      "conso": 0,
+      "reel": 21.34,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 10.67,
+      "reelS2": 10.67
+    },
+    {
+      "site": "98-3574491365 BÂTIMENT GROUPE SCOLAIRE EUROPE (CENTRE DE LOISIRS PETIT PRINCE)   - AVENUE JEAN JAURES / ANGLE ALLE GERMAIN VAYSSE",
+      "conso": 709,
+      "reel": 5362.47,
+      "consoS1": 0,
+      "consoS2": 709,
+      "reelS1": 879.26,
+      "reelS2": 4483.21
+    },
+    {
+      "site": "98-7157874145 BÂTIMENT MAISON DES ARTS - 31, AV. J. JAURES",
+      "conso": 175,
+      "reel": 910.92,
+      "consoS1": 0,
+      "consoS2": 175,
+      "reelS1": 10.67,
+      "reelS2": 900.25
+    },
+    {
+      "site": "98-5955063497 BÂTIMENT MAISON PETITE ENFANCE ET CLUB ADOS - AV. PLAINE HAUTE ANGLE RUE DES BÂTISSEURS",
+      "conso": 227,
+      "reel": 1304.51,
+      "consoS1": 0,
+      "consoS2": 227,
+      "reelS1": 0,
+      "reelS2": 1304.51
+    },
+    {
+      "site": "98-1954094687 BÂTIMENT GROUPE SCOLAIRE EUROPE (ECOLES G. BRASSENS ET J. PREVERT 2) - AVENUE DE L'EUROPE / RUE DE SCHOTTEN",
+      "conso": 337,
+      "reel": 2116.31,
+      "consoS1": 0,
+      "consoS2": 337,
+      "reelS1": 0,
+      "reelS2": 2116.31
+    },
+    {
+      "site": "98-5195929471 BÂTIMENT GROUPE SCOLAIRE VINGT ARPENTS - 2, RUE M. RAVEL",
+      "conso": 1875,
+      "reel": 11289.43,
+      "consoS1": 0,
+      "consoS2": 1875,
+      "reelS1": 879.26,
+      "reelS2": 10410.17
+    },
+    {
+      "site": "98-5523729053 BÂTIMENT ECOLE J. PREVERT 1 - 3, RUE A. FOUDRIER",
+      "conso": 225,
+      "reel": 1294.34,
+      "consoS1": 0,
+      "consoS2": 225,
+      "reelS1": 0,
+      "reelS2": 1294.34
+    },
+    {
+      "site": "98-5923698393 ESPACES VERTS STADE HENRI HURT - 2/6, AV. S. ALLENDE",
+      "conso": 1283,
+      "reel": 7328.25,
+      "consoS1": 0,
+      "consoS2": 1283,
+      "reelS1": 403.28,
+      "reelS2": 6924.97
+    },
+    {
+      "site": "98-1188741211 BÂTIMENT GYMNASE LA PALESTRE GERARD PRIET- 12, AV. L. JOUHAUX",
+      "conso": 627,
+      "reel": 3993.7,
+      "consoS1": 0,
+      "consoS2": 627,
+      "reelS1": 403.28,
+      "reelS2": 3590.42
+    },
+    {
+      "site": "98-3199319415 BÂTIMENT TENNIS CLUB HOUSE - 2, ALLEE DES USELLES",
+      "conso": 56,
+      "reel": 392.7,
+      "consoS1": 0,
+      "consoS2": 56,
+      "reelS1": 54.02,
+      "reelS2": 338.68
+    },
+    {
+      "site": "98-4059230265 BÂTIMENT TENNIS COUVERTS ET LOGEMENT GARDIEN - 10, AV. L. JOUHAUX",
+      "conso": 392,
+      "reel": 2013.96,
+      "consoS1": 0,
+      "consoS2": 392,
+      "reelS1": 10.67,
+      "reelS2": 2003.29
+    },
+    {
+      "site": "98-7848819001 BÂTIMENT EGLISE - 3, PLACE SAINTE-EUTROPE",
+      "conso": 32,
+      "reel": 184,
+      "consoS1": 0,
+      "consoS2": 32,
+      "reelS1": 10.67,
+      "reelS2": 173.33
+    },
+    {
+      "site": "98-8680554373 CIMETIERE RUE DU MONT-GRIFFON ANGLE AV. SALVADOR ALLENDE",
+      "conso": 28,
+      "reel": 78.67,
+      "consoS1": 0,
+      "consoS2": 28,
+      "reelS1": 0,
+      "reelS2": 78.67
+    },
+    {
+      "site": "98-5876160341 ESPACES VERTS VERGER COMMUNAL - 17, AVENUE DE L'ABBE SIEYES",
+      "conso": 32,
+      "reel": 270.7,
+      "consoS1": 0,
+      "consoS2": 32,
+      "reelS1": 54.02,
+      "reelS2": 216.68
+    },
+    {
+      "site": "98-6121578987 FONTAINE FONTAINE - 4, PLACE SAINTE-EUTROPE",
+      "conso": 273,
+      "reel": 684.3,
+      "consoS1": 0,
+      "consoS2": 273,
+      "reelS1": 10.67,
+      "reelS2": 673.63
+    },
+    {
+      "site": "98-5975827077 ESPACES VERTS ESPLANADE DES POETES",
+      "conso": 11,
+      "reel": 48.06,
+      "consoS1": 0,
+      "consoS2": 11,
+      "reelS1": 10.67,
+      "reelS2": 37.39
+    },
+    {
+      "site": "98-5322262445 VOIRIE ESPLANADE DES POETES - MARCHE",
+      "conso": 0,
+      "reel": 21.34,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 10.67,
+      "reelS2": 10.67
+    },
+    {
+      "site": "98-5386148003 ESPACES VERTS GYMNASE LA PALESTRE GERARD PRIET- 12, AV. L. JOUHAUX",
+      "conso": 23,
+      "reel": 357.06,
+      "consoS1": 0,
+      "consoS2": 23,
+      "reelS1": 150.61,
+      "reelS2": 206.45
+    },
+    {
+      "site": "98-5818464697 ESPACES VERTS JARDIN MEDIEVAL - RUELLE SAINT-LOUIS",
+      "conso": 216,
+      "reel": 825.75,
+      "consoS1": 0,
+      "consoS2": 216,
+      "reelS1": 150.61,
+      "reelS2": 675.14
+    },
+    {
+      "site": "98-7618353781 ESPACES VERTS PLACE BOILEAU",
+      "conso": 339,
+      "reel": 833.91,
+      "consoS1": 0,
+      "consoS2": 339,
+      "reelS1": 0,
+      "reelS2": 833.91
+    },
+    {
+      "site": "98-1565656181 ESPACES VERTS RUE DANIEL MAYER",
+      "conso": 5,
+      "reel": 415.44,
+      "consoS1": 5,
+      "consoS2": 0,
+      "reelS1": 415.44,
+      "reelS2": 0
+    },
+    {
+      "site": "98-4417552183 BORNE FONTAINE AV. SALVADOR ALLENDE / ANGLE ALLEE DU GENERAL LEJEUNE",
+      "conso": 48,
+      "reel": 137.9,
+      "consoS1": 0,
+      "consoS2": 48,
+      "reelS1": 10.67,
+      "reelS2": 127.23
+    },
+    {
+      "site": "98-7670425779 ESPACES VERTS AV. FRANCOIS MITTERRAND / ROND-POINT DES DROITS DE L'HOMME",
+      "conso": 62,
+      "reel": 161.23,
+      "consoS1": 0,
+      "consoS2": 62,
+      "reelS1": 0,
+      "reelS2": 161.23
+    },
+    {
+      "site": "98-6720205255 ESPACES VERTS AV. LEON JOUHAUX / CARREFOUR RUES INVESTISSEURS ET ENTREPRENEURS (SUD)",
+      "conso": 41,
+      "reel": 207.60000000000002,
+      "consoS1": 0,
+      "consoS2": 41,
+      "reelS1": 54.02,
+      "reelS2": 153.58
+    },
+    {
+      "site": "98-2626899999 ESPACES VERTS AV. LEON JOUHAUX / CARREFOUR RUES INVESTISSEURS ET ENTREPRENEURS (NORD)",
+      "conso": 145,
+      "reel": 460.19,
+      "consoS1": 0,
+      "consoS2": 145,
+      "reelS1": 54.02,
+      "reelS2": 406.17
+    },
+    {
+      "site": "TOTAL FACTURATION EN € TTC :",
+      "conso": 0,
+      "reel": 50633.409999999996,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 4088.78,
+      "reelS2": 46544.63
+    }
+  ],
+  "gaz": [
+    {
+      "site": "GYMNASE LA PALESTRE GERARD PRIET - 12, AV L. JOUHAUX",
+      "conso": 50472,
+      "reel": 14726.900000000001,
+      "consoS1": 49924,
+      "consoS2": 548,
+      "reelS1": 12268.4,
+      "reelS2": 2458.5
+    },
+    {
+      "site": "GROUPE SCOLAIRE VINGT ARPENTS - PLACE DU 19 MARS 1962",
+      "conso": 63008,
+      "reel": 19371.03,
+      "consoS1": 61953,
+      "consoS2": 1055,
+      "reelS1": 16038.27,
+      "reelS2": 3332.7599999999998
+    },
+    {
+      "site": "GROUPE SCOLAIRE EUROPE (ECOLES G. BRASSENS ET J. PREVERT 2) - 5, RUE DE SCHOTTEN",
+      "conso": 77671,
+      "reel": 27783.340000000004,
+      "consoS1": 72922,
+      "consoS2": 4749,
+      "reelS1": 19328.39,
+      "reelS2": 8454.949999999999
+    },
+    {
+      "site": "BOUTIQUE EPHEMERE - 1, PL. BOILEAU",
+      "conso": 4692,
+      "reel": 3387.3199999999997,
+      "consoS1": 3725,
+      "consoS2": 967,
+      "reelS1": 1662.2,
+      "reelS2": 1725.12
+    },
+    {
+      "site": "SERVICES TECHNIQUES - 13/15, RUE DES INVESTISSEURS",
+      "conso": 16845,
+      "reel": 8042.73,
+      "consoS1": 13086,
+      "consoS2": 3759,
+      "reelS1": 2786.15,
+      "reelS2": 5256.58
+    },
+    {
+      "site": "ECOLE J. PREVERT 1 - 3, RUE A. FOUDRIER",
+      "conso": 16973,
+      "reel": 7700.04,
+      "consoS1": 13141,
+      "consoS2": 3832,
+      "reelS1": 4774.62,
+      "reelS2": 2925.42
+    },
+    {
+      "site": "ANCIENNEMENT SERVICE SCOLAIRE - JEUNESSE - CITOYENNETE - 8/10, RUE RYMAROV",
+      "conso": 7456,
+      "reel": 3569.14,
+      "consoS1": 6269,
+      "consoS2": 1187,
+      "reelS1": 1873.83,
+      "reelS2": 1695.31
+    },
+    {
+      "site": "BÂTIMENT SYNDICAT ET FNACA - 31, AV. JEAN JAURES",
+      "conso": 5962,
+      "reel": 2656.35,
+      "consoS1": 3045,
+      "consoS2": 2917,
+      "reelS1": 358.2,
+      "reelS2": 2298.1499999999996
+    },
+    {
+      "site": "MAISON DES ARTS - 31, AV. J. JAURES",
+      "conso": 6968,
+      "reel": 4051.95,
+      "consoS1": 5586,
+      "consoS2": 1382,
+      "reelS1": 2073.04,
+      "reelS2": 1978.91
+    },
+    {
+      "site": "GROUPE SCOLAIRE EUROPE (CENTRE DE LOISIRS PETIT PRINCE ET RESTAURATION GAVROCHE) - ALLEE GERMAIN VAYSSE ANGLE AV. J. JAURES",
+      "conso": 162862,
+      "reel": 23503.469999999998,
+      "consoS1": 160589,
+      "consoS2": 2273,
+      "reelS1": 20115.62,
+      "reelS2": 3387.85
+    },
+    {
+      "site": "MAISON DE LA PETITE ENFANCE P. MENDES FRANCE ET CLUB ADOS - AV. PLAINE HAUTE ANGLE RUE DES BÂTISSEURS",
+      "conso": 567,
+      "reel": 302.82,
+      "consoS1": 357,
+      "consoS2": 210,
+      "reelS1": 65.64,
+      "reelS2": 237.18
+    },
+    {
+      "site": "MAISON DES ASSOCIATIONS 1901 - 28, RUE COLBERT",
+      "conso": 24111,
+      "reel": 9217.85,
+      "consoS1": 7877,
+      "consoS2": 16234,
+      "reelS1": 7135.660000000001,
+      "reelS2": 2082.19
+    }
+  ],
+  "elec": [
+    {
+      "site": "GROUPE SCOLAIRE EUROPE (GAVROCHE ET J. PREVERT 2) - ANGLE RUES DE SCHOTTEN ET BOILEAU",
+      "conso": 102454,
+      "reel": 27930.25,
+      "consoS1": 73916,
+      "consoS2": 28538,
+      "reelS1": 20485.39,
+      "reelS2": 7444.86
+    },
+    {
+      "site": "STADE HENRI HURT - 2/6, AV. S. ALLENDE",
+      "conso": 96765,
+      "reel": 22461.96,
+      "consoS1": 76297,
+      "consoS2": 20468,
+      "reelS1": 17475.3,
+      "reelS2": 4986.66
+    },
+    {
+      "site": "GYMNASE LA PALESTRE GERARD PRIET- 12, AV. L. JOUHAUX",
+      "conso": 62906,
+      "reel": 16972.15,
+      "consoS1": 42182,
+      "consoS2": 20724,
+      "reelS1": 11832.46,
+      "reelS2": 5139.69
+    },
+    {
+      "site": "GROUPE SCOLAIRE EUROPE (BRASSENS ET PETIT PRINCE)   - RUE DE SCHOTTEN",
+      "conso": 64163,
+      "reel": 14309.210000000001,
+      "consoS1": 35191,
+      "consoS2": 28972,
+      "reelS1": 8317.46,
+      "reelS2": 5991.749999999999
+    },
+    {
+      "site": "GROUPE SCOLAIRE VINGT ARPENTS (CURIE ET SAND) - 2, RUE M. RAVEL",
+      "conso": 209503,
+      "reel": 50585.270000000004,
+      "consoS1": 150544,
+      "consoS2": 58959,
+      "reelS1": 37117.81,
+      "reelS2": 13467.460000000001
+    },
+    {
+      "site": "MAISON PETITE ENFANCE ET CLUB ADOS - AV. PLAINE HAUTE ANGLE RUE DES BÂTISSEURS",
+      "conso": 106093,
+      "reel": 27912.180000000004,
+      "consoS1": 74659,
+      "consoS2": 31434,
+      "reelS1": 20056.260000000002,
+      "reelS2": 7855.92
+    },
+    {
+      "site": "RUELLE SAINT-PIERRE (ARMOIRE BRANCHEMENT DANS JARDIN MEDIEVAL)",
+      "conso": 204,
+      "reel": 2353.01,
+      "consoS1": 127,
+      "consoS2": 77,
+      "reelS1": 1556.09,
+      "reelS2": 796.92
+    },
+    {
+      "site": "TOILETTES PUBLIQUES PARC DU MOULIN - RUE DU MOULIN DE SENLIS",
+      "conso": 2421,
+      "reel": 3777.4,
+      "consoS1": 1836,
+      "consoS2": 585,
+      "reelS1": 2553.16,
+      "reelS2": 1224.24
+    },
+    {
+      "site": "SERVICES TECHNIQUES - 13/15, RUE DES INVESTISSEURS",
+      "conso": 37086,
+      "reel": 12909.329999999998,
+      "consoS1": 25023,
+      "consoS2": 12063,
+      "reelS1": 8811.11,
+      "reelS2": 4098.219999999999
+    },
+    {
+      "site": "ECOLE J. PREVERT 1 - 3, RUE A. FOUDRIER",
+      "conso": 32493,
+      "reel": 11644.949999999999,
+      "consoS1": 20564,
+      "consoS2": 11929,
+      "reelS1": 7753.539999999999,
+      "reelS2": 3891.41
+    },
+    {
+      "site": "FACE AU 31, AV. J. JAURES  (POSTE N°2 SLT)",
+      "conso": 9384,
+      "reel": 1685.03,
+      "consoS1": 5712,
+      "consoS2": 3672,
+      "reelS1": 1026.73,
+      "reelS2": 658.3
+    },
+    {
+      "site": "AV. J. JAURES FACE AU N°3 TER (POSTE N°3 SLT)",
+      "conso": 9384,
+      "reel": 1684.03,
+      "consoS1": 5712,
+      "consoS2": 3672,
+      "reelS1": 1026.73,
+      "reelS2": 657.3
+    },
+    {
+      "site": "POLICE MUNICIPALE - 33 BIS, AV. J. JAURES",
+      "conso": 22593,
+      "reel": 4783.750000000001,
+      "consoS1": 15269,
+      "consoS2": 7324,
+      "reelS1": 3354.8599999999997,
+      "reelS2": 1428.89
+    },
+    {
+      "site": "BOUTIQUE EPHEMERE - 1, PL. BOILEAU",
+      "conso": 8548,
+      "reel": 2016.6999999999996,
+      "consoS1": 5504,
+      "consoS2": 3044,
+      "reelS1": 1268.39,
+      "reelS2": 748.31
+    },
+    {
+      "site": "LOGEMENT GARDIEN TENNIS - 10, AV. L. JOUHAUX",
+      "conso": 20093,
+      "reel": 4023.19,
+      "consoS1": 14966,
+      "consoS2": 5127,
+      "reelS1": 3045.97,
+      "reelS2": 977.2200000000001
+    },
+    {
+      "site": "ANGLE AV. JEAN JAURES / RUE DES PLATANES (POSTE N°7 SLT)",
+      "conso": 1144,
+      "reel": 314.03,
+      "consoS1": 682,
+      "consoS2": 462,
+      "reelS1": 189.6,
+      "reelS2": 124.42999999999999
+    },
+    {
+      "site": "MAISON DES ASSOCIATIONS (THEÂTRE - COS - MISSION LOCALE) - 28, RUE COLBERT",
+      "conso": 9194,
+      "reel": 2467.8,
+      "consoS1": 6866,
+      "consoS2": 2328,
+      "reelS1": 1779.41,
+      "reelS2": 688.3900000000001
+    },
+    {
+      "site": "ANCIENNEMENT SERVICE SCOLAIRE - JEUNESSE - CITOYENNETE - 8/10, RUE RYMAROV",
+      "conso": 1501,
+      "reel": 546.15,
+      "consoS1": 1501,
+      "consoS2": 0,
+      "reelS1": 461.57000000000005,
+      "reelS2": 84.58
+    },
+    {
+      "site": "AMICALE LAÏQUE (ANCIENNEMENT CROIX ROUGE) - 8, RUE A. FOUDRIER",
+      "conso": 1140,
+      "reel": 564.17,
+      "consoS1": 974,
+      "consoS2": 166,
+      "reelS1": 412.08,
+      "reelS2": 152.09
+    },
+    {
+      "site": "ANCIENNEMENT RESTOS DU CŒUR - 3, RUE A. FOUDRIER",
+      "conso": 6597,
+      "reel": 1782.76,
+      "consoS1": 6400,
+      "consoS2": 197,
+      "reelS1": 1577.8200000000002,
+      "reelS2": 204.94000000000003
+    },
+    {
+      "site": "ANCIENNEMENT SERVICE SCOLAIRE - JEUNESSE - CITOYENNETE (CULTURE) - 8/10, RUE RYMAROV",
+      "conso": 3209,
+      "reel": 798.2399999999999,
+      "consoS1": 3085,
+      "consoS2": 124,
+      "reelS1": 683.7099999999999,
+      "reelS2": 114.53
+    },
+    {
+      "site": "MAIRIE (GUICHET UNIQUE) - 35, AV. J. JAURES",
+      "conso": 131572,
+      "reel": 34904.17,
+      "consoS1": 90625,
+      "consoS2": 40947,
+      "reelS1": 24557.85,
+      "reelS2": 10346.32
+    },
+    {
+      "site": "BÂTIMENT SYNDICAT ET FNACA - 31, AV. JEAN JAURES",
+      "conso": 1107,
+      "reel": 421.9,
+      "consoS1": 743,
+      "consoS2": 364,
+      "reelS1": 267.2,
+      "reelS2": 154.70000000000002
+    },
+    {
+      "site": "MAISON DES ARTS - 31, AV. J. JAURES",
+      "conso": 8374,
+      "reel": 2322.5099999999998,
+      "consoS1": 6636,
+      "consoS2": 1738,
+      "reelS1": 1738.58,
+      "reelS2": 583.93
+    },
+    {
+      "site": "BAINS DOUCHES - 29 TER, AV. J. JAURES",
+      "conso": 0,
+      "reel": 1040.27,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 650.1600000000001,
+      "reelS2": 390.11
+    },
+    {
+      "site": "BRANCHEMENTS FESTIFS (ARMOIRES EXTERIEURES PARC A. FRANCE)- 31, AV. J. JAURES",
+      "conso": 0,
+      "reel": 323.4,
+      "consoS1": 0,
+      "consoS2": 0,
+      "reelS1": 201.6,
+      "reelS2": 121.8
+    },
+    {
+      "site": "FONTAINE - 4, PLACE SAINTE-EUTROPE",
+      "conso": 815,
+      "reel": 347.90999999999997,
+      "consoS1": 634,
+      "consoS2": 181,
+      "reelS1": 232.62,
+      "reelS2": 115.28999999999999
+    },
+    {
+      "site": "EGLISE - 3, PLACE SAINTE-EUTROPE",
+      "conso": 38166,
+      "reel": 8779.1,
+      "consoS1": 35413,
+      "consoS2": 2753,
+      "reelS1": 7878.14,
+      "reelS2": 900.9600000000002
+    },
+    {
+      "site": "MARCHE (PRISES D'ALIMENTATIONS ELEC.) - 31, AV. JEAN JAURES",
+      "conso": 10126,
+      "reel": 2183.9300000000003,
+      "consoS1": 5490,
+      "consoS2": 4636,
+      "reelS1": 1239.58,
+      "reelS2": 944.3499999999999
+    },
+    {
+      "site": "RUE DANIEL MAYER FACE AU N°22 (POSTE N°22 EP)",
+      "conso": 10849,
+      "reel": 2059.01,
+      "consoS1": 6781,
+      "consoS2": 4068,
+      "reelS1": 1362.33,
+      "reelS2": 696.68
+    },
+    {
+      "site": "RUE DE PAMPELUNE FACE AU N°17 (POSTE N°1 EP)",
+      "conso": 4930,
+      "reel": 1064.39,
+      "consoS1": 2890,
+      "consoS2": 2040,
+      "reelS1": 633.82,
+      "reelS2": 430.57000000000005
+    },
+    {
+      "site": "RUE DU MOULIN DE SENLIS ANGLE AV. REPUBLIQUE (POSTE N°1 SLT)",
+      "conso": 48039,
+      "reel": 9435.43,
+      "consoS1": 30106,
+      "consoS2": 17933,
+      "reelS1": 5892.46,
+      "reelS2": 3542.9700000000003
+    },
+    {
+      "site": "PLACE DES ACACIAS FACE AU N°12 (POSTE N°2 EP)",
+      "conso": 1449,
+      "reel": 451.38,
+      "consoS1": 946,
+      "consoS2": 503,
+      "reelS1": 286.36999999999995,
+      "reelS2": 165.01
+    },
+    {
+      "site": "MAISON DES ASSOCIATIONS 1901 - 28, RUE COLBERT (BAS)",
+      "conso": 34174,
+      "reel": 7591.83,
+      "consoS1": 22006,
+      "consoS2": 12168,
+      "reelS1": 4847.460000000001,
+      "reelS2": 2744.3700000000003
+    },
+    {
+      "site": "FACE AU 31, AV. J. JAURES (POSTE N°8 EP)",
+      "conso": 26650,
+      "reel": 5293.250000000001,
+      "consoS1": 16588,
+      "consoS2": 10062,
+      "reelS1": 3289,
+      "reelS2": 2004.25
+    },
+    {
+      "site": "MAISON DES ASSOCIATIONS 1901 - 28, RUE COLBERT (HAUT)",
+      "conso": 8968,
+      "reel": 2373.71,
+      "consoS1": 5607,
+      "consoS2": 3361,
+      "reelS1": 1525.54,
+      "reelS2": 848.1700000000001
+    },
+    {
+      "site": "RUE SUZANNE FACE AU N°22 (POSTE N°9 EP)",
+      "conso": 50672,
+      "reel": 10352.83,
+      "consoS1": 31996,
+      "consoS2": 18676,
+      "reelS1": 6506.65,
+      "reelS2": 3846.1800000000003
+    },
+    {
+      "site": "RUE DES VIGNES ANGLE RUE DES PINSONS (POSTE N°10 EP)",
+      "conso": 50452,
+      "reel": 10344.529999999999,
+      "consoS1": 32099,
+      "consoS2": 18353,
+      "reelS1": 6536.72,
+      "reelS2": 3807.8099999999995
+    },
+    {
+      "site": "RUE DES VIGNES FACE AU N°54 (POSTE N°12 EP)",
+      "conso": 13191,
+      "reel": 2898.9100000000003,
+      "consoS1": 7578,
+      "consoS2": 5613,
+      "reelS1": 1678,
+      "reelS2": 1220.91
+    },
+    {
+      "site": "RUE DES VIGNES FACE AU N°64 (POSTE N°13 EP)",
+      "conso": 17302,
+      "reel": 4161.6900000000005,
+      "consoS1": 11403,
+      "consoS2": 5899,
+      "reelS1": 2684.8700000000003,
+      "reelS2": 1476.82
+    },
+    {
+      "site": "RUE DE LA GUETTE FACE AU SQUARE CROSNE SOLEIL (POSTE N°23 EP)",
+      "conso": 15534,
+      "reel": 3138.0999999999995,
+      "consoS1": 10767,
+      "consoS2": 4767,
+      "reelS1": 2115.64,
+      "reelS2": 1022.4599999999999
+    },
+    {
+      "site": "RUE VICTOR HUGO FACE AU N°34 (POSTE N°6 EP)",
+      "conso": 32547,
+      "reel": 6377.26,
+      "consoS1": 20772,
+      "consoS2": 11775,
+      "reelS1": 4040.5099999999998,
+      "reelS2": 2336.75
+    },
+    {
+      "site": "RUE COLBERT FACE AU N°21 (POSTE N°7 EP)",
+      "conso": 25596,
+      "reel": 5069.4400000000005,
+      "consoS1": 16122,
+      "consoS2": 9474,
+      "reelS1": 3178.79,
+      "reelS2": 1890.65
+    },
+    {
+      "site": "RUE DES GIRONVILLES FACE AU N°2 (POSTE N°4 EP ET POSTE N°9 SLT)",
+      "conso": 46383,
+      "reel": 8910.840000000002,
+      "consoS1": 29709,
+      "consoS2": 16674,
+      "reelS1": 5664.2,
+      "reelS2": 3246.64
+    },
+    {
+      "site": "RUE DU CHÂTEAU GAILLARD ANGLE IMP. DU PETIT BOIS (POSTE N°5 EP)",
+      "conso": 17860,
+      "reel": 3821.399999999999,
+      "consoS1": 9060,
+      "consoS2": 8800,
+      "reelS1": 1812.75,
+      "reelS2": 2008.6499999999999
+    },
+    {
+      "site": "RUE JEAN ASPE FACE AU N°1C (POSTE N°16 EP)",
+      "conso": 4641,
+      "reel": 1031.7900000000002,
+      "consoS1": 2963,
+      "consoS2": 1678,
+      "reelS1": 651.48,
+      "reelS2": 380.31000000000006
+    },
+    {
+      "site": "RUE DU CARNAVAL ANGLE RUE DES JARDINS DU MAGICIEN (POSTE N°14 EP)",
+      "conso": 18030,
+      "reel": 3541.4900000000002,
+      "consoS1": 11168,
+      "consoS2": 6862,
+      "reelS1": 2190.7000000000003,
+      "reelS2": 1350.79
+    },
+    {
+      "site": "RUE ANDREI SAKHAROV FACE AU N°15 (POSTE N°15 EP)",
+      "conso": 34069,
+      "reel": 6690.679999999999,
+      "consoS1": 21405,
+      "consoS2": 12664,
+      "reelS1": 4188.33,
+      "reelS2": 2502.35
+    },
+    {
+      "site": "RUE DES ENTREPRENEURS FACE AU N°18 (POSTE N°18 EP)",
+      "conso": 14911,
+      "reel": 3021.649999999999,
+      "consoS1": 9297,
+      "consoS2": 5614,
+      "reelS1": 1880.3400000000001,
+      "reelS2": 1141.31
+    },
+    {
+      "site": "RUE DES INVESTISSEURS FACE AU N°5 (POSTE N°17 EP)",
+      "conso": 13999,
+      "reel": 2694.69,
+      "consoS1": 8557,
+      "consoS2": 5442,
+      "reelS1": 1648.43,
+      "reelS2": 1046.26
+    },
+    {
+      "site": "AV. REPUBLIQUE FACE AU N°47 (POSTE N°3 EP)",
+      "conso": 18768,
+      "reel": 3282.16,
+      "consoS1": 11424,
+      "consoS2": 7344,
+      "reelS1": 2000.44,
+      "reelS2": 1281.72
+    },
+    {
+      "site": "MAISON DES JEUNES - 28, RUE COLBERT (ECLAIRAGE ET PRISE ALIM.)",
+      "conso": 11632,
+      "reel": 2583.57,
+      "consoS1": 8674,
+      "consoS2": 2958,
+      "reelS1": 1961.71,
+      "reelS2": 621.86
+    },
+    {
+      "site": "MAISON DES JEUNES - 28, RUE COLBERT (CHAUFFAGE)",
+      "conso": 34519,
+      "reel": 8031.22,
+      "consoS1": 32283,
+      "consoS2": 2236,
+      "reelS1": 7275.97,
+      "reelS2": 755.25
+    },
+    {
+      "site": "TENNIS CLUB HOUSE - 2, ALLEE DES USELLES",
+      "conso": 32638,
+      "reel": 7265.28,
+      "consoS1": 24745,
+      "consoS2": 7893,
+      "reelS1": 5535.63,
+      "reelS2": 1729.65
+    },
+    {
+      "site": "RUE DU VIEUX CHÂTEAU ANGLE RUE BEAUSEJOUR (POSTE N°11 EP)",
+      "conso": 15805,
+      "reel": 3399.61,
+      "consoS1": 10312,
+      "consoS2": 5493,
+      "reelS1": 2185.33,
+      "reelS2": 1214.28
+    },
+    {
+      "site": "AV. LEON JOUHAUX FACE AU N°2 (POSTE N°6 SLT)",
+      "conso": 1717,
+      "reel": 447.52000000000004,
+      "consoS1": 1019,
+      "consoS2": 698,
+      "reelS1": 269.61,
+      "reelS2": 177.91000000000003
+    },
+    {
+      "site": "ALLEE DES SAULES FACE AU N°9 (POSTE N°20 EP)",
+      "conso": 3103,
+      "reel": 741.14,
+      "consoS1": 1927,
+      "consoS2": 1176,
+      "reelS1": 479.19,
+      "reelS2": 261.95
+    }
+  ],
+  "biSemestriel": []
+}

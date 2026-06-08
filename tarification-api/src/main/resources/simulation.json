@@ -1,0 +1,172 @@
+{
+  "restauration": [
+    {
+      "tranche": "EXT",
+      "codeTranche": "EXT",
+      "prixFacture": 5.54,
+      "nombreEnfants": 11,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 6806.799999999999,
+      "recetteAnnuelle": 8531.6,
+      "ecart": 1724.800000000001,
+      "tauxCouverture": 1.2533936651583713
+    },
+    {
+      "tranche": "Plus de 18 000€",
+      "codeTranche": "A",
+      "prixFacture": 5.13,
+      "nombreEnfants": 429,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 265465.2,
+      "recetteAnnuelle": 308107.8,
+      "ecart": 42642.59999999998,
+      "tauxCouverture": 1.1606334841628958
+    },
+    {
+      "tranche": "15 000 à 17 999 €",
+      "codeTranche": "B",
+      "prixFacture": 4.53,
+      "nombreEnfants": 90,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 55692,
+      "recetteAnnuelle": 57078.00000000001,
+      "ecart": 1386.0000000000073,
+      "tauxCouverture": 1.0248868778280544
+    },
+    {
+      "tranche": "13 000€ à 14 999 €",
+      "codeTranche": "B2",
+      "prixFacture": 4,
+      "nombreEnfants": 90,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 55692,
+      "recetteAnnuelle": 50400,
+      "ecart": -5292,
+      "tauxCouverture": 0.9049773755656109
+    },
+    {
+      "tranche": "11 000€ à 12 999 €",
+      "codeTranche": "C",
+      "prixFacture": 3.86,
+      "nombreEnfants": 79,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 48885.200000000004,
+      "recetteAnnuelle": 42691.6,
+      "ecart": -6193.600000000006,
+      "tauxCouverture": 0.8733031674208144
+    },
+    {
+      "tranche": "9 000 à 10 999 €",
+      "codeTranche": "D",
+      "prixFacture": 3.25,
+      "nombreEnfants": 79,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 48885.200000000004,
+      "recetteAnnuelle": 35945,
+      "ecart": -12940.200000000004,
+      "tauxCouverture": 0.7352941176470588
+    },
+    {
+      "tranche": "7 000€ à 8 999 €",
+      "codeTranche": "E",
+      "prixFacture": 2.7,
+      "nombreEnfants": 90,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 55692,
+      "recetteAnnuelle": 34020.00000000001,
+      "ecart": -21671.999999999993,
+      "tauxCouverture": 0.6108597285067875
+    },
+    {
+      "tranche": "5 000€ à 6 999 €",
+      "codeTranche": "F",
+      "prixFacture": 2,
+      "nombreEnfants": 79,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 48885.200000000004,
+      "recetteAnnuelle": 22120,
+      "ecart": -26765.200000000004,
+      "tauxCouverture": 0.4524886877828054
+    },
+    {
+      "tranche": "3 000€ à 4 999 €",
+      "codeTranche": "F2",
+      "prixFacture": 1.45,
+      "nombreEnfants": 57,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 35271.6,
+      "recetteAnnuelle": 11570.999999999998,
+      "ecart": -23700.6,
+      "tauxCouverture": 0.3280542986425339
+    },
+    {
+      "tranche": "Moins de 3 000 €",
+      "codeTranche": "G",
+      "prixFacture": 1.32,
+      "nombreEnfants": 124,
+      "coutMoyen": 4.42,
+      "depenseAnnuelle": 76731.20000000001,
+      "recetteAnnuelle": 22915.2,
+      "ecart": -53816.000000000015,
+      "tauxCouverture": 0.2986425339366515
+    },
+    {
+      "tranche": "Total",
+      "codeTranche": "Total",
+      "prixFacture": 0,
+      "nombreEnfants": 1128,
+      "coutMoyen": 0,
+      "depenseAnnuelle": 698006.3999999999,
+      "recetteAnnuelle": 593380.2,
+      "ecart": -104626.19999999995,
+      "tauxCouverture": 0.8501071050351401
+    }
+  ],
+  "totalEnfants": 1128,
+  "depensesReelles": {
+    "Scolarest (prestations)": 713752.4699999999,
+    "Personnel": 1051019.6400000001,
+    "Alimentation": 1451.91,
+    "Eau": 8159,
+    "Electricite": 30563.489999999998,
+    "Gaz": 8159,
+    "TOTAL": 1813105.5099999998
+  },
+  "depensesAccueilLoisirs": {
+    "Personnel": 664758.87,
+    "Materiel": 1022.56,
+    "Fournitures pedagogiques": 6143.02,
+    "Prestations (spectacles)": 2223.08,
+    "Alimentation": 13263.82,
+    "Transport": 5803.389999999999,
+    "Droits d'entree": 12609.07,
+    "Autres": 4834.47,
+    "TOTAL": 710658.2799999999
+  },
+  "depensesEtudesSurveillees": {
+    "TOTAL": 0
+  },
+  "depensesEspaceAdos": {
+    "Personnel": 119794.89,
+    "Electricite": 10918.975,
+    "Gaz": 426,
+    "Eau": 3499.27,
+    "Fournitures": 1265.87,
+    "Petit materiel": 467.86,
+    "Alimentation": 59.24,
+    "Autres": 327.01,
+    "Transport": 4016.42,
+    "TOTAL": 140775.53499999997
+  },
+  "depensesSejours": {
+    "Transport (bus/mini bus)": 3868.82,
+    "Hebergement (centre vacances)": 16429.030000000002,
+    "Fournitures": 298.96,
+    "Autres": 314.73,
+    "TOTAL": 20911.54
+  },
+  "depensesPeriscolaire": {
+    "Personnel": 268883.59,
+    "TOTAL": 268883.59
+  }
+}
