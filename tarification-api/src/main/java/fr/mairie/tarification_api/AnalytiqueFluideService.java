@@ -89,28 +89,34 @@ public class AnalytiqueFluideService {
 
             // EAU
             for (JsonNode n : root.path("eau")) {
+                String site = n.path("site").asText("");
+                if (site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 double conso = n.path("conso").asDouble();
                 double reel  = n.path("reel").asDouble();
                 if (conso > 0 || reel > 0) {
-                    resultats.add(calculer(n.path("site").asText(), "Eau", conso, reel,
+                    resultats.add(calculer(site, "Eau", conso, reel,
                             "m3", PRIX_EAU_M3, ABO_EAU_SEMESTRE * 2, "Année 2025"));
                 }
             }
             // GAZ
             for (JsonNode n : root.path("gaz")) {
+                String site = n.path("site").asText("");
+                if (site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 double conso = n.path("conso").asDouble();
                 double reel  = n.path("reel").asDouble();
                 if (conso > 0 || reel > 0) {
-                    resultats.add(calculer(n.path("site").asText(), "Gaz", conso, reel,
+                    resultats.add(calculer(site, "Gaz", conso, reel,
                             "m3", PRIX_GAZ_M3, 0, "Année 2025"));
                 }
             }
             // ELEC
             for (JsonNode n : root.path("elec")) {
+                String site = n.path("site").asText("");
+                if (site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 double conso = n.path("conso").asDouble();
                 double reel  = n.path("reel").asDouble();
                 if (conso > 0 || reel > 0) {
-                    resultats.add(calculer(n.path("site").asText(), "Electricité", conso, reel,
+                    resultats.add(calculer(site, "Electricité", conso, reel,
                             "kWh", PRIX_ELEC_KWH, 0, "Année 2025"));
                 }
             }
@@ -130,21 +136,21 @@ public class AnalytiqueFluideService {
 
             for (JsonNode n : root.path("eau")) {
                 String site = n.path("site").asText();
-                if (site.isEmpty()) continue;
+                if (site.isEmpty() || site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 resultats.add(creerRapport(site, "Eau", "m3",
                         n.path("consoS1").asDouble(), n.path("consoS2").asDouble(),
                         n.path("reelS1").asDouble(),  n.path("reelS2").asDouble()));
             }
             for (JsonNode n : root.path("gaz")) {
                 String site = n.path("site").asText();
-                if (site.isEmpty()) continue;
+                if (site.isEmpty() || site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 resultats.add(creerRapport(site, "Gaz", "m3",
                         n.path("consoS1").asDouble(), n.path("consoS2").asDouble(),
                         n.path("reelS1").asDouble(),  n.path("reelS2").asDouble()));
             }
             for (JsonNode n : root.path("elec")) {
                 String site = n.path("site").asText();
-                if (site.isEmpty()) continue;
+                if (site.isEmpty() || site.toUpperCase().startsWith("TOTAL FACTURATION")) continue;
                 resultats.add(creerRapport(site, "Electricité", "kWh",
                         n.path("consoS1").asDouble(), n.path("consoS2").asDouble(),
                         n.path("reelS1").asDouble(),  n.path("reelS2").asDouble()));
