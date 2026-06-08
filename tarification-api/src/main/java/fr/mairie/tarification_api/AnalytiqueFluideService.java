@@ -11,11 +11,14 @@ import java.util.*;
 @Service
 public class AnalytiqueFluideService {
 
-    private static final String FICHIER = new File("Donnees/Autres/CALC DEP(4).xlsx").exists() 
-        ? "Donnees/Autres/CALC DEP(4).xlsx" 
-        : new File("../Donnees/Autres/CALC DEP(4).xlsx").exists() 
-            ? "../Donnees/Autres/CALC DEP(4).xlsx"
-            : new File("CALC DEP(4).xlsx").exists() ? "CALC DEP(4).xlsx" : "CALC DEP(4).xlsx";
+    private static final String FICHIER = getFichierPath("CALC DEP(4).xlsx");
+
+    private static String getFichierPath(String nom) {
+        if (new File(nom).exists()) return nom;
+        if (new File("tarification-api/" + nom).exists()) return "tarification-api/" + nom;
+        if (new File("Donnees/Autres/" + nom).exists()) return "Donnees/Autres/" + nom;
+        return nom;
+    }
 
     private static final double PRIX_EAU_M3 = 4.50; 
     private static final double ABO_EAU_SEMESTRE = 10.67;

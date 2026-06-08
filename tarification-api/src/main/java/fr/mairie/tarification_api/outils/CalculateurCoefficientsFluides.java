@@ -5,9 +5,14 @@ import java.io.FileInputStream;
 import java.io.File;
 
 public class CalculateurCoefficientsFluides {
-    private static final String FICHIER = new File("Donnees/Autres/CALC DEP(4).xlsx").exists() 
-        ? "Donnees/Autres/CALC DEP(4).xlsx" 
-        : "../Donnees/Autres/CALC DEP(4).xlsx";
+    private static final String FICHIER = getFichierPath("CALC DEP(4).xlsx");
+
+    private static String getFichierPath(String nom) {
+        if (new File(nom).exists()) return nom;
+        if (new File("tarification-api/" + nom).exists()) return "tarification-api/" + nom;
+        if (new File("Donnees/Autres/" + nom).exists()) return "Donnees/Autres/" + nom;
+        return nom;
+    }
 
     public static void main(String[] args) {
         try (FileInputStream fis = new FileInputStream(FICHIER);

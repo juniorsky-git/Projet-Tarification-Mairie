@@ -13,11 +13,14 @@ import java.util.Map;
  */
 public class Calculateur {
 
-    private static final String FICHIER = new File("Donnees/Autres/CALC DEP (3).xlsx").exists() 
-        ? "Donnees/Autres/CALC DEP (3).xlsx" 
-        : new File("../Donnees/Autres/CALC DEP (3).xlsx").exists() 
-            ? "../Donnees/Autres/CALC DEP (3).xlsx"
-            : "CALC DEP (3).xlsx"; // fallback au cas où
+    private static final String FICHIER = getFichierPath("CALC DEP (3).xlsx");
+
+    private static String getFichierPath(String nom) {
+        if (new File(nom).exists()) return nom;
+        if (new File("tarification-api/" + nom).exists()) return "tarification-api/" + nom;
+        if (new File("Donnees/Autres/" + nom).exists()) return "Donnees/Autres/" + nom;
+        return nom;
+    }
     
     private static final String ONGLET_SYNTHESE = "syntheses charges";
 

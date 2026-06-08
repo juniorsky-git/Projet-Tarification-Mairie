@@ -25,7 +25,15 @@ public class SimulationCalculateur {
     private static final String ONGLET_SIMULATION = "CALC DEP(4)";
 
     public SimulationCalculateur(String fichierExcel) {
-        this.fichierExcel = fichierExcel;
+        if (new java.io.File(fichierExcel).exists()) {
+            this.fichierExcel = fichierExcel;
+        } else if (new java.io.File("tarification-api/" + fichierExcel).exists()) {
+            this.fichierExcel = "tarification-api/" + fichierExcel;
+        } else if (new java.io.File("Donnees/Autres/" + fichierExcel).exists()) {
+            this.fichierExcel = "Donnees/Autres/" + fichierExcel;
+        } else {
+            this.fichierExcel = fichierExcel;
+        }
     }
 
     public List<SimulationLigne> lireSimulationRestauration() {

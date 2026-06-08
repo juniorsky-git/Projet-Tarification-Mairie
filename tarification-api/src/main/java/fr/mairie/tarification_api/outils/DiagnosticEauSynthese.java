@@ -15,9 +15,14 @@ import java.io.FileOutputStream;
  */
 public class DiagnosticEauSynthese {
 
-    private static final String FICHIER_SOURCE = new File("Donnees/Autres/CALC DEP(4).xlsx").exists() 
-        ? "Donnees/Autres/CALC DEP(4).xlsx" 
-        : "../Donnees/Autres/CALC DEP(4).xlsx";
+    private static final String FICHIER_SOURCE = getFichierPath("CALC DEP(4).xlsx");
+
+    private static String getFichierPath(String nom) {
+        if (new File(nom).exists()) return nom;
+        if (new File("tarification-api/" + nom).exists()) return "tarification-api/" + nom;
+        if (new File("Donnees/Autres/" + nom).exists()) return "Donnees/Autres/" + nom;
+        return nom;
+    }
         
     private static final String FICHIER_EXPORT = "Synthese_Conso_Eau_2025.xlsx";
 
