@@ -2661,7 +2661,7 @@
             poleActif: 'Restauration', // Pôle actuellement affiché
             lignes: [],              // Lignes brutes chargées depuis l'API
             anneesDispo: [],         // Années ayant des données en base
-            anneeEnCours: new Date().getFullYear(), // Année courante
+            ANNEE_DEBUT: 2026,       // Première année de saisie (jamais 2025)
             poles: ['Restauration', 'Accueil de Loisirs', 'Accueil periscolaire',
                     'Etudes surveillees', 'Espace Ados', 'Sejours'],
             polesLabels: {
@@ -2693,7 +2693,7 @@
             }
         }
 
-        /** Charge la liste des années disponibles en base */
+        /** Charge la liste des années disponibles en base, puis sélectionne 2026 automatiquement */
         async function saisieChargerAnnees() {
             try {
                 const resp = await apiFetch('/api/saisie/annees');
@@ -2702,6 +2702,19 @@
                 saisie.anneesDispo = [];
             }
             saisieRendreOngletAnnees();
+
+            // Sélection automatique : 2026 en priorité, sinon 2025
+            const anneeParDefaut = saisie.anneesDispo.includes(saisie.ANNEE_DEBUT)
+                ? saisie.ANNEE_DEBUT
+                : (saisie.anneesDispo.find(a => a > 2025) || null);
+
+            if (anneeParDefaut) {
+                await saisieSelectAnnee(anneeParDefaut);
+            } else {
+                // 2026 n'existe pas encore → on la crée automatiquement
+                saisieAfficherNotif('⏳ Initialisation de 2026 depuis les données 2025...');
+                await saisieCreerAnnee(saisie.ANNEE_DEBUT);
+            }
         }
 
         /** Rend les onglets d'années dans la barre d'outils */
@@ -2709,23 +2722,24 @@
             const container = document.getElementById('saisie-annee-tabs');
             let html = '';
 
-            // Onglet 2025 (Référence — toujours présent)
-            html += `<button class="saisie-tab ref-tag ${saisie.anneeActive === 2025 ? 'active' : ''}" onclick="saisieSelectAnnee(2025)">
+            // Onglet 2025 (Référence — toujours présent, en lecture seule)
+            html += `<button class="saisie-tab ref-tag ${saisie.anneeActive === 2025 ? 'active' : ''}" onclick="saisieSelectAnnee(2025)" title="Données de référence 2025 (lecture seule)">
                 2025 <span class="tab-badge">Réf.</span>
             </button>`;
 
-            // Onglets des années saisies
-            saisie.anneesDispo.filter(a => a !== 2025).forEach(a => {
-                html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">
-                    ${a}
-                </button>`;
+            // Onglets des années saisies (hors 2025)
+            const anneesSaisies = saisie.anneesDispo.filter(a => a !== 2025).sort((a,b) => a - b);
+            anneesSaisies.forEach(a => {
+                html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">${a}</button>`;
             });
 
-            // Onglet + Nouvelle année
-            const prochaine = Math.max(saisie.anneeEnCours, ...saisie.anneesDispo, 2025) + 1;
-            if (!saisie.anneesDispo.includes(prochaine)) {
-                html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${prochaine})" style="border:1px dashed var(--border); color:var(--text-muted);">
-                    <i data-lucide="plus" style="width:12px;height:12px;"></i> ${prochaine}
+            // Bouton pour créer l'année suivante (toujours visible si pas encore créée)
+            const prochaineACreer = anneesSaisies.length > 0
+                ? Math.max(...anneesSaisies) + 1
+                : saisie.ANNEE_DEBUT;
+            if (!saisie.anneesDispo.includes(prochaineACreer)) {
+                html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${prochaineACreer})" title="Créer les données ${prochaineACreer} à partir de 2025" style="border:1px dashed var(--border); color:var(--text-muted);">
+                    <i data-lucide="plus" style="width:12px;height:12px;"></i> ${prochaineACreer}
                 </button>`;
             }
 
@@ -2766,10 +2780,11 @@
             }
         }
 
-        /** Alias appelé depuis le bouton dans l'état vide */
+        /** Alias appelé depuis le bouton dans l'état vide — crée toujours 2026 en priorité */
         function saisieInitialiserAnnee() {
-            const prochaine = Math.max(...saisie.anneesDispo, 2025) + 1;
-            saisieCreerAnnee(prochaine);
+            const anneesCibles = saisie.anneesDispo.filter(a => a > 2025);
+            const cible = anneesCibles.length > 0 ? Math.max(...anneesCibles) + 1 : saisie.ANNEE_DEBUT;
+            saisieCreerAnnee(cible);
         }
 
         /** Charge les lignes depuis l'API pour une année */
@@ -2810,15 +2825,14 @@
         /** Rend les tableaux de saisie pour le pôle et l'année actifs */
         function saisieRendreTableaux() {
             if (!saisie.lignes || saisie.lignes.length === 0) {
+                // Pas de données → on crée automatiquement sans demander
                 document.getElementById('saisie-tables-zone').innerHTML = `
-                    <div class="saisie-empty">
-                        <i data-lucide="clipboard-list"></i>
-                        <p>Aucune donnée pour ${saisie.anneeActive}. Initialisez d'abord l'année.</p>
-                        <button class="btn-primary" onclick="saisieCreerAnnee(${saisie.anneeActive})">
-                            <i data-lucide="plus" style="width:14px;height:14px;"></i> Initialiser ${saisie.anneeActive}
-                        </button>
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                        <div style="font-size:2rem;margin-bottom:12px;">⏳</div>
+                        <div style="font-weight:600;margin-bottom:4px;">Initialisation de ${saisie.anneeActive}...</div>
+                        <div style="font-size:0.8rem;">Copie des données 2025 en cours</div>
                     </div>`;
-                lucide.createIcons();
+                saisieCreerAnnee(saisie.anneeActive);
                 return;
             }
 
@@ -2928,7 +2942,7 @@
                 </td>
                 <td>
                     <input class="saisie-input montant" type="number" step="0.01" min="0"
-                        value="${ligne.montant || 0}"
+                        value="${Number(ligne.montant || 0).toFixed(2)}"
                         oninput="saisieMarquerModifie(); saisieMettreAJourTotaux()"
                         data-field="montant">
                 </td>
