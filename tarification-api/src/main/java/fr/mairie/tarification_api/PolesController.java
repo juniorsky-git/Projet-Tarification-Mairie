@@ -18,10 +18,14 @@ public class PolesController {
 
     private final DonneesBudgetaires budgetService;
     private final AnalytiqueFluideService analytiqueFluideService;
+    private final SaisieComptableService saisieService;
 
-    public PolesController(DonneesBudgetaires budgetService, AnalytiqueFluideService analytiqueFluideService) {
+    public PolesController(DonneesBudgetaires budgetService,
+                           AnalytiqueFluideService analytiqueFluideService,
+                           SaisieComptableService saisieService) {
         this.budgetService = budgetService;
         this.analytiqueFluideService = analytiqueFluideService;
+        this.saisieService = saisieService;
     }
 
     private String getServiceKey(String pole) {
@@ -38,34 +42,52 @@ public class PolesController {
 
     /**
      * Retourne la liste complète des pôles budgétaires.
-     * @param source "A" (défaut, CALC DEP(4) + Depenses recettes nf.xlsx)
-     *               ou "B" (VF_REC_DEP.xlsx + repli A pour pôles manquants)
+     * Si `annee` est fourni et qu'il existe des données saisies pour cette année,
+     * les totaux de la saisie sont utilisés à la place des fichiers Excel.
+     *
+     * @param source "A" (défaut) ou "B"
+     * @param annee  Année de saisie (optionnel, ex: 2026)
      */
     @GetMapping
     public ResponseEntity<?> getAllPoles(
-            @RequestParam(required = false, defaultValue = "A") String source) {
+            @RequestParam(required = false, defaultValue = "A") String source,
+            @RequestParam(required = false) Integer annee) {
 
         List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
         List<AnalytiqueFluide> fluides = analytiqueFluideService.analyserTout();
 
-        // Chargement des recettes réelles depuis la source active
+        // Données de recettes : saisie si disponible, sinon Excel
+        boolean utiliseSaisie = (annee != null) && saisieService.getAnneesDisponibles().contains(annee);
         Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
+        Map<String, Map<String, Double>> totauxSaisie = utiliseSaisie
+            ? saisieService.getTotauxParPole(annee) : null;
 
         List<Map<String, Object>> enrichis = poles.stream().map(p -> {
             Map<String, Object> map = new java.util.HashMap<>();
             map.put("nom", p.nom());
-            map.put("depensesTotales", p.depensesTotales());
+
+            double depenses;
+            double recettes;
+
+            if (utiliseSaisie && totauxSaisie != null && totauxSaisie.containsKey(p.nom())) {
+                // Priorité : données saisies
+                Map<String, Double> t = totauxSaisie.get(p.nom());
+                depenses = t.getOrDefault("depenses", p.depensesTotales());
+                recettes = t.getOrDefault("recettes", 0.0);
+            } else {
+                // Fallback : Excel 2025
+                depenses = p.depensesTotales();
+                recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
+            }
+
+            double couverture = (depenses > 0) ? (recettes / depenses) : 0;
+            map.put("depensesTotales", depenses);
             map.put("nombreEnfants", p.nombreEnfants());
-
-            // Calcul du Taux de Couverture avec les recettes réelles
-            double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
-            double couverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
-
             map.put("tauxCouverture", couverture);
             map.put("recettesTotales", recettes);
-            map.put("source", source); // utile pour debug côté frontend
+            map.put("source", utiliseSaisie ? "SAISIE_" + annee : source);
 
-            // Performance Fluides (Score moyen d'écart par pôle)
+            // Performance Fluides
             double ecartMoyen = fluides.stream()
                 .filter(f -> {
                     if (p.nom().equals("Restauration")) return f.site().contains("GROUPE SCOLAIRE") || f.site().contains("RESTAURATION");

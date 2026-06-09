@@ -414,6 +414,85 @@
                 </div>
             </div>
             </div>
+
+            <!-- ================================================================
+                 SECTION SAISIE COMPTABLE — En bas du dashboard, dépliable
+                 ================================================================ -->
+            <div class="saisie-section" id="saisie-section-wrapper">
+
+                <!-- En-tête cliquable -->
+                <div class="saisie-header" id="saisie-header-toggle" onclick="toggleSaisieSection()">
+                    <div class="saisie-header-left">
+                        <div class="saisie-header-icon">
+                            <i data-lucide="database"></i>
+                        </div>
+                        <div>
+                            <div class="saisie-header-title">📋 Saisie Comptable</div>
+                            <div class="saisie-header-sub">Mettre à jour les dépenses et recettes réelles par pôle · Comparer avec 2025</div>
+                        </div>
+                    </div>
+                    <div class="saisie-header-actions">
+                        <span id="saisie-source-badge" style="font-size:0.7rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; padding:4px 10px; border-radius:20px; font-weight:700; display:none;">
+                            ✓ Données saisie actives
+                        </span>
+                        <i data-lucide="chevron-down" class="saisie-chevron"></i>
+                    </div>
+                </div>
+
+                <!-- Corps dépliable -->
+                <div class="saisie-body" id="saisie-body">
+
+                    <!-- Barre d'outils -->
+                    <div class="saisie-toolbar">
+                        <div class="saisie-annee-tabs" id="saisie-annee-tabs">
+                            <!-- Généré dynamiquement par JS -->
+                            <div style="padding:8px 16px; font-size:0.8rem; color:var(--text-muted);">Chargement...</div>
+                        </div>
+                        <div class="saisie-toolbar-btns">
+                            <button class="btn-secondary" style="gap:7px; display:flex; align-items:center;" onclick="saisieReinitialiser()" id="btn-reinit" title="Réinitialiser vers les données 2025">
+                                <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Réinitialiser
+                            </button>
+                            <button class="btn-primary" style="gap:7px; display:flex; align-items:center;" onclick="saisieSauvegarder()" id="btn-sauvegarder">
+                                <i data-lucide="save" style="width:14px;height:14px;"></i> Sauvegarder
+                            </button>
+                            <button class="btn-secondary" style="gap:7px; display:flex; align-items:center;" onclick="saisieExporterXlsx()" id="btn-export-xlsx">
+                                <i data-lucide="download" style="width:14px;height:14px;"></i> Télécharger XLSX
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sélecteur de pôle -->
+                    <div class="saisie-pole-selector" id="saisie-pole-selector">
+                        <!-- Généré dynamiquement -->
+                    </div>
+
+                    <!-- Zone des tableaux de saisie -->
+                    <div id="saisie-tables-zone">
+                        <div class="saisie-empty">
+                            <i data-lucide="clipboard-list"></i>
+                            <p>Sélectionnez une année ci-dessus pour commencer la saisie.</p>
+                            <button class="btn-primary" onclick="saisieInitialiserAnnee()">
+                                <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                                Initialiser depuis les données 2025
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tableau Comparatif 2025 vs Saisie -->
+                    <div class="saisie-comparatif" id="saisie-comparatif-zone" style="display:none;">
+                        <div class="saisie-comparatif-title">
+                            <i data-lucide="bar-chart-2"></i>
+                            Comparatif 2025 (Référence Excel) vs Saisie
+                            <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
+                        </div>
+                        <div id="saisie-comparatif-content">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
         <!-- PAGE : DIAGNOSTIC ÉNERGIE (RÉEL VS THÉORIQUE) -->
@@ -2065,7 +2144,9 @@
                     const dotClass = (perfEnergie > 15) ? 'red' : 'green';
 
                     return `
-                    <div class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: box-shadow 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
+                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
+                        <!-- Badge sélectionné (masqué par défaut) -->
+                        <span class="pole-selected-badge">✓ Sélectionné</span>
                         
                         <!-- Nom du pôle + pastille -->
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
@@ -2287,14 +2368,27 @@
         }
 
 
-        // --- DETAIL POLE (clic sur stat card) ---
+        // --- DETAIL POLE (clic sur stat card) + SURBRILLANCE ---
         function ouvrirDetailPole(nomPole) {
-            // Scroll to details card
-            const card = document.getElementById('poleDetailsResult');
-            if (card) {
-                card.closest('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 1. Retirer la surbrillance de toutes les cartes
+            document.querySelectorAll('#dashboardBudgetSummary .stat-card').forEach(c => {
+                c.classList.remove('pole-card-selected');
+            });
+
+            // 2. Mettre en surbrillance la carte cliquée
+            const poleId = 'pole-card-' + nomPole.replace(/\s+/g, '-');
+            const poleCard = document.getElementById(poleId);
+            if (poleCard) {
+                poleCard.classList.add('pole-card-selected');
             }
-            // Set select and trigger load
+
+            // 3. Scroll vers l'analyse financière
+            const zoneDetails = document.getElementById('poleDetailsResult');
+            if (zoneDetails) {
+                zoneDetails.closest('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // 4. Mettre à jour le select et charger les données
             const sel = document.getElementById('selectPoleDetails');
             if (sel) {
                 sel.value = nomPole;
@@ -2556,6 +2650,617 @@
         window.onload = function() {
             checkAuth();
         };
+
+        // =======================================================================
+        // MODULE SAISIE COMPTABLE — JavaScript complet
+        // =======================================================================
+
+        /** État de la saisie comptable */
+        const saisie = {
+            anneeActive: null,       // Année actuellement sélectionnée
+            poleActif: 'Restauration', // Pôle actuellement affiché
+            lignes: [],              // Lignes brutes chargées depuis l'API
+            anneesDispo: [],         // Années ayant des données en base
+            anneeEnCours: new Date().getFullYear(), // Année courante
+            poles: ['Restauration', 'Accueil de Loisirs', 'Accueil periscolaire',
+                    'Etudes surveillees', 'Espace Ados', 'Sejours'],
+            polesLabels: {
+                'Restauration': 'Restauration',
+                'Accueil de Loisirs': 'Loisirs',
+                'Accueil periscolaire': 'Périscolaire',
+                'Etudes surveillees': 'Études',
+                'Espace Ados': 'Ados',
+                'Sejours': 'Séjours'
+            }
+        };
+
+        /** Ouvre/ferme la section saisie comptable */
+        function toggleSaisieSection() {
+            const header = document.getElementById('saisie-header-toggle');
+            const body   = document.getElementById('saisie-body');
+            const isOpen = header.classList.contains('open');
+
+            if (isOpen) {
+                header.classList.remove('open');
+                body.classList.remove('open');
+            } else {
+                header.classList.add('open');
+                body.classList.add('open');
+                // Charger les données si pas encore chargées
+                if (saisie.anneesDispo.length === 0) {
+                    saisieChargerAnnees();
+                }
+            }
+        }
+
+        /** Charge la liste des années disponibles en base */
+        async function saisieChargerAnnees() {
+            try {
+                const resp = await apiFetch('/api/saisie/annees');
+                saisie.anneesDispo = await resp.json();
+            } catch(e) {
+                saisie.anneesDispo = [];
+            }
+            saisieRendreOngletAnnees();
+        }
+
+        /** Rend les onglets d'années dans la barre d'outils */
+        function saisieRendreOngletAnnees() {
+            const container = document.getElementById('saisie-annee-tabs');
+            let html = '';
+
+            // Onglet 2025 (Référence — toujours présent)
+            html += `<button class="saisie-tab ref-tag ${saisie.anneeActive === 2025 ? 'active' : ''}" onclick="saisieSelectAnnee(2025)">
+                2025 <span class="tab-badge">Réf.</span>
+            </button>`;
+
+            // Onglets des années saisies
+            saisie.anneesDispo.filter(a => a !== 2025).forEach(a => {
+                html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">
+                    ${a}
+                </button>`;
+            });
+
+            // Onglet + Nouvelle année
+            const prochaine = Math.max(saisie.anneeEnCours, ...saisie.anneesDispo, 2025) + 1;
+            if (!saisie.anneesDispo.includes(prochaine)) {
+                html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${prochaine})" style="border:1px dashed var(--border); color:var(--text-muted);">
+                    <i data-lucide="plus" style="width:12px;height:12px;"></i> ${prochaine}
+                </button>`;
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        /** Sélectionne une année et charge ses données */
+        async function saisieSelectAnnee(annee) {
+            saisie.anneeActive = annee;
+            saisieRendreOngletAnnees();
+            saisieMettreAJourPoleSelector();
+
+            if (annee === 2025) {
+                // Année 2025 = données Excel (lecture seule)
+                saisieRendreVue2025Readonly();
+            } else {
+                // Charger les lignes depuis la base
+                await saisieChargerLignes(annee);
+            }
+
+            // Afficher/masquer le badge "données saisie actives"
+            const badge = document.getElementById('saisie-source-badge');
+            badge.style.display = saisie.anneesDispo.includes(annee) && annee !== 2025 ? 'inline' : 'none';
+        }
+
+        /** Crée une nouvelle année en l'initialisant depuis 2025 */
+        async function saisieCreerAnnee(annee) {
+            saisieAfficherNotif(`⏳ Initialisation de ${annee} depuis les données 2025...`);
+            try {
+                const resp = await apiFetch(`/api/saisie/${annee}/initialiser`, { method: 'POST' });
+                const data = await resp.json();
+                saisie.anneesDispo.unshift(annee);
+                saisieAfficherNotif(`✓ ${data.message}`);
+                await saisieSelectAnnee(annee);
+            } catch(e) {
+                saisieAfficherNotif('❌ Erreur lors de l\'initialisation.');
+            }
+        }
+
+        /** Alias appelé depuis le bouton dans l'état vide */
+        function saisieInitialiserAnnee() {
+            const prochaine = Math.max(...saisie.anneesDispo, 2025) + 1;
+            saisieCreerAnnee(prochaine);
+        }
+
+        /** Charge les lignes depuis l'API pour une année */
+        async function saisieChargerLignes(annee) {
+            try {
+                const resp = await apiFetch(`/api/saisie/${annee}`);
+                saisie.lignes = await resp.json();
+                saisieRendreTableaux();
+                await saisieRendreComparatif(annee);
+            } catch(e) {
+                document.getElementById('saisie-tables-zone').innerHTML =
+                    '<div style="color:#ef4444;padding:20px;">Erreur de chargement des données.</div>';
+            }
+        }
+
+        /** Met à jour les boutons de sélection de pôle */
+        function saisieMettreAJourPoleSelector() {
+            const container = document.getElementById('saisie-pole-selector');
+            let html = '';
+            saisie.poles.forEach(p => {
+                const label = saisie.polesLabels[p] || p;
+                html += `<button class="saisie-pole-btn ${saisie.poleActif === p ? 'active' : ''}" onclick="saisieSelectPole('${p}')">${label}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        /** Sélectionne un pôle et rafraîchit les tableaux */
+        function saisieSelectPole(pole) {
+            saisie.poleActif = pole;
+            saisieMettreAJourPoleSelector();
+            if (saisie.anneeActive === 2025) {
+                saisieRendreVue2025Readonly();
+            } else {
+                saisieRendreTableaux();
+            }
+        }
+
+        /** Rend les tableaux de saisie pour le pôle et l'année actifs */
+        function saisieRendreTableaux() {
+            if (!saisie.lignes || saisie.lignes.length === 0) {
+                document.getElementById('saisie-tables-zone').innerHTML = `
+                    <div class="saisie-empty">
+                        <i data-lucide="clipboard-list"></i>
+                        <p>Aucune donnée pour ${saisie.anneeActive}. Initialisez d'abord l'année.</p>
+                        <button class="btn-primary" onclick="saisieCreerAnnee(${saisie.anneeActive})">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i> Initialiser ${saisie.anneeActive}
+                        </button>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            const poleActif = saisie.poleActif;
+            const estReadonly = (saisie.anneeActive === 2025);
+
+            // Filtrer les lignes du pôle actif
+            const lignesPole = saisie.lignes.filter(l => l.pole === poleActif);
+            const depenses  = lignesPole.filter(l => l.typeLigne === 'DEPENSE');
+            const recettes  = lignesPole.filter(l => l.typeLigne === 'RECETTE');
+
+            const html = `
+                <!-- TABLE DÉPENSES -->
+                <div class="saisie-table-wrapper">
+                    <div class="saisie-table-title">
+                        <div class="saisie-table-title-text depense">
+                            <i data-lucide="trending-down"></i> Dépenses — ${poleActif}
+                        </div>
+                        <div id="saisie-total-dep-${poleActif.replace(/\s+/g,'-')}" style="font-size:0.85rem;font-weight:800;color:#ef4444;font-variant-numeric:tabular-nums;">
+                            ${saisieFormatMontant(depenses.reduce((s,l) => s + (l.montant||0), 0))}
+                        </div>
+                    </div>
+                    <table class="saisie-table">
+                        <thead><tr>
+                            <th class="col-libelle">Libellé</th>
+                            <th class="col-montant">Montant (€)</th>
+                            <th class="col-commentaire">Commentaire / Anomalie</th>
+                            <th class="col-actions"></th>
+                        </tr></thead>
+                        <tbody id="tbody-dep-${poleActif.replace(/\s+/g,'-')}">
+                            ${depenses.map(l => saisieRendreLigne(l, estReadonly)).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr class="saisie-total-row">
+                                <td><strong>Total dépenses</strong></td>
+                                <td class="saisie-total-montant" style="color:#ef4444;">${saisieFormatMontant(depenses.reduce((s,l) => s + (l.montant||0), 0))}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    ${!estReadonly ? `<button class="btn-ajouter-ligne" onclick="saisieAjouterLigne('DEPENSE')">
+                        <i data-lucide="plus"></i> Ajouter une ligne de charge
+                    </button>` : ''}
+                </div>
+
+                <!-- TABLE RECETTES -->
+                <div class="saisie-table-wrapper">
+                    <div class="saisie-table-title">
+                        <div class="saisie-table-title-text recette">
+                            <i data-lucide="trending-up"></i> Recettes — ${poleActif}
+                        </div>
+                        <div id="saisie-total-rec-${poleActif.replace(/\s+/g,'-')}" style="font-size:0.85rem;font-weight:800;color:#10b981;font-variant-numeric:tabular-nums;">
+                            ${saisieFormatMontant(recettes.reduce((s,l) => s + (l.montant||0), 0))}
+                        </div>
+                    </div>
+                    <table class="saisie-table">
+                        <thead><tr>
+                            <th class="col-libelle">Libellé</th>
+                            <th class="col-montant">Montant (€)</th>
+                            <th class="col-commentaire">Commentaire / Anomalie</th>
+                            <th class="col-actions"></th>
+                        </tr></thead>
+                        <tbody id="tbody-rec-${poleActif.replace(/\s+/g,'-')}">
+                            ${recettes.map(l => saisieRendreLigne(l, estReadonly)).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr class="saisie-total-row">
+                                <td><strong>Total recettes</strong></td>
+                                <td class="saisie-total-montant" style="color:#10b981;">${saisieFormatMontant(recettes.reduce((s,l) => s + (l.montant||0), 0))}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    ${!estReadonly ? `<button class="btn-ajouter-ligne" onclick="saisieAjouterLigne('RECETTE')">
+                        <i data-lucide="plus"></i> Ajouter une ligne de recette
+                    </button>` : ''}
+                </div>
+            `;
+
+            document.getElementById('saisie-tables-zone').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        /** Génère le HTML d'une ligne de saisie */
+        function saisieRendreLigne(ligne, estReadonly) {
+            const id = ligne.id || 'new_' + Date.now() + Math.random();
+            const predefini = ligne.predefinie;
+
+            if (estReadonly) {
+                return `<tr>
+                    <td>${ligne.libelle} ${predefini ? '<span class="saisie-predefini-badge">Système</span>' : ''}</td>
+                    <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">${saisieFormatMontant(ligne.montant)}</td>
+                    <td style="color:var(--text-muted);font-size:0.78rem;">${ligne.commentaire || '—'}</td>
+                    <td></td>
+                </tr>`;
+            }
+
+            return `<tr data-ligne-id="${ligne.id || ''}" data-type="${ligne.typeLigne}" data-predefinie="${predefini}">
+                <td>
+                    <input class="saisie-input" type="text"
+                        value="${(ligne.libelle||'').replace(/"/g,'&quot;')}"
+                        placeholder="Libellé de la charge..."
+                        ${predefini ? 'readonly style="font-weight:600;"' : ''}
+                        oninput="saisieMarquerModifie()"
+                        data-field="libelle">
+                    ${predefini ? '<span class="saisie-predefini-badge">Système</span>' : ''}
+                </td>
+                <td>
+                    <input class="saisie-input montant" type="number" step="0.01" min="0"
+                        value="${ligne.montant || 0}"
+                        oninput="saisieMarquerModifie(); saisieMettreAJourTotaux()"
+                        data-field="montant">
+                </td>
+                <td>
+                    <input class="saisie-input" type="text"
+                        value="${(ligne.commentaire||'').replace(/"/g,'&quot;')}"
+                        placeholder="Commentaire, anomalie..."
+                        oninput="saisieMarquerModifie()"
+                        data-field="commentaire">
+                </td>
+                <td>
+                    ${!predefini ? `<button class="btn-supprimer-ligne" onclick="saisieSupprimerLigne(this, '${ligne.id}')" title="Supprimer cette ligne">
+                        <i data-lucide="trash-2"></i>
+                    </button>` : ''}
+                </td>
+            </tr>`;
+        }
+
+        /** Rend la vue 2025 en lecture seule (données Excel) */
+        async function saisieRendreVue2025Readonly() {
+            saisieMettreAJourPoleSelector();
+            document.getElementById('saisie-tables-zone').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">Chargement des données 2025...</div>';
+            try {
+                // Charger les données 2025 depuis l'API dashboard
+                const resp = await apiFetch(`/api/dashboard?pole=${encodeURIComponent(saisie.poleActif)}&source=A`);
+                const data = await resp.json();
+
+                const depenses = Object.entries(data.detailsCharges || {}).map(([libelle, montant]) => ({
+                    libelle, montant, typeLigne:'DEPENSE', predefinie: true, commentaire: 'Valeur 2025 (Excel)'
+                }));
+                const recettes = [{
+                    libelle: 'Recettes totales', montant: data.recettesTotales,
+                    typeLigne: 'RECETTE', predefinie: true, commentaire: 'Source: Dépenses recettes nf.xlsx'
+                }];
+
+                saisie.lignes = [...depenses, ...recettes].map(l => ({ ...l, id: null, pole: saisie.poleActif, annee: 2025 }));
+                saisieRendreTableaux();
+                document.getElementById('saisie-comparatif-zone').style.display = 'none';
+            } catch(e) {
+                document.getElementById('saisie-tables-zone').innerHTML = '<div style="color:#ef4444;padding:20px;">Données 2025 non disponibles.</div>';
+            }
+        }
+
+        /** Ajoute une nouvelle ligne vide dans le tableau */
+        function saisieAjouterLigne(type) {
+            const poleSlug = saisie.poleActif.replace(/\s+/g, '-');
+            const tbody = document.getElementById(`tbody-${type === 'DEPENSE' ? 'dep' : 'rec'}-${poleSlug}`);
+            if (!tbody) return;
+
+            const nouvelleLigne = {
+                id: null, annee: saisie.anneeActive, pole: saisie.poleActif,
+                typeLigne: type, libelle: '', montant: 0,
+                commentaire: '', predefinie: false
+            };
+
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-ligne-id', '');
+            tr.setAttribute('data-type', type);
+            tr.setAttribute('data-predefinie', 'false');
+            tr.innerHTML = saisieRendreLigne(nouvelleLigne, false);
+            tbody.appendChild(tr);
+            lucide.createIcons();
+
+            // Focus sur le libellé
+            tr.querySelector('.saisie-input[data-field="libelle"]')?.focus();
+        }
+
+        /** Supprime une ligne de la table */
+        async function saisieSupprimerLigne(btn, ligneId) {
+            const tr = btn.closest('tr');
+
+            if (ligneId && ligneId !== 'null' && ligneId !== '') {
+                // Ligne existante en base → DELETE API
+                try {
+                    const resp = await apiFetch(`/api/saisie/lignes/${ligneId}`, { method: 'DELETE' });
+                    const data = await resp.json();
+                    if (!data.succes) {
+                        saisieAfficherNotif('⚠️ ' + data.message);
+                        return;
+                    }
+                } catch(e) {
+                    saisieAfficherNotif('❌ Erreur lors de la suppression.');
+                    return;
+                }
+            }
+
+            // Animation de disparition
+            tr.style.opacity = '0';
+            tr.style.transition = 'opacity 0.2s';
+            setTimeout(() => { tr.remove(); saisieMettreAJourTotaux(); }, 200);
+            saisieAfficherNotif('✓ Ligne supprimée.');
+        }
+
+        /** Collecte toutes les lignes visibles et les sauvegarde en base */
+        async function saisieSauvegarder() {
+            const btnSave = document.getElementById('btn-sauvegarder');
+            btnSave.textContent = '⏳ Sauvegarde...';
+            btnSave.disabled = true;
+
+            try {
+                const lignesAEnvoyer = [];
+                const rows = document.querySelectorAll('#saisie-tables-zone tr[data-type]');
+
+                rows.forEach(tr => {
+                    const id = tr.getAttribute('data-ligne-id');
+                    const type = tr.getAttribute('data-type');
+                    const predefinie = tr.getAttribute('data-predefinie') === 'true';
+
+                    const libelle = tr.querySelector('[data-field="libelle"]')?.value?.trim() || '';
+                    const montant = parseFloat(tr.querySelector('[data-field="montant"]')?.value) || 0;
+                    const commentaire = tr.querySelector('[data-field="commentaire"]')?.value?.trim() || '';
+
+                    if (!libelle) return; // Ligne vide → on ignore
+
+                    const ligne = {
+                        annee: saisie.anneeActive,
+                        pole: saisie.poleActif,
+                        typeLigne: type,
+                        libelle, montant, commentaire, predefinie
+                    };
+                    if (id && id !== '' && id !== 'null') ligne.id = parseInt(id);
+
+                    lignesAEnvoyer.push(ligne);
+                });
+
+                const resp = await apiFetch('/api/saisie/lignes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lignesAEnvoyer)
+                });
+
+                if (resp.ok) {
+                    const saved = await resp.json();
+                    // Mettre à jour les IDs dans les lignes
+                    saisie.lignes = saved;
+                    saisieAfficherNotif(`✓ ${saved.length} ligne(s) sauvegardée(s).`);
+
+                    // Rafraîchir le tableau de bord avec les nouvelles données
+                    await saisieRafraichirDashboard();
+                    await saisieRendreComparatif(saisie.anneeActive);
+
+                    // Marquer le badge actif
+                    document.getElementById('saisie-source-badge').style.display = 'inline';
+                } else {
+                    saisieAfficherNotif('❌ Erreur lors de la sauvegarde.');
+                }
+            } catch(e) {
+                saisieAfficherNotif('❌ Erreur réseau : ' + e.message);
+            } finally {
+                btnSave.innerHTML = '<i data-lucide="save" style="width:14px;height:14px;"></i> Sauvegarder';
+                btnSave.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        /** Rafraîchit le tableau de bord avec les nouvelles données de saisie */
+        async function saisieRafraichirDashboard() {
+            try {
+                const resp = await apiFetch(`/api/poles?source=${currentSource}&annee=${saisie.anneeActive}`);
+                const poles = await resp.json();
+
+                let html = poles.map(p => {
+                    const couverturePct = (p.tauxCouverture * 100).toFixed(0);
+                    const perfEnergie = p.performanceEnergie || 0;
+                    const dotClass = (perfEnergie > 15) ? 'red' : 'green';
+                    return `
+                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
+                        <span class="pole-selected-badge">✓ Sélectionné</span>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
+                            <span class="pulse-dot ${dotClass}" style="flex-shrink: 0;"></span>
+                            <div style="font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; line-height: 1.3;">${p.nom}</div>
+                        </div>
+                        <div style="margin-bottom: 8px; padding: 10px 0;">
+                            <div style="font-size: 1.7rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; line-height: 1.1;">
+                                ${p.depensesTotales.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<span style="font-size: 0.65em; font-weight: 600; color: var(--text-muted); margin-left: 6px;">€</span>
+                            </div>
+                            <div style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-top: 6px;">Dépenses réelles ${saisie.anneeActive}</div>
+                        </div>
+                        <div style="border-top: 1px solid #f1f5f9; margin: 12px 0;"></div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.05rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums;">${couverturePct}%</span>
+                            <span style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600;">Taux de couverture</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('dashboardBudgetSummary').innerHTML = html;
+                lucide.createIcons();
+                saisieAfficherNotif('✓ Tableau de bord rafraîchi.');
+            } catch(e) {
+                console.log('Erreur rafraîchissement dashboard', e);
+            }
+        }
+
+        /** Charge et affiche le comparatif 2025 vs année saisie */
+        async function saisieRendreComparatif(annee) {
+            if (!annee || annee === 2025) {
+                document.getElementById('saisie-comparatif-zone').style.display = 'none';
+                return;
+            }
+
+            try {
+                const resp = await apiFetch(`/api/saisie/${annee}/comparatif`);
+                const data = await resp.json();
+
+                document.getElementById('saisie-comparatif-annee-label').textContent = annee;
+
+                let html = `<table class="comparatif-table">
+                    <thead><tr>
+                        <th>Pôle</th>
+                        <th>Dép. 2025</th>
+                        <th>Dép. ${annee}</th>
+                        <th>Écart Dép.</th>
+                        <th>Rec. 2025</th>
+                        <th>Rec. ${annee}</th>
+                        <th>Écart Rec.</th>
+                        <th>TC 2025</th>
+                        <th>TC ${annee}</th>
+                    </tr></thead><tbody>`;
+
+                data.forEach(ligne => {
+                    const ecartDClass = ligne.ecartDep > 0 ? 'ecart-positif' : (ligne.ecartDep < 0 ? 'ecart-negatif' : 'ecart-neutre');
+                    const ecartRClass = ligne.ecartRec > 0 ? 'ecart-negatif' : (ligne.ecartRec < 0 ? 'ecart-positif' : 'ecart-neutre');
+                    const signe = v => v > 0 ? '+' : '';
+
+                    html += `<tr>
+                        <td>${ligne.pole}</td>
+                        <td>${saisieFormatMontant(ligne.dep2025)}</td>
+                        <td>${saisieFormatMontant(ligne.depN)}</td>
+                        <td class="${ecartDClass}">${signe(ligne.ecartDep)}${saisieFormatMontant(ligne.ecartDep)} (${signe(ligne.ecartDepPct)}${ligne.ecartDepPct.toFixed(1)}%)</td>
+                        <td>${saisieFormatMontant(ligne.rec2025)}</td>
+                        <td>${saisieFormatMontant(ligne.recN)}</td>
+                        <td class="${ecartRClass}">${signe(ligne.ecartRec)}${saisieFormatMontant(ligne.ecartRec)} (${signe(ligne.ecartRecPct)}${ligne.ecartRecPct.toFixed(1)}%)</td>
+                        <td>${(ligne.tc2025 * 100).toFixed(1)}%</td>
+                        <td style="font-weight:800;color:var(--primary);">${(ligne.tcN * 100).toFixed(1)}%</td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                document.getElementById('saisie-comparatif-content').innerHTML = html;
+                document.getElementById('saisie-comparatif-zone').style.display = 'block';
+            } catch(e) {
+                document.getElementById('saisie-comparatif-zone').style.display = 'none';
+            }
+        }
+
+        /** Réinitialise l'année active vers les données 2025 */
+        async function saisieReinitialiser() {
+            if (!saisie.anneeActive || saisie.anneeActive === 2025) {
+                saisieAfficherNotif('⚠️ Sélectionnez une année autre que 2025 pour réinitialiser.');
+                return;
+            }
+            if (!confirm(`Réinitialiser les données ${saisie.anneeActive} vers la référence 2025 ?\nToutes les modifications seront perdues.`)) return;
+
+            try {
+                saisieAfficherNotif(`⏳ Réinitialisation de ${saisie.anneeActive}...`);
+                const resp = await apiFetch(`/api/saisie/${saisie.anneeActive}/reinitialiser`, { method: 'POST' });
+                const data = await resp.json();
+                saisieAfficherNotif(`✓ ${data.message}`);
+                await saisieChargerLignes(saisie.anneeActive);
+                // Remettre le dashboard 2025
+                chargerDashboardData();
+            } catch(e) {
+                saisieAfficherNotif('❌ Erreur lors de la réinitialisation.');
+            }
+        }
+
+        /** Télécharge le XLSX de la saisie */
+        function saisieExporterXlsx() {
+            if (!saisie.anneeActive || saisie.anneeActive === 2025) {
+                saisieAfficherNotif('⚠️ Sélectionnez une année de saisie (pas 2025) pour exporter.');
+                return;
+            }
+            saisieAfficherNotif('⏳ Génération du fichier XLSX...');
+            window.location.href = `/api/saisie/${saisie.anneeActive}/export`;
+            setTimeout(() => saisieAfficherNotif('✓ Téléchargement démarré.'), 1500);
+        }
+
+        /** Marque qu'il y a des modifications non sauvegardées */
+        function saisieMarquerModifie() {
+            const btn = document.getElementById('btn-sauvegarder');
+            if (btn && !btn.style.outline) {
+                btn.style.outline = '2px solid #fbbf24';
+                btn.style.outlineOffset = '2px';
+            }
+        }
+
+        /** Met à jour les totaux en temps réel lors de la saisie */
+        function saisieMettreAJourTotaux() {
+            const poleSlug = saisie.poleActif.replace(/\s+/g, '-');
+
+            ['dep', 'rec'].forEach(t => {
+                const tbody = document.getElementById(`tbody-${t}-${poleSlug}`);
+                if (!tbody) return;
+                let total = 0;
+                tbody.querySelectorAll('[data-field="montant"]').forEach(inp => {
+                    total += parseFloat(inp.value) || 0;
+                });
+
+                const zoneTotal = document.getElementById(`saisie-total-${t}-${poleSlug}`);
+                if (zoneTotal) zoneTotal.textContent = saisieFormatMontant(total);
+
+                // Mettre à jour la ligne tfoot
+                const fRow = tbody.closest('table').querySelector('tfoot .saisie-total-montant');
+                if (fRow) fRow.textContent = saisieFormatMontant(total);
+            });
+        }
+
+        /** Formate un montant en euros */
+        function saisieFormatMontant(v) {
+            return (v || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        }
+
+        /** Affiche une notification toast en bas à droite */
+        function saisieAfficherNotif(message) {
+            const old = document.getElementById('saisie-notif-toast');
+            if (old) old.remove();
+
+            const el = document.createElement('div');
+            el.id = 'saisie-notif-toast';
+            el.className = 'saisie-notif';
+            el.innerHTML = `<i data-lucide="check-circle"></i> ${message}`;
+            document.body.appendChild(el);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.4s';
+                setTimeout(() => el.remove(), 400);
+            }, 3000);
+        }
+
     </script>
     <div id="report-print-area" style="display: none;"></div>
     <div id="impact-print-area" style="display: none; font-family: 'DM Sans', sans-serif;"></div>

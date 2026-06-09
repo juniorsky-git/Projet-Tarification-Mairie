@@ -1320,3 +1320,527 @@ tr:last-child td {
         min-width: auto !important;
     }
 }
+
+/* ==========================================================================
+   SURBRILLANCE DES CARTES PÔLES (Dashboard)
+   ========================================================================== */
+
+.pole-card-selected {
+    border: 2px solid var(--primary) !important;
+    background: #f5f3ff !important;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08), 0 4px 16px rgba(79, 70, 229, 0.15) !important;
+    transform: translateY(-2px);
+    transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+.pole-card-selected .pole-selected-badge {
+    display: flex !important;
+}
+
+.pole-selected-badge {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 7px;
+    border-radius: 20px;
+    align-items: center;
+    gap: 3px;
+}
+
+/* ==========================================================================
+   MODULE SAISIE COMPTABLE — Section au bas du Dashboard
+   ========================================================================== */
+
+.saisie-section {
+    margin-top: 32px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* En-tête de la section — cliquable pour déplier */
+.saisie-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+    border-bottom: 1px solid transparent;
+}
+
+.saisie-header:hover {
+    background: #fafbff;
+}
+
+.saisie-header.open {
+    border-bottom-color: var(--border);
+    background: #fafbff;
+}
+
+.saisie-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.saisie-header-icon {
+    width: 38px;
+    height: 38px;
+    background: #eff6ff;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.saisie-header-icon i {
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+}
+
+.saisie-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+}
+
+.saisie-header-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.saisie-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.saisie-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--text-muted);
+    transition: transform 0.25s ease;
+}
+
+.saisie-header.open .saisie-chevron {
+    transform: rotate(180deg);
+}
+
+/* Corps — déplié */
+.saisie-body {
+    display: none;
+    padding: 28px;
+    animation: fadeIn 0.3s ease;
+}
+
+.saisie-body.open {
+    display: block;
+}
+
+/* Barre d'outils (Année + boutons) */
+.saisie-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.saisie-annee-tabs {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.saisie-tab {
+    padding: 7px 18px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.saisie-tab:hover {
+    color: var(--text-main);
+    background: white;
+}
+
+.saisie-tab.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.saisie-tab .tab-badge {
+    font-size: 0.6rem;
+    background: #e0e7ff;
+    color: var(--primary);
+    padding: 1px 6px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.saisie-tab.ref-tag .tab-badge {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.saisie-toolbar-btns {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Sélecteur de pôle dans la saisie */
+.saisie-pole-selector {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.saisie-pole-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.saisie-pole-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.saisie-pole-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Tableau de saisie */
+.saisie-table-wrapper {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.saisie-table-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+}
+
+.saisie-table-title-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.saisie-table-title-text i {
+    width: 14px;
+    height: 14px;
+}
+
+.saisie-table-title-text.depense i { color: #ef4444; }
+.saisie-table-title-text.recette i { color: #10b981; }
+
+.saisie-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.saisie-table th {
+    padding: 10px 16px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: #f8fafc;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.saisie-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.saisie-table tr:last-child td {
+    border-bottom: none;
+}
+
+.saisie-table tr:hover td {
+    background: #fafbff;
+}
+
+.saisie-table .col-libelle { width: 35%; }
+.saisie-table .col-montant { width: 20%; }
+.saisie-table .col-commentaire { width: 35%; }
+.saisie-table .col-actions { width: 10%; text-align: right; }
+
+/* Input dans la table */
+.saisie-input {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-main);
+    background: transparent;
+    transition: all 0.15s;
+    outline: none;
+}
+
+.saisie-input:hover {
+    border-color: var(--border);
+    background: white;
+}
+
+.saisie-input:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+}
+
+.saisie-input.montant {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+/* Badge pré-définie */
+.saisie-predefini-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.55rem;
+    background: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 8px;
+}
+
+/* Bouton supprimer ligne */
+.btn-supprimer-ligne {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    opacity: 0;
+}
+
+.saisie-table tr:hover .btn-supprimer-ligne {
+    opacity: 1;
+}
+
+.btn-supprimer-ligne:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.btn-supprimer-ligne i { width: 11px; height: 11px; }
+
+/* Bouton + Ajouter une ligne */
+.btn-ajouter-ligne {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+}
+
+.btn-ajouter-ligne:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f5f3ff;
+}
+
+.btn-ajouter-ligne i { width: 14px; height: 14px; }
+
+/* Ligne total de la table */
+.saisie-total-row td {
+    background: #f8fafc !important;
+    font-weight: 700;
+    border-top: 2px solid var(--border) !important;
+    border-bottom: none !important;
+}
+
+.saisie-total-montant {
+    font-size: 1rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* Tableau comparatif 2025 vs N */
+.saisie-comparatif {
+    margin-top: 32px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+}
+
+.saisie-comparatif-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.saisie-comparatif-title i { width: 14px; height: 14px; }
+
+.comparatif-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.comparatif-table th {
+    padding: 10px 16px;
+    text-align: right;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+}
+
+.comparatif-table th:first-child {
+    text-align: left;
+}
+
+.comparatif-table td {
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid #f1f5f9;
+    font-variant-numeric: tabular-nums;
+}
+
+.comparatif-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+}
+
+.comparatif-table tr:hover td {
+    background: #fafbff;
+}
+
+.ecart-positif { color: #ef4444; font-weight: 700; }
+.ecart-negatif { color: #10b981; font-weight: 700; }
+.ecart-neutre  { color: var(--text-muted); }
+
+/* Notification de sauvegarde */
+.saisie-notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #0d0d0d;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: slideUp 0.25s ease;
+    pointer-events: none;
+}
+
+.saisie-notif i { width: 16px; height: 16px; color: #6ee7b7; }
+
+/* Etat vide — pour encourager la saisie */
+.saisie-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+}
+
+.saisie-empty i {
+    width: 40px;
+    height: 40px;
+    opacity: 0.3;
+    margin: 0 auto 12px;
+    display: block;
+}
+
+.saisie-empty p {
+    font-size: 0.85rem;
+    margin: 0 0 16px;
+}
