@@ -2703,17 +2703,12 @@
             }
             saisieRendreOngletAnnees();
 
-            // Sélection automatique : 2026 en priorité, sinon 2025
-            const anneeParDefaut = saisie.anneesDispo.includes(saisie.ANNEE_DEBUT)
-                ? saisie.ANNEE_DEBUT
-                : (saisie.anneesDispo.find(a => a > 2025) || null);
-
-            if (anneeParDefaut) {
-                await saisieSelectAnnee(anneeParDefaut);
-            } else {
-                // 2026 n'existe pas encore → on la crée automatiquement
-                saisieAfficherNotif('⏳ Initialisation de 2026 depuis les données 2025...');
+            // Sélection automatique : toujours forcer 2026 au démarrage
+            if (!saisie.anneesDispo.includes(saisie.ANNEE_DEBUT)) {
+                saisieAfficherNotif('⏳ Initialisation de ' + saisie.ANNEE_DEBUT + ' depuis les données 2025...');
                 await saisieCreerAnnee(saisie.ANNEE_DEBUT);
+            } else {
+                await saisieSelectAnnee(saisie.ANNEE_DEBUT);
             }
         }
 
@@ -2727,20 +2722,23 @@
                 2025 <span class="tab-badge">Réf.</span>
             </button>`;
 
-            // Onglets des années saisies (hors 2025)
+            // Trouver l'année max actuelle (ex: 2027)
             const anneesSaisies = saisie.anneesDispo.filter(a => a !== 2025).sort((a,b) => a - b);
-            anneesSaisies.forEach(a => {
-                html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">${a}</button>`;
-            });
-
-            // Bouton pour créer l'année suivante (toujours visible si pas encore créée)
-            const prochaineACreer = anneesSaisies.length > 0
-                ? Math.max(...anneesSaisies) + 1
-                : saisie.ANNEE_DEBUT;
-            if (!saisie.anneesDispo.includes(prochaineACreer)) {
-                html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${prochaineACreer})" title="Créer les données ${prochaineACreer} à partir de 2025" style="border:1px dashed var(--border); color:var(--text-muted);">
-                    <i data-lucide="plus" style="width:12px;height:12px;"></i> ${prochaineACreer}
-                </button>`;
+            const maxAnnee = anneesSaisies.length > 0 ? Math.max(...anneesSaisies) : 2025;
+            
+            // On affiche toutes les années de 2026 jusqu'à maxAnnee + 1
+            const prochaineACreer = Math.max(saisie.ANNEE_DEBUT, maxAnnee + 1);
+            
+            for (let a = saisie.ANNEE_DEBUT; a <= prochaineACreer; a++) {
+                if (saisie.anneesDispo.includes(a)) {
+                    // Année existe
+                    html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">${a}</button>`;
+                } else {
+                    // Année manquante (à créer)
+                    html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${a})" title="Créer les données ${a} à partir de 2025" style="border:1px dashed var(--border); color:var(--text-muted);">
+                        <i data-lucide="plus" style="width:12px;height:12px;"></i> ${a}
+                    </button>`;
+                }
             }
 
             container.innerHTML = html;
