@@ -82,6 +82,7 @@ public class SaisieComptableService {
             Map<String, Double> charges = pole.chargesDetaillees();
             List<String> libellesPredefinis = CHARGES_PREDEFINES.getOrDefault(pole.nom(), List.of());
 
+            double sommeMappee = 0.0;
             for (String libelle : libellesPredefinis) {
                 // Cherche le montant correspondant dans les charges 2025 (correspondance souple)
                 double montant = charges.entrySet().stream()
@@ -92,6 +93,16 @@ public class SaisieComptableService {
                 LigneSaisie ligne = new LigneSaisie(annee, pole.nom(), "DEPENSE", libelle, montant, true);
                 ligne.setCommentaire("Valeur de référence 2025 — à mettre à jour");
                 lignesACreer.add(ligne);
+                sommeMappee += montant;
+            }
+
+            // --- Ajouter le reliquat pour que le total soit exactement égal à 2025 ---
+            double totalReel2025 = pole.depensesTotales();
+            double restant = totalReel2025 - sommeMappee;
+            if (restant > 0.01 || restant < -0.01) {
+                LigneSaisie ligneReliquat = new LigneSaisie(annee, pole.nom(), "DEPENSE", "Autres charges (reliquat 2025)", restant, true);
+                ligneReliquat.setCommentaire("Charges de 2025 non classifiées dans les catégories standard");
+                lignesACreer.add(ligneReliquat);
             }
 
             // --- RECETTES : lignes prédéfinies avec montants 2025 ---
