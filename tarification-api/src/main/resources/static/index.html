@@ -2067,11 +2067,15 @@
             const annee = dashboardAnneeActive ? dashboardAnneeActive : "2025";
             const dateStr = new Date().toLocaleDateString('fr-FR');
             
-            // On crée un conteneur d'impression au bout du DOM (affichage temporaire classique)
+            // On crée un conteneur d'impression absolu qui couvre temporairement l'application
             const printArea = document.createElement('div');
-            printArea.style.width = '1200px'; // Forcer une largeur de bureau pour éviter les coupures
-            printArea.style.padding = '30px';
+            printArea.style.position = 'absolute';
+            printArea.style.top = '0';
+            printArea.style.left = '0';
+            printArea.style.zIndex = '999999';
+            printArea.style.width = '1200px'; // Forcer une largeur de bureau
             printArea.style.background = 'white';
+            printArea.style.padding = '40px';
             printArea.style.color = '#0f172a';
             printArea.style.fontFamily = "'Inter', sans-serif";
             document.body.appendChild(printArea);
