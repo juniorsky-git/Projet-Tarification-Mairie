@@ -2183,6 +2183,10 @@
             if (badge) badge.textContent = annee ? `${annee} — Saisie` : '2025 — Référence';
             await initDashboardYearSwitcher(); // refresh les boutons actifs
             await chargerDashboardData();
+            // Mettre à jour l'analyse financière en bas si un pôle est déjà sélectionné
+            if (document.getElementById("selectPoleDetails").value) {
+                chargerDetailsPole();
+            }
         }
 
         // --- DASHBOARD DATA ---
@@ -2257,7 +2261,11 @@
             zoneFinance.innerHTML = `<div class="loading-spinner">Analyse financière en cours...</div>`;
 
             try {
-                const response = await apiFetch(`/api/dashboard?pole=${encodeURIComponent(pole)}&source=${currentSource}`);
+                let url = `/api/dashboard?pole=${encodeURIComponent(pole)}&source=${currentSource}`;
+                if (dashboardAnneeActive && dashboardAnneeActive !== null) {
+                    url += `&annee=${dashboardAnneeActive}`;
+                }
+                const response = await apiFetch(url);
                 const data = await response.json();
 
                 // RENDU FINANCES
