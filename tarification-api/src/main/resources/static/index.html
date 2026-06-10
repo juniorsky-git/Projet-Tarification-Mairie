@@ -177,16 +177,6 @@
                 </div>
 
                 <!-- Floating chips -->
-                <div class="lp-chip chip-1">
-                    <div class="lp-chip-icon blue">
-                        <i data-lucide="trending-up"></i>
-                    </div>
-                    <div class="lp-chip-text">
-                        <div class="lp-chip-title">Simulation What-If</div>
-                        <div class="lp-chip-sub">Impact en temps réel</div>
-                    </div>
-                </div>
-
                 <div class="lp-chip chip-2">
                     <div class="lp-chip-icon green">
                         <i data-lucide="droplets"></i>
@@ -208,11 +198,6 @@
                         <div class="lp-strip-icon a"><i data-lucide="search"></i></div>
                         <div class="lp-strip-title">Consultation tarifaire</div>
                         <div class="lp-strip-desc">Retrouvez instantanément le tarif d'un usager selon son quotient familial.</div>
-                    </div>
-                    <div class="lp-strip-item">
-                        <div class="lp-strip-icon b"><i data-lucide="line-chart"></i></div>
-                        <div class="lp-strip-title">Simulation financière</div>
-                        <div class="lp-strip-desc">Modifiez les prix et visualisez l'impact budgétaire annuel en direct.</div>
                     </div>
                     <div class="lp-strip-item">
                         <div class="lp-strip-icon c"><i data-lucide="droplets"></i></div>
@@ -664,64 +649,6 @@
             </div>
         </div>
 
-        <!-- PAGE : SIMULATION (HIFI - RESTAURATION) -->
-        <div id="page-simulation" class="content-page">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h1>Simulation financière - Restauration</h1>
-                    <p class="subtitle">Analyse des coûts, recettes et taux de couverture par tranche.</p>
-                </div>
-                <div id="whatif-controls" style="display: none; background: #f8fafc; padding: 12px 18px; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center; gap: 15px;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;">🛠 MOTEUR SIMULATION ACTIF</span>
-                    <span id="whatif-restored-info" style="font-size: 0.75rem; color: #94a3b8; font-style: italic;"></span>
-                    <button onclick="resetSimulation()" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">
-                        Réinitialiser (Excel)
-                    </button>
-                    <button onclick="genererRapportPDF()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
-                        Exporter PDF
-                    </button>
-                </div>
-            </div>
-            <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
-                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
-                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Recettes totales</div>
-                    <div class="value" id="sim-recettes-totales" style="color: #10b981; font-size: 1.75rem;">...</div>
-                </div>
-                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
-                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Dépenses totales</div>
-                    <div class="value" id="sim-depenses-totales" style="font-size: 1.75rem;">...</div>
-                </div>
-                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
-                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Écart global</div>
-                    <div class="value" id="sim-ecart-global" style="font-size: 1.75rem;">...</div>
-                </div>
-                <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; box-shadow: none; border: 1px solid #f1f5f9;">
-                    <div class="label" style="font-size: 0.8rem; font-weight: 500;">Taux de couverture moyen</div>
-                    <div class="value" id="sim-taux-moyen" style="color: #10b981; font-size: 1.75rem;">...</div>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <table id="fullGridTable">
-                    <thead>
-                        <tr>
-                            <th>Tranche</th>
-                            <th>Prix facturé<br><span style="font-size: 0.65rem; color: #94a3b8; font-weight: 400; text-transform: none;">(moyen)</span></th>
-                            <th>Coût réel<br><span style="font-size: 0.65rem; color: #94a3b8; font-weight: 400; text-transform: none;">(moyen)</span></th>
-                            <th>Nombre<br>d'enfants</th>
-                            <th>Dépense<br>annuelle</th>
-                            <th>Recette<br>annuelle</th>
-                            <th>Écart</th>
-                            <th>Taux de<br>couverture</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Corps généré par JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
         
         <!-- PAGE : RAPPORTS MAÎTRES (GÉNÉRATION BACKEND) -->
         <div id="page-rapports" class="content-page">
@@ -1816,216 +1743,7 @@
             `;
         }
 
-        // --- API : SIMULATION (HIFI - RESTAURATION + WHAT-IF) ---
-        let originalSimData = [];
-
-        // --- LOCALSTORAGE : PERSISTANCE DES SIMULATIONS ---
-        const WHATIF_STORAGE_KEY = 'whatif_restauration_prix';
-
-        function saveSimulationToStorage() {
-            const overrides = {};
-            originalSimData.forEach(t => {
-                const isTotal = (t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-                if (!isTotal) overrides[t.codeTranche] = t.prixFacture;
-            });
-            localStorage.setItem(WHATIF_STORAGE_KEY, JSON.stringify({
-                overrides,
-                savedAt: new Date().toISOString()
-            }));
-        }
-
-        function loadSimulationFromStorage() {
-            const raw = localStorage.getItem(WHATIF_STORAGE_KEY);
-            return raw ? JSON.parse(raw) : null;
-        }
-
-        function clearSimulationStorage() {
-            localStorage.removeItem(WHATIF_STORAGE_KEY);
-        }
-
-        function resetSimulation() {
-            clearSimulationStorage();
-            chargerSimulationRestauration();
-        }
-
-        async function chargerSimulationRestauration() {
-            const table = document.getElementById("fullGridTable");
-            const tbody = table.querySelector('tbody');
-            document.getElementById('whatif-controls').style.display = 'none';
-            document.getElementById('whatif-restored-info').textContent = '';
-
-            try {
-                tbody.innerHTML = `<tr><td colspan="8" class="loading-spinner">Chargement des données de simulation...</td></tr>`;
-                
-                const response = await apiFetch("/api/simulation/restauration");
-                originalSimData = await response.json();
-
-                // Stocker le prix original et le facteur annuel (nb_repas × enfants)
-                originalSimData.forEach(t => {
-                    t.prixOriginal = t.prixFacture;
-                    t.facteurAnnuel = (t.prixFacture > 0) ? (t.recetteAnnuelle / t.prixFacture) : t.nombreEnfants;
-                });
-
-                // Appliquer les overrides sauvegardés en localStorage
-                const saved = loadSimulationFromStorage();
-                if (saved && saved.overrides && Object.keys(saved.overrides).length > 0) {
-                    Object.entries(saved.overrides).forEach(([codeTranche, prix]) => {
-                        const ligne = originalSimData.find(t => t.codeTranche === codeTranche);
-                        if (ligne) {
-                            ligne.prixFacture = prix;
-                            ligne.recetteAnnuelle = prix * ligne.facteurAnnuel;
-                            ligne.ecart = ligne.recetteAnnuelle - ligne.depenseAnnuelle;
-                            ligne.tauxCouverture = ligne.depenseAnnuelle > 0
-                                ? (ligne.recetteAnnuelle / ligne.depenseAnnuelle) : 0;
-                        }
-                    });
-
-                    // Recalculer la ligne Total
-                    const totalIndex = originalSimData.findIndex(t => t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-                    if (totalIndex !== -1) {
-                        let totalRecettes = 0, totalDepenses = 0;
-                        originalSimData.forEach((t, i) => {
-                            const isTotal = (t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-                            if (!isTotal) { totalRecettes += t.recetteAnnuelle; totalDepenses += t.depenseAnnuelle; }
-                        });
-                        originalSimData[totalIndex].recetteAnnuelle = totalRecettes;
-                        originalSimData[totalIndex].depenseAnnuelle = totalDepenses;
-                        originalSimData[totalIndex].ecart = totalRecettes - totalDepenses;
-                        originalSimData[totalIndex].tauxCouverture = totalDepenses > 0 ? totalRecettes / totalDepenses : 0;
-                    }
-
-                    const dateStr = new Date(saved.savedAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                    document.getElementById('whatif-restored-info').textContent = `Restauré du ${dateStr}`;
-                    document.getElementById('whatif-controls').style.display = 'flex';
-                }
-
-                renderSimulationTable(originalSimData);
-
-            } catch (error) {
-                console.error("Erreur simulation restauration :", error);
-                tbody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center; padding: 20px;">Erreur de communication avec le serveur</td></tr>`;
-            }
-        }
-
-        function renderSimulationTable(data) {
-            const tbody = document.querySelector("#fullGridTable tbody");
-            let body = "";
-            let sumRecettes = 0;
-            let sumDepenses = 0;
-            let sumEcart = 0;
-
-            data.forEach((t, index) => {
-                const isTotal = (t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-                
-                if (isTotal) {
-                    sumRecettes = t.recetteAnnuelle;
-                    sumDepenses = t.depenseAnnuelle;
-                    sumEcart = t.ecart;
-                }
-
-                body += `
-                    <tr ${isTotal ? 'style="font-weight: 700; background-color: #f1f5f9; border-top: 2px solid #cbd5e1;"' : ''}>
-                        <td><span style="${isTotal ? 'font-size: 1.05rem; color: #1e293b;' : 'font-weight: 600; color: var(--text-main); font-size: 0.95rem;'}">${t.codeTranche}</span></td>
-                        <td style="width: 120px;">
-                            ${isTotal ? '' : `
-                                <input type="number" step="0.01" value="${t.prixFacture.toFixed(2)}" 
-                                    oninput="simulerChangementPrix(${index}, this.value)" 
-                                    style="width: 70px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit; font-size: 0.9rem; font-weight: 600; color: #1e293b;"> €
-                            `}
-                        </td>
-                        <td>${isTotal ? '' : t.coutMoyen.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits:2}) + ' €'}</td>
-                        <td id="sim-kids-${index}">${t.nombreEnfants}</td>
-                        <td id="sim-dep-${index}">${t.depenseAnnuelle.toLocaleString('fr-FR')} €</td>
-                        <td id="sim-rec-${index}" style="font-weight: 600; color: #1e293b;">${t.recetteAnnuelle.toLocaleString('fr-FR')} €</td>
-                        <td id="sim-ecart-${index}" style="color: ${t.ecart < 0 ? '#ef4444' : '#10b981'}; font-weight: 500;">
-                            ${t.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}
-                        </td>
-                        <td id="sim-taux-${index}" style="font-weight: 500;">${(t.tauxCouverture * 100).toLocaleString('fr-FR', {maximumFractionDigits: 1})} %</td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = body;
-            updateSimulationStats(sumRecettes, sumDepenses, sumEcart);
-        }
-
-        function simulerChangementPrix(index, nouveauPrix) {
-            document.getElementById('whatif-controls').style.display = 'flex';
-            const price = parseFloat(nouveauPrix) || 0;
-            
-            // Mise à jour locale de la ligne
-            const line = originalSimData[index];
-            line.prixFacture = price;
-            line.recetteAnnuelle = price * line.facteurAnnuel;
-            line.ecart = line.recetteAnnuelle - line.depenseAnnuelle;
-            line.tauxCouverture = line.depenseAnnuelle > 0 ? (line.recetteAnnuelle / line.depenseAnnuelle) : 0;
-
-            // Update UI de la ligne
-            document.getElementById(`sim-rec-${index}`).innerText = line.recetteAnnuelle.toLocaleString('fr-FR') + ' €';
-            const ecartEl = document.getElementById(`sim-ecart-${index}`);
-            if (ecartEl) {
-                ecartEl.innerText = line.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
-                ecartEl.style.color = line.ecart < 0 ? '#ef4444' : '#10b981';
-            }
-            const tauxEl = document.getElementById(`sim-taux-${index}`);
-            if (tauxEl) tauxEl.innerText = (line.tauxCouverture * 100).toLocaleString('fr-FR', {maximumFractionDigits: 1}) + ' %';
-
-            // Recalcul des totaux globaux
-            let totalRecettes = 0;
-            let totalDepenses = 0;
-            
-            originalSimData.forEach(t => {
-                const isTotal = (t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-                if (!isTotal) {
-                    totalRecettes += t.recetteAnnuelle;
-                    totalDepenses += t.depenseAnnuelle;
-                }
-            });
-
-            const totalEcart = totalRecettes - totalDepenses;
-            updateSimulationStats(totalRecettes, totalDepenses, totalEcart);
-
-            // Sauvegarder la simulation dans localStorage
-            saveSimulationToStorage();
-
-            // Mettre à jour la ligne Total dans le tableau
-            const totalIndex = originalSimData.findIndex(t => t.codeTranche.toLowerCase() === 'total' || (t.tranche && t.tranche.toLowerCase() === 'total'));
-            if (totalIndex !== -1) {
-                const totalLine = originalSimData[totalIndex];
-                totalLine.recetteAnnuelle = totalRecettes;
-                totalLine.depenseAnnuelle = totalDepenses;
-                totalLine.ecart = totalEcart;
-                totalLine.tauxCouverture = totalDepenses > 0 ? (totalRecettes / totalDepenses) : 0;
-                
-                document.getElementById(`sim-rec-${totalIndex}`).innerText = totalLine.recetteAnnuelle.toLocaleString('fr-FR') + ' €';
-                const tEcartEl = document.getElementById(`sim-ecart-${totalIndex}`);
-                if (tEcartEl) {
-                    tEcartEl.innerText = totalLine.ecart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'});
-                    tEcartEl.style.color = totalLine.ecart < 0 ? '#ef4444' : '#10b981';
-                }
-                const tTauxEl = document.getElementById(`sim-taux-${totalIndex}`);
-                if (tTauxEl) tTauxEl.innerText = (totalLine.tauxCouverture * 100).toLocaleString('fr-FR', {maximumFractionDigits: 1}) + ' %';
-            }
-        }
-
-        function updateSimulationStats(sumRecettes, sumDepenses, sumEcart) {
-            const globalTaux = sumDepenses > 0 ? (sumRecettes / sumDepenses) * 100 : 0;
-            
-            document.getElementById('sim-recettes-totales').innerText = sumRecettes.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
-            document.getElementById('sim-depenses-totales').innerText = sumDepenses.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
-            
-            const ecartEl = document.getElementById('sim-ecart-global');
-            if (ecartEl) {
-                ecartEl.innerText = sumEcart.toLocaleString('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
-                ecartEl.style.color = sumEcart < 0 ? '#ef4444' : '#10b981';
-            }
-
-            const tauxEl = document.getElementById('sim-taux-moyen');
-            if (tauxEl) {
-                tauxEl.innerText = globalTaux.toLocaleString('fr-FR', {maximumFractionDigits: 1}) + ' %';
-                tauxEl.style.color = globalTaux >= 100 ? '#10b981' : (globalTaux > 50 ? '#f59e0b' : '#ef4444');
-            }
-        }
+        // --- Fin Simulation ---
 
         async function ouvrirLogsTechniques() {
             const modal = document.getElementById('modalLogsTechniques');
@@ -2887,7 +2605,7 @@
             const nb = parseFloat(val) || 0;
             let statLigne = saisie.lignes.find(l => l.pole === poleActif && l.typeLigne === 'STAT' && l.libelle === "Nombre d'enfants");
             if (!statLigne) {
-                statLigne = { id: null, typeLigne: 'STAT', pole: poleActif, libelle: "Nombre d'enfants", montant: nb, commentaire: "", predefinie: false };
+                statLigne = { id: null, annee: saisie.anneeActive, typeLigne: 'STAT', pole: poleActif, libelle: "Nombre d'enfants", montant: nb, commentaire: "", predefinie: false };
                 saisie.lignes.push(statLigne);
             } else {
                 statLigne.montant = nb;
