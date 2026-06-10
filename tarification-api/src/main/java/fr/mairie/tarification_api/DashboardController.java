@@ -60,7 +60,7 @@ public class DashboardController {
             boolean utiliseSaisie = (annee != null) && saisieService.getAnneesDisponibles().contains(annee);
 
             if (utiliseSaisie) {
-                return getDashboardDepuisSaisie(decodedPole, annee);
+                return getDashboardDepuisSaisie(decodedPole, annee, source);
             } else {
                 return getDashboardDepuisExcel(decodedPole, source);
             }
@@ -73,13 +73,16 @@ public class DashboardController {
     /**
      * Construit la réponse dashboard depuis les données de saisie comptable (PostgreSQL).
      */
-    private ResponseEntity<?> getDashboardDepuisSaisie(String pole, Integer annee) {
+    private ResponseEntity<?> getDashboardDepuisSaisie(String pole, Integer annee, String source) {
         Map<String, Map<String, Double>> totaux = saisieService.getTotauxParPole(annee);
         Map<String, Double> totauxPole = totaux.get(pole);
 
         if (totauxPole == null) {
             return ResponseEntity.notFound().build();
         }
+
+        List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
+        int defaultEnfants = poles.stream().filter(p -> p.nom().equalsIgnoreCase(pole)).mapToInt(DepensePole::nombreEnfants).findFirst().orElse(0);
 
         // Détail des charges depuis la base (lignes de type DEPENSE)
         Map<String, Double> detailCharges = new LinkedHashMap<>();
@@ -91,7 +94,7 @@ public class DashboardController {
             .filter(l -> l.getPole().equalsIgnoreCase(pole) && "STAT".equals(l.getTypeLigne()) && "Nombre d'enfants".equals(l.getLibelle()))
             .mapToInt(l -> (int) Math.round(l.getMontant()))
             .findFirst()
-            .orElse(0);
+            .orElse(defaultEnfants);
 
         DashboardResponse r = new DashboardResponse();
         r.pole = pole;
