@@ -2926,10 +2926,10 @@
                 <div class="saisie-stat-wrapper" style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
                     <i data-lucide="users" style="color: #64748b;"></i>
                     <strong style="color: #334155;">Nombre d'enfants :</strong>
-                    <input type="number" class="saisie-input" style="width: 120px;" 
+                    <input type="number" id="saisie-stat-enfants-input" class="saisie-input" style="width: 120px;" 
                         ${estReadonly ? 'disabled' : ''} 
                         value="${nbEnfants}" 
-                        onchange="saisieMettreAJourStatEnfants(this.value)"
+                        oninput="saisieMettreAJourStatEnfants(this.value); saisieMarquerModifie()"
                         placeholder="Ex: 450">
                     <span style="font-size: 0.85rem; color: #64748b; margin-left: 10px;">
                         (Sera utilisé pour calculer le coût unitaire réel de l'année)
@@ -3159,6 +3159,19 @@
                     lignesAEnvoyer.push(ligne);
                 });
 
+                // Récupérer et mettre à jour le nombre d'enfants (STAT)
+                const inputKids = document.getElementById('saisie-stat-enfants-input');
+                if (inputKids) {
+                    const nb = parseFloat(inputKids.value) || 0;
+                    saisieMettreAJourStatEnfants(nb);
+                }
+
+                // Ajouter la ligne STAT du pôle actif à envoyer au backend
+                const statLigne = saisie.lignes.find(l => l.pole === saisie.poleActif && l.typeLigne === 'STAT' && l.libelle === "Nombre d'enfants");
+                if (statLigne) {
+                    lignesAEnvoyer.push(statLigne);
+                }
+
                 const resp = await apiFetch('/api/saisie/lignes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -3166,14 +3179,23 @@
                 });
 
                 if (resp.ok) {
-                    const saved = await resp.json();
-                    // Mettre à jour les IDs dans les lignes
-                    saisie.lignes = saved;
-                    saisieAfficherNotif(`✓ ${saved.length} ligne(s) sauvegardée(s).`);
+                    // Retirer l'outline de modification non enregistrée
+                    btnSave.style.outline = '';
+                    btnSave.style.outlineOffset = '';
+
+                    // Charger toutes les lignes à jour pour synchroniser les états en mémoire
+                    await saisieChargerLignes(saisie.anneeActive);
+                    saisieAfficherNotif(`✓ Données sauvegardées.`);
 
                     // Rafraîchir le tableau de bord avec les nouvelles données
                     await saisieRafraichirDashboard();
                     await saisieRendreComparatif(saisie.anneeActive);
+
+                    // Rafraîchir l'analyse financière détaillée du pôle actif si sélectionné
+                    const currentPoleDetail = document.getElementById("selectPoleDetails")?.value;
+                    if (currentPoleDetail) {
+                        await chargerDetailsPole();
+                    }
 
                     // Marquer le badge actif
                     document.getElementById('saisie-source-badge').style.display = 'inline';
