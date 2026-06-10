@@ -653,7 +653,7 @@
         <!-- PAGE : GUIDE ET TUTORIEL -->
         <div id="page-tutoriel" class="content-page">
             <div style="text-align: center; margin-bottom: 40px;">
-                <h1 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;">Bienvenue sur l'Outil de Tarification ! 👋</h1>
+                <h1 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;">Bienvenue sur l'Outil de Tarification !</h1>
                 <p class="subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Un outil simple et rapide pour gérer les finances et répondre aux usagers de la Mairie de Crosne.</p>
                 
                 <a href="/document_passation.pdf" download style="display: inline-flex; align-items: center; gap: 10px; background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 24px; font-size: 1.05rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
@@ -1961,8 +1961,8 @@
                     const couverturePct = (p.tauxCouverture * 100).toFixed(0);
                     const perfEnergie = p.performanceEnergie || 0;
                     
-                    // Point scintillant : Rouge si alerte, Vert sinon
-                    const dotClass = (perfEnergie > 15) ? 'red' : 'green';
+                    // Point scintillant : Toujours vert pour indiquer que le pôle est opérationnel
+                    const dotClass = 'green';
 
                     return `
                     <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
@@ -2978,7 +2978,7 @@
                 let html = poles.map(p => {
                     const couverturePct = (p.tauxCouverture * 100).toFixed(0);
                     const perfEnergie = p.performanceEnergie || 0;
-                    const dotClass = (perfEnergie > 15) ? 'red' : 'green';
+                    const dotClass = 'green';
                     return `
                     <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
                         <span class="pole-selected-badge">✓ Sélectionné</span>
