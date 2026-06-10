@@ -303,9 +303,9 @@
                 <i data-lucide="droplets"></i>
                 <span>Audit S1/S2</span>
             </div>
-            <div class="nav-item" onclick="switchPage('rapports', this)">
-                <i data-lucide="file-text"></i>
-                <span>Rapports Maîtres</span>
+            <div class="nav-item" onclick="switchPage('tutoriel', this)">
+                <i data-lucide="book-open"></i>
+                <span>Guide & Tutoriel</span>
             </div>
 
             <div class="nav-item" onclick="switchPage('parametres', this)">
@@ -650,43 +650,64 @@
         </div>
 
         
-        <!-- PAGE : RAPPORTS MAÎTRES (GÉNÉRATION BACKEND) -->
-        <div id="page-rapports" class="content-page">
-            <div style="margin-bottom: 24px;">
-                <h1>Centre de Rapports Officiels</h1>
-                <p class="subtitle">Générez et téléchargez les documents de synthèse pour les commissions de tarification.</p>
+        <!-- PAGE : GUIDE ET TUTORIEL -->
+        <div id="page-tutoriel" class="content-page">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 12px;">Bienvenue sur l'Outil de Tarification ! 👋</h1>
+                <p class="subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Un outil simple et rapide pour gérer les finances et répondre aux usagers de la Mairie de Crosne.</p>
+                
+                <a href="/document_passation.pdf" download style="display: inline-flex; align-items: center; gap: 10px; background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 24px; font-size: 1.05rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+                    <i data-lucide="download" style="width: 20px; height: 20px;"></i>
+                    Télécharger le Document de Passation Complet (PDF)
+                </a>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <div class="form-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                        <div style="width: 48px; height: 48px; background: #e0f2fe; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                            <i data-lucide="file-check" style="color: #0369a1;"></i>
-                        </div>
-                        <h3 style="margin-bottom: 8px;">Rapport Décisionnel Complet</h3>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
-                            Document officiel consolidé incluant la synthèse budgétaire, le détail analytique par pôle et l'audit énergétique des fluides municipaux.
-                        </p>
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border-left: 3px solid #0ea5e9; font-size: 0.8rem; color: #64748b; margin-bottom: 20px;">
-                            <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
-                            Format PDF professionnel optimisé pour l'impression A4.
-                        </div>
+            <h2 style="margin-bottom: 24px; text-align: center; color: #1e293b;">Découvrez les 5 modules de l'application :</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Carte 1 -->
+                <div class="stat-card" style="flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; border-top: 4px solid #3b82f6;">
+                    <div style="width: 64px; height: 64px; background: #eff6ff; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="layout-dashboard" style="color: #3b82f6; width: 32px; height: 32px;"></i>
                     </div>
-                    <button onclick="telechargerRapportBackend()" class="btn-primary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 8px;">
-                        <i data-lucide="download"></i>
-                        Générer et Télécharger (.pdf)
-                    </button>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">1. Tableau de bord</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">La vue d'ensemble ! Vérifiez la santé financière de chaque pôle d'activité (dépenses, recettes, coût par enfant).</p>
                 </div>
 
-                <div class="form-card" style="opacity: 0.6; cursor: not-allowed;">
-                    <div style="width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                        <i data-lucide="table" style="color: #64748b;"></i>
+                <!-- Carte 2 -->
+                <div class="stat-card" style="flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; border-top: 4px solid #10b981;">
+                    <div style="width: 64px; height: 64px; background: #ecfdf5; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="search" style="color: #10b981; width: 32px; height: 32px;"></i>
                     </div>
-                    <h3 style="margin-bottom: 8px;">Export de Données (XLSX)</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
-                        Extraction brute des calculs de simulation vers un tableur pour analyse externe approfondie.
-                    </p>
-                    <span class="badge" style="background: #f1f5f9; color: #64748b;">Prochainement</span>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">2. Consultation</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Le guichet rapide. Entrez le Quotient Familial d'un usager pour lui donner instantanément son tarif exact.</p>
+                </div>
+
+                <!-- Carte 3 -->
+                <div class="stat-card" style="flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; border-top: 4px solid #f59e0b;">
+                    <div style="width: 64px; height: 64px; background: #fffbeb; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="users" style="color: #f59e0b; width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">3. Impact Familles</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">L'outil magique pour simuler une augmentation de prix et voir immédiatement le surcoût mensuel pour les parents.</p>
+                </div>
+
+                <!-- Carte 4 -->
+                <div class="stat-card" style="flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; border-top: 4px solid #8b5cf6;">
+                    <div style="width: 64px; height: 64px; background: #f5f3ff; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="zap" style="color: #8b5cf6; width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">4. Énergie & Audit</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Suivez la consommation d'eau, de gaz et d'électricité des bâtiments et comparez avec le semestre précédent.</p>
+                </div>
+
+                <!-- Carte 5 -->
+                <div class="stat-card" style="flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; border-top: 4px solid #64748b;">
+                    <div style="width: 64px; height: 64px; background: #f8fafc; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i data-lucide="settings" style="color: #64748b; width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">5. Paramètres</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Le tableau de commande. Mettez à jour les données de l'année en important simplement les nouveaux fichiers Excel.</p>
                 </div>
             </div>
         </div>
