@@ -383,6 +383,14 @@
                 </div>
             </div>
 
+            <!-- SWITCHER D'ANNÉE DU DASHBOARD -->
+            <div id="dashboard-year-switcher" style="display:none; align-items:center; gap:10px; margin-bottom:18px; padding:10px 16px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px;">
+                <i data-lucide="calendar" style="width:16px;height:16px;color:#0284c7;"></i>
+                <span style="font-size:0.78rem;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:0.06em;">Année affichée</span>
+                <div id="dashboard-year-tabs" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+                <span id="dashboard-year-badge" style="font-size:0.7rem;background:#0284c7;color:white;padding:3px 10px;border-radius:20px;font-weight:700;">2025 — Référence</span>
+            </div>
+
             <div id="dashboardBudgetSummary" class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;">
                 <!-- Rempli par JS avec un style épuré -->
             </div>
@@ -427,7 +435,7 @@
                             <i data-lucide="database"></i>
                         </div>
                         <div>
-                            <div class="saisie-header-title">📋 Saisie Comptable</div>
+                            <div class="saisie-header-title">Saisie Comptable</div>
                             <div class="saisie-header-sub">Mettre à jour les dépenses et recettes réelles par pôle · Comparer avec 2025</div>
                         </div>
                     </div>
@@ -1502,6 +1510,7 @@
             // Chargement des données du tableau de bord
             chargerDashboardData();
             chargerGrilleActive();
+            initDashboardYearSwitcher();
         }
 
         function ouvrirLogin() {
@@ -1561,6 +1570,7 @@
 
         // --- VARIABLE GLOBALE SOURCE BUDGÉTAIRE ---
         let currentSource = 'A'; // 'A' = Source classique, 'B' = VF_REC_DEP (hybride)
+        let dashboardAnneeActive = null; // null = 2025 (référence Excel), sinon année saisie
 
         // --- NAVIGATION ---
         function switchPage(pageId, element) {
@@ -1570,7 +1580,7 @@
             document.getElementById('page-' + pageId).classList.add('active');
             if (element) element.classList.add('active');
 
-            if (pageId === 'dashboard') { chargerDashboardData(); }
+            if (pageId === 'dashboard') { chargerDashboardData(); initDashboardYearSwitcher(); }
             if (pageId === 'simulation') chargerSimulationRestauration();
             if (pageId === 'impact-familles') { calculerImpactLoisirs(); calculerSynthetique(); }
             if (pageId === 'diagnostic-energie') initialiserDiagnosticEnergie();
@@ -2130,12 +2140,67 @@
             chargerDashboardData();
         }
 
+        /** Initialise le switcher d'année du dashboard et charge les années disponibles */
+        async function initDashboardYearSwitcher() {
+            try {
+                const resp = await apiFetch('/api/saisie/annees');
+                const annees = await resp.json();
+                // On garde uniquement les années saisies (hors 2025)
+                const anneesSaisies = annees.filter(a => a !== 2025).sort((a,b) => a - b);
+
+                const switcher = document.getElementById('dashboard-year-switcher');
+                const tabsZone = document.getElementById('dashboard-year-tabs');
+
+                if (anneesSaisies.length === 0) {
+                    switcher.style.display = 'none';
+                    return;
+                }
+
+                switcher.style.display = 'flex';
+
+                // Construit les onglets : 2025 (réf) + années saisies
+                let html = `<button onclick="switchDashboardAnnee(null)" 
+                    style="padding:4px 12px;border-radius:20px;border:1px solid #bae6fd;font-size:0.78rem;font-weight:700;cursor:pointer;
+                    ${dashboardAnneeActive === null ? 'background:#0284c7;color:white;' : 'background:white;color:#0369a1;'}">
+                    2025 Réf.
+                </button>`;
+                anneesSaisies.forEach(a => {
+                    html += `<button onclick="switchDashboardAnnee(${a})"
+                        style="padding:4px 12px;border-radius:20px;border:1px solid #bae6fd;font-size:0.78rem;font-weight:700;cursor:pointer;
+                        ${dashboardAnneeActive === a ? 'background:#0284c7;color:white;' : 'background:white;color:#0369a1;'}">
+                        ${a}
+                    </button>`;
+                });
+                tabsZone.innerHTML = html;
+                lucide.createIcons();
+            } catch(e) { /* pas de données */ }
+        }
+
+        /** Bascule l'année affichée sur le dashboard */
+        async function switchDashboardAnnee(annee) {
+            dashboardAnneeActive = annee;
+            const badge = document.getElementById('dashboard-year-badge');
+            if (badge) badge.textContent = annee ? `${annee} — Saisie` : '2025 — Référence';
+            await initDashboardYearSwitcher(); // refresh les boutons actifs
+            await chargerDashboardData();
+        }
+
         // --- DASHBOARD DATA ---
         async function chargerDashboardData() {
             try {
-                const response = await apiFetch(`/api/poles?source=${currentSource}`);
+                let url;
+                if (dashboardAnneeActive && dashboardAnneeActive !== null) {
+                    // Données saisies en base pour l'année choisie
+                    url = `/api/poles?source=${currentSource}&annee=${dashboardAnneeActive}`;
+                } else {
+                    // Données de référence (Excel 2025)
+                    url = `/api/poles?source=${currentSource}`;
+                }
+                const response = await apiFetch(url);
                 const poles = await response.json();
                 
+                const anneeLabel = dashboardAnneeActive ? dashboardAnneeActive : '2025';
+
                 let html = poles.map(p => {
                     const couverturePct = (p.tauxCouverture * 100).toFixed(0);
                     const perfEnergie = p.performanceEnergie || 0;
@@ -2159,7 +2224,7 @@
                             <div style="font-size: 1.7rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; line-height: 1.1;">
                                 ${p.depensesTotales.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<span style="font-size: 0.65em; font-weight: 600; color: var(--text-muted); margin-left: 6px; letter-spacing: 0;">€</span>
                             </div>
-                            <div style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-top: 6px;">Dépenses réelles</div>
+                            <div style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-top: 6px;">Dépenses réelles ${anneeLabel}</div>
                         </div>
 
                         <!-- Séparateur -->
