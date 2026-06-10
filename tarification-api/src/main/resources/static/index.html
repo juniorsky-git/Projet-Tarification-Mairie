@@ -2703,13 +2703,8 @@
             }
             saisieRendreOngletAnnees();
 
-            // Sélection automatique : toujours forcer 2026 au démarrage
-            if (!saisie.anneesDispo.includes(saisie.ANNEE_DEBUT)) {
-                saisieAfficherNotif('⏳ Initialisation de ' + saisie.ANNEE_DEBUT + ' depuis les données 2025...');
-                await saisieCreerAnnee(saisie.ANNEE_DEBUT);
-            } else {
-                await saisieSelectAnnee(saisie.ANNEE_DEBUT);
-            }
+            // Sélection automatique : pointer sur 2026 au démarrage
+            await saisieSelectAnnee(saisie.ANNEE_DEBUT);
         }
 
         /** Rend les onglets d'années dans la barre d'outils */
@@ -2823,14 +2818,16 @@
         /** Rend les tableaux de saisie pour le pôle et l'année actifs */
         function saisieRendreTableaux() {
             if (!saisie.lignes || saisie.lignes.length === 0) {
-                // Pas de données → on crée automatiquement sans demander
                 document.getElementById('saisie-tables-zone').innerHTML = `
-                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
-                        <div style="font-size:2rem;margin-bottom:12px;">⏳</div>
-                        <div style="font-weight:600;margin-bottom:4px;">Initialisation de ${saisie.anneeActive}...</div>
-                        <div style="font-size:0.8rem;">Copie des données 2025 en cours</div>
+                    <div class="saisie-empty" style="text-align:center;padding:40px;color:var(--text-muted);">
+                        <i data-lucide="clipboard-list" style="width:48px;height:48px;margin-bottom:16px;color:#cbd5e1;"></i>
+                        <p style="margin-bottom:16px;font-size:1.1rem;color:var(--text-main);">Aucune donnée pour ${saisie.anneeActive}.</p>
+                        <button class="btn-primary" style="padding:10px 20px;font-size:1rem;border-radius:8px;background:var(--primary);color:white;border:none;cursor:pointer;" onclick="saisieCreerAnnee(${saisie.anneeActive})">
+                            <i data-lucide="plus" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Initialiser les données ${saisie.anneeActive}
+                        </button>
+                        <p style="margin-top:12px;font-size:0.85rem;">(Cela copiera les données de référence 2025 comme base de travail)</p>
                     </div>`;
-                saisieCreerAnnee(saisie.anneeActive);
+                lucide.createIcons();
                 return;
             }
 
