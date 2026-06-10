@@ -172,13 +172,16 @@ public class SaisieComptableService {
         return totaux;
     }
 
-    /**
-     * Comparatif entre l'année de référence (2025 depuis Excel) et une année saisie.
-     */
     public List<Map<String, Object>> getComparatif(Integer anneeSource) {
-        // Données de référence 2025 (Excel)
+        Integer anneeRef = anneeSource - 1;
+        
+        // On récupère d d'abord la structure des pôles depuis 2025 pour avoir la liste complète
         List<DepensePole> poles2025 = budgetService.chargerPolesDynamiques("A");
         Map<String, Double> recettes2025 = budgetService.chargerRecettesReelles("A");
+
+        // Totaux de l'année de référence (N-1 si en base, sinon Excel 2025)
+        boolean hasRefDB = repository.existsByAnnee(anneeRef);
+        Map<String, Map<String, Double>> totauxRef = hasRefDB ? getTotauxParPole(anneeRef) : new HashMap<>();
 
         // Données de la nouvelle année (base de données)
         Map<String, Map<String, Double>> totauxNouvelleAnnee = getTotauxParPole(anneeSource);
@@ -187,15 +190,17 @@ public class SaisieComptableService {
         for (DepensePole pole : poles2025) {
             Map<String, Object> ligne = new LinkedHashMap<>();
             ligne.put("pole", pole.nom());
+            
+            ligne.put("anneeRefTexte", hasRefDB ? String.valueOf(anneeRef) : "2025 (Référence initiale)");
 
-            // Référence 2025
-            double dep2025 = pole.depensesTotales();
-            double rec2025 = recettes2025.getOrDefault(pole.nom(), 0.0);
-            double tc2025 = dep2025 > 0 ? rec2025 / dep2025 : 0.0;
+            // Référence
+            double depRef = hasRefDB ? totauxRef.getOrDefault(pole.nom(), Map.of("depenses", 0.0)).getOrDefault("depenses", 0.0) : pole.depensesTotales();
+            double recRef = hasRefDB ? totauxRef.getOrDefault(pole.nom(), Map.of("recettes", 0.0)).getOrDefault("recettes", 0.0) : recettes2025.getOrDefault(pole.nom(), 0.0);
+            double tcRef = depRef > 0 ? recRef / depRef : 0.0;
 
-            ligne.put("dep2025", dep2025);
-            ligne.put("rec2025", rec2025);
-            ligne.put("tc2025", tc2025);
+            ligne.put("dep2025", depRef);
+            ligne.put("rec2025", recRef);
+            ligne.put("tc2025", tcRef);
 
             // Nouvelle année
             Map<String, Double> totaux = totauxNouvelleAnnee.getOrDefault(pole.nom(), Map.of("depenses", 0.0, "recettes", 0.0));
@@ -208,10 +213,10 @@ public class SaisieComptableService {
             ligne.put("tcN", tcN);
 
             // Écarts
-            ligne.put("ecartDep", depN - dep2025);
-            ligne.put("ecartRec", recN - rec2025);
-            ligne.put("ecartDepPct", dep2025 > 0 ? ((depN - dep2025) / dep2025) * 100 : 0.0);
-            ligne.put("ecartRecPct", rec2025 > 0 ? ((recN - rec2025) / rec2025) * 100 : 0.0);
+            ligne.put("ecartDep", depN - depRef);
+            ligne.put("ecartRec", recN - recRef);
+            ligne.put("ecartDepPct", depRef > 0 ? ((depN - depRef) / depRef) * 100 : 0.0);
+            ligne.put("ecartRecPct", recRef > 0 ? ((recN - recRef) / recRef) * 100 : 0.0);
 
             comparatif.add(ligne);
         }

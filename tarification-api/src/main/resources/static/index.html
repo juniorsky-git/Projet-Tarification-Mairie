@@ -431,7 +431,7 @@
                         </div>
                         <div>
                             <div class="saisie-header-title">Saisie Comptable</div>
-                            <div class="saisie-header-sub">Mettre à jour les dépenses et recettes réelles par pôle · Comparer avec 2025</div>
+                            <div class="saisie-header-sub">Mettre à jour les dépenses et recettes réelles par pôle · Comparer avec l'année précédente</div>
                         </div>
                     </div>
                     <div class="saisie-header-actions">
@@ -485,7 +485,7 @@
                     <div class="saisie-comparatif" id="saisie-comparatif-zone" style="display:none;">
                         <div class="saisie-comparatif-title">
                             <i data-lucide="bar-chart-2"></i>
-                            Comparatif 2025 (Référence Excel) vs Saisie
+                            Comparatif Année précédente vs Saisie
                             <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
                         </div>
                         <div id="saisie-comparatif-content">
@@ -3163,13 +3163,13 @@
                 let html = `<table class="comparatif-table">
                     <thead><tr>
                         <th>Pôle</th>
-                        <th>Dép. 2025</th>
+                        <th>Dép. Réf.</th>
                         <th>Dép. ${annee}</th>
                         <th>Écart Dép.</th>
-                        <th>Rec. 2025</th>
+                        <th>Rec. Réf.</th>
                         <th>Rec. ${annee}</th>
                         <th>Écart Rec.</th>
-                        <th>TC 2025</th>
+                        <th>TC Réf.</th>
                         <th>TC ${annee}</th>
                     </tr></thead><tbody>`;
 
@@ -3177,16 +3177,17 @@
                     const ecartDClass = ligne.ecartDep > 0 ? 'ecart-positif' : (ligne.ecartDep < 0 ? 'ecart-negatif' : 'ecart-neutre');
                     const ecartRClass = ligne.ecartRec > 0 ? 'ecart-negatif' : (ligne.ecartRec < 0 ? 'ecart-positif' : 'ecart-neutre');
                     const signe = v => v > 0 ? '+' : '';
+                    let anneeRefTexte = ligne.anneeRefTexte || "Année précédente";
 
                     html += `<tr>
                         <td>${ligne.pole}</td>
-                        <td>${saisieFormatMontant(ligne.dep2025)}</td>
+                        <td title="${anneeRefTexte}">${saisieFormatMontant(ligne.dep2025)}</td>
                         <td>${saisieFormatMontant(ligne.depN)}</td>
                         <td class="${ecartDClass}">${signe(ligne.ecartDep)}${saisieFormatMontant(ligne.ecartDep)} (${signe(ligne.ecartDepPct)}${ligne.ecartDepPct.toFixed(1)}%)</td>
-                        <td>${saisieFormatMontant(ligne.rec2025)}</td>
+                        <td title="${anneeRefTexte}">${saisieFormatMontant(ligne.rec2025)}</td>
                         <td>${saisieFormatMontant(ligne.recN)}</td>
                         <td class="${ecartRClass}">${signe(ligne.ecartRec)}${saisieFormatMontant(ligne.ecartRec)} (${signe(ligne.ecartRecPct)}${ligne.ecartRecPct.toFixed(1)}%)</td>
-                        <td>${(ligne.tc2025 * 100).toFixed(1)}%</td>
+                        <td title="${anneeRefTexte}">${(ligne.tc2025 * 100).toFixed(1)}%</td>
                         <td style="font-weight:800;color:var(--primary);">${(ligne.tcN * 100).toFixed(1)}%</td>
                     </tr>`;
                 });
