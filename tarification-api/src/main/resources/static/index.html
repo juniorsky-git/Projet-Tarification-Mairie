@@ -13,6 +13,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- html2pdf — génération de PDF natif côté client -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- SheetJS pour export XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -352,9 +355,12 @@
                     <!-- BOUTONS D'EXPORT -->
                     <div style="display: flex; gap: 8px;">
                         <button onclick="window.print()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimer
+                        </button>
+                        <button onclick="exporterDashboardPDF()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
                             <i data-lucide="file-down" style="width: 14px; height: 14px;"></i> Exporter PDF
                         </button>
-                        <button onclick="alert('Export Excel en cours de développement...')" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <button onclick="exporterDashboardExcel()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
                             <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Exporter Excel
                         </button>
                     </div>
@@ -1994,7 +2000,7 @@
                     const dotClass = 'green';
 
                     return `
-                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
+                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" data-pole="${p.nom}" data-depenses="${p.depensesTotales}" data-couverture="${couverturePct}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
                         <!-- Badge sélectionné (masqué par défaut) -->
                         <span class="pole-selected-badge">✓ Sélectionné</span>
                         
@@ -2028,6 +2034,110 @@
             } catch (error) {
                 console.log("Erreur dashboard stats");
             }
+        }
+
+        // --- EXPORT DASHBOARD ---
+        function exporterDashboardExcel() {
+            const cards = Array.from(document.querySelectorAll('#dashboardBudgetSummary .stat-card'));
+            if (cards.length === 0) {
+                alert("Aucune donnée à exporter.");
+                return;
+            }
+
+            const data = cards.map(c => {
+                return {
+                    "Pôle": c.getAttribute('data-pole'),
+                    "Dépenses Réelles (€)": parseFloat(c.getAttribute('data-depenses')),
+                    "Taux de Couverture (%)": parseInt(c.getAttribute('data-couverture'), 10)
+                };
+            });
+
+            // On peut aussi rajouter le détail du pôle actuellement ouvert si on le souhaite, 
+            // mais ici on exporte le résumé global du tableau de bord.
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Résumé Budgétaire");
+            
+            const annee = dashboardAnneeActive ? dashboardAnneeActive : "2025";
+            XLSX.writeFile(wb, `Tableau_de_Bord_Mairie_${annee}.xlsx`);
+        }
+
+        function exporterDashboardPDF() {
+            const annee = dashboardAnneeActive ? dashboardAnneeActive : "2025";
+            const dateStr = new Date().toLocaleDateString('fr-FR');
+            
+            // On crée un conteneur d'impression invisible
+            const printArea = document.createElement('div');
+            printArea.style.padding = '30px';
+            printArea.style.background = 'white';
+            printArea.style.color = '#0f172a';
+            printArea.style.fontFamily = "'Inter', sans-serif";
+            
+            // Header
+            printArea.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px;">
+                    <div>
+                        <h1 style="margin:0; font-size: 24px; color: #0f172a;">Résumé Budgétaire — Tableau de Bord</h1>
+                        <p style="margin: 8px 0 0; font-size: 14px; color: #64748b;">Année affichée : <strong>${annee}</strong></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <img src="Crosne-LOGO.png" style="height:50px; width:auto; object-fit:contain; margin-bottom: 8px;" alt="Logo Mairie">
+                        <div style="font-size: 11px; color: #94a3b8;">Généré le ${dateStr}</div>
+                    </div>
+                </div>
+            `;
+            
+            // On clone les cartes du dashboard
+            const gridClone = document.getElementById('dashboardBudgetSummary').cloneNode(true);
+            gridClone.style.display = 'grid';
+            gridClone.style.gridTemplateColumns = 'repeat(2, 1fr)'; // 2 colonnes pour PDF au lieu de 4
+            gridClone.style.gap = '20px';
+            
+            // On nettoie un peu le style pour le PDF
+            gridClone.querySelectorAll('.stat-card').forEach(c => {
+                c.style.boxShadow = 'none';
+                c.style.border = '1px solid #cbd5e1';
+                c.style.pageBreakInside = 'avoid';
+                const badge = c.querySelector('.pole-selected-badge');
+                if (badge) badge.style.display = 'none';
+            });
+            
+            printArea.appendChild(gridClone);
+
+            // S'il y a un pôle sélectionné, on exporte aussi son détail
+            const poleDetail = document.getElementById('poleDetailsResult');
+            if (poleDetail && poleDetail.innerHTML.trim() !== '') {
+                const detailTitle = document.createElement('h2');
+                detailTitle.textContent = "Détail : " + document.getElementById('selectPoleDetails').value;
+                detailTitle.style.marginTop = '40px';
+                detailTitle.style.fontSize = '18px';
+                detailTitle.style.borderBottom = '1px solid #e2e8f0';
+                detailTitle.style.paddingBottom = '10px';
+                printArea.appendChild(detailTitle);
+                
+                const detailClone = poleDetail.cloneNode(true);
+                detailClone.style.marginTop = '20px';
+                printArea.appendChild(detailClone);
+            }
+
+            // Options html2pdf
+            const opt = {
+                margin:       10,
+                filename:     `Tableau_de_Bord_${annee}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const btnPdf = document.querySelector('button[onclick="exporterDashboardPDF()"]');
+            const originalHtml = btnPdf.innerHTML;
+            btnPdf.innerHTML = '<i data-lucide="loader-2" class="spin"></i> PDF en cours...';
+
+            html2pdf().set(opt).from(printArea).save().then(() => {
+                btnPdf.innerHTML = originalHtml;
+                lucide.createIcons();
+            });
         }
 
         async function chargerDetailsPole() {
@@ -3009,7 +3119,7 @@
                     const perfEnergie = p.performanceEnergie || 0;
                     const dotClass = 'green';
                     return `
-                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
+                    <div id="pole-card-${p.nom.replace(/\s+/g, '-')}" data-pole="${p.nom}" data-depenses="${p.depensesTotales}" data-couverture="${couverturePct}" class="stat-card" style="padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: #fff; transition: all 0.2s ease; cursor: pointer; position: relative;" onclick="ouvrirDetailPole('${p.nom}')">
                         <span class="pole-selected-badge">✓ Sélectionné</span>
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
                             <span class="pulse-dot ${dotClass}" style="flex-shrink: 0;"></span>
