@@ -2087,7 +2087,7 @@
             // On clone les cartes du dashboard
             const gridClone = document.getElementById('dashboardBudgetSummary').cloneNode(true);
             gridClone.style.display = 'grid';
-            gridClone.style.gridTemplateColumns = 'repeat(3, 1fr)'; // 3 colonnes sécurisées
+            gridClone.style.gridTemplateColumns = 'repeat(2, 1fr)'; // 2 colonnes pour ne pas écraser les cartes
             gridClone.style.gap = '15px';
             
             // On nettoie le style pour le PDF
@@ -2132,8 +2132,8 @@
                 margin:       10,
                 filename:     `Tableau_de_Bord_${annee}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1050, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['avoid-all', 'css'] }
             };
 
@@ -3301,7 +3301,7 @@
     </script>
     <div id="report-print-area" style="display: none;"></div>
     <div id="impact-print-area" style="display: none; font-family: 'DM Sans', sans-serif;"></div>
-    <div id="dashboard-print-area" style="display: none; font-family: 'DM Sans', sans-serif; background: white; color: #0f172a; padding: 20px;"></div>
+    <div id="dashboard-print-area" style="display: none; font-family: 'DM Sans', sans-serif; background: white; color: #0f172a; padding: 20px; width: 1050px; max-width: 1050px;"></div>
 </body>
 
 
