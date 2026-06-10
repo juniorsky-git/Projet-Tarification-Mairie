@@ -68,21 +68,28 @@ public class PolesController {
 
             double depenses;
             double recettes;
+            int nombreEnfants;
 
             if (utiliseSaisie && totauxSaisie != null && totauxSaisie.containsKey(p.nom())) {
                 // Priorité : données saisies
                 Map<String, Double> t = totauxSaisie.get(p.nom());
                 depenses = t.getOrDefault("depenses", p.depensesTotales());
                 recettes = t.getOrDefault("recettes", 0.0);
+                nombreEnfants = saisieService.getLignesBrutes(annee).stream()
+                    .filter(l -> l.getPole().equalsIgnoreCase(p.nom()) && "STAT".equals(l.getTypeLigne()) && "Nombre d'enfants".equals(l.getLibelle()))
+                    .mapToInt(l -> (int) Math.round(l.getMontant()))
+                    .findFirst()
+                    .orElse(p.nombreEnfants());
             } else {
                 // Fallback : Excel 2025
                 depenses = p.depensesTotales();
                 recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
+                nombreEnfants = p.nombreEnfants();
             }
 
             double couverture = (depenses > 0) ? (recettes / depenses) : 0;
             map.put("depensesTotales", depenses);
-            map.put("nombreEnfants", p.nombreEnfants());
+            map.put("nombreEnfants", nombreEnfants);
             map.put("tauxCouverture", couverture);
             map.put("recettesTotales", recettes);
             map.put("source", utiliseSaisie ? "SAISIE_" + annee : source);

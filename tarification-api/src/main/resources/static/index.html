@@ -305,10 +305,7 @@
                 <i data-lucide="search"></i>
                 <span>Consultation</span>
             </div>
-            <div class="nav-item" onclick="switchPage('simulation', this)">
-                <i data-lucide="line-chart"></i>
-                <span>Simulation financière</span>
-            </div>
+
             <div class="nav-item" onclick="switchPage('impact-familles', this)">
                 <i data-lucide="users"></i>
                 <span>Impact Familles</span>
@@ -325,10 +322,7 @@
                 <i data-lucide="file-text"></i>
                 <span>Rapports Maîtres</span>
             </div>
-            <div class="nav-item" onclick="switchPage('historique', this)">
-                <i data-lucide="history"></i>
-                <span>Historique</span>
-            </div>
+
             <div class="nav-item" onclick="switchPage('parametres', this)">
                 <i data-lucide="settings"></i>
                 <span>Paramètres</span>
@@ -2888,6 +2882,18 @@
             }
         }
 
+        function saisieMettreAJourStatEnfants(val) {
+            const poleActif = saisie.poleActif;
+            const nb = parseFloat(val) || 0;
+            let statLigne = saisie.lignes.find(l => l.pole === poleActif && l.typeLigne === 'STAT' && l.libelle === "Nombre d'enfants");
+            if (!statLigne) {
+                statLigne = { id: null, typeLigne: 'STAT', pole: poleActif, libelle: "Nombre d'enfants", montant: nb, commentaire: "", predefinie: false };
+                saisie.lignes.push(statLigne);
+            } else {
+                statLigne.montant = nb;
+            }
+        }
+
         /** Rend les tableaux de saisie pour le pôle et l'année actifs */
         function saisieRendreTableaux() {
             if (!saisie.lignes || saisie.lignes.length === 0) {
@@ -2912,7 +2918,24 @@
             const depenses  = lignesPole.filter(l => l.typeLigne === 'DEPENSE');
             const recettes  = lignesPole.filter(l => l.typeLigne === 'RECETTE');
 
+            const statEnfants = lignesPole.find(l => l.typeLigne === 'STAT' && l.libelle === "Nombre d'enfants");
+            const nbEnfants = statEnfants ? (statEnfants.montant || 0) : 0;
+
             const html = `
+                <!-- STATISTIQUES POLE -->
+                <div class="saisie-stat-wrapper" style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="users" style="color: #64748b;"></i>
+                    <strong style="color: #334155;">Nombre d'enfants :</strong>
+                    <input type="number" class="saisie-input" style="width: 120px;" 
+                        ${estReadonly ? 'disabled' : ''} 
+                        value="${nbEnfants}" 
+                        onchange="saisieMettreAJourStatEnfants(this.value)"
+                        placeholder="Ex: 450">
+                    <span style="font-size: 0.85rem; color: #64748b; margin-left: 10px;">
+                        (Sera utilisé pour calculer le coût unitaire réel de l'année)
+                    </span>
+                </div>
+
                 <!-- TABLE DÉPENSES -->
                 <div class="saisie-table-wrapper">
                     <div class="saisie-table-title">

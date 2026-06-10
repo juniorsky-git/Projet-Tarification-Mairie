@@ -87,14 +87,20 @@ public class DashboardController {
             .filter(l -> l.getPole().equalsIgnoreCase(pole) && "DEPENSE".equals(l.getTypeLigne()))
             .forEach(l -> detailCharges.put(l.getLibelle(), l.getMontant()));
 
+        int nombreEnfants = saisieService.getLignesBrutes(annee).stream()
+            .filter(l -> l.getPole().equalsIgnoreCase(pole) && "STAT".equals(l.getTypeLigne()) && "Nombre d'enfants".equals(l.getLibelle()))
+            .mapToInt(l -> (int) Math.round(l.getMontant()))
+            .findFirst()
+            .orElse(0);
+
         DashboardResponse r = new DashboardResponse();
         r.pole = pole;
         r.depensesTotales  = totauxPole.getOrDefault("depenses", 0.0);
         r.recettesTotales  = totauxPole.getOrDefault("recettes", 0.0);
         r.tauxCouverture   = totauxPole.getOrDefault("tauxCouverture", 0.0);
         r.ecart            = r.recettesTotales - r.depensesTotales;
-        r.coutUnitaire     = 0.0;
-        r.nombreEnfants    = 0;
+        r.nombreEnfants    = nombreEnfants;
+        r.coutUnitaire     = nombreEnfants > 0 ? (r.depensesTotales / nombreEnfants) : 0.0;
         r.unitesAnnuelles  = null;
         r.detailsCharges   = detailCharges;
         r.distributionTranches = Map.of();
