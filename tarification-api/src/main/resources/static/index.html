@@ -710,6 +710,25 @@
                     <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Le tableau de commande. Mettez à jour les données de l'année en important simplement les nouveaux fichiers Excel.</p>
                 </div>
             </div>
+
+            <!-- Section concept clé : Taux de couverture -->
+            <div class="stat-card" style="margin-top: 40px; padding: 24px; display: flex; flex-direction: row; gap: 20px; align-items: flex-start; text-align: left; background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border-left: 5px solid var(--primary); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px;">
+                    <i data-lucide="percent" style="color: var(--primary); width: 24px; height: 24px;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px; color: #1e293b; font-weight: 700;">Concept clé : Qu'est-ce que le Taux de Couverture ?</h3>
+                    <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; margin-bottom: 10px;">
+                        Le <strong>Taux de Couverture des charges</strong> mesure la part du coût réel d'un service public (comme la Restauration scolaire ou l'Accueil de loisirs) qui est directement payée par la participation financière des usagers (les familles via la tarification).
+                    </p>
+                    <div style="background: white; padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; color: #0f172a; border: 1px solid #e2e8f0; display: inline-block; margin-bottom: 10px;">
+                        Taux de couverture = (Recettes facturées aux familles / Dépenses réelles de fonctionnement) × 100
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin: 0;">
+                        💡 <strong>Exemple :</strong> Si la restauration a un taux de couverture de 31 %, cela signifie que la participation des familles couvre 31 % du coût total du service. Les 69 % restants constituent la subvention de la Ville, prise en charge par le budget général de la commune pour maintenir ce service public.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- PAGE : IMPACT FAMILLES (SIMULATEUR ACCUEIL DE LOISIRS) -->
@@ -2002,7 +2021,7 @@
                 const data = await response.json();
 
                 // RENDU FINANCES
-                const couverturePct = (data.tauxCouverture * 100).toFixed(2);
+                const couverturePct = (data.tauxCouverture * 100).toFixed(0);
                 let badgeClass = "badge-danger";
                 if (data.tauxCouverture >= 1.0) badgeClass = "badge-success";
                 else if (data.tauxCouverture >= 0.7) badgeClass = "badge-warning";
