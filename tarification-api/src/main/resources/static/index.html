@@ -348,17 +348,27 @@
                     <h1>Tableau de bord</h1>
                     <p class="subtitle">Résumé budgétaire réel par pôle d'activité.</p>
                 </div>
-                <!-- SÉLECTEUR DE SOURCE BUDGÉTAIRE -->
-                <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 16px;">
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
-                        <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">Source budgétaire</span>
-                        <span id="source-badge" style="font-size: 0.7rem; font-weight: 600; color: var(--primary); background: var(--primary-bg); padding: 2px 8px; border-radius: 20px;">Source A — Classique</span>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                    <!-- BOUTONS D'EXPORT -->
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="window.print()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i data-lucide="file-down" style="width: 14px; height: 14px;"></i> Exporter PDF
+                        </button>
+                        <button onclick="alert('Export Excel en cours de développement...')" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; font-size: 0.75rem; cursor: pointer; background: white; color: var(--text-main); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Exporter Excel
+                        </button>
                     </div>
-                    <select id="budgetSourceSelect" onchange="changerSourceBudget()"
-                        style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 0.82rem; font-weight: 600; color: var(--text-main); background: #fff; cursor: pointer; min-width: 280px;">
-                        <option value="A" selected>Source A — CALC DEP(4) + Depenses recettes nf</option>
-                        <option value="B">Source B — VF_REC_DEP.xlsx (Hybride)</option>
-                    </select>
+                    <!-- SÉLECTEUR DE SOURCE BUDGÉTAIRE -->
+                    <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px;">
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                            <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">Source budgétaire</span>
+                        </div>
+                        <select id="budgetSourceSelect" onchange="changerSourceBudget()"
+                            style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 0.8rem; font-weight: 600; color: var(--text-main); background: #fff; cursor: pointer; min-width: 250px;">
+                            <option value="A" selected>Source A — CALC DEP(4) + Depenses recettes nf</option>
+                            <option value="B">Source B — VF_REC_DEP.xlsx (Hybride)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -757,6 +767,25 @@
                     <button onclick="exporterImpactPDF()"
                         style="padding: 9px 18px; border-radius: 7px; border: none; font-weight: 600; font-size: 0.83rem; cursor: pointer; background: #0f172a; color: white; transition: all 0.18s; font-family: inherit; display: flex; align-items: center; gap: 7px;">
                         <i data-lucide="file-down" style="width: 15px; height: 15px;"></i> Exporter en PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- NOTIFICATION CHANGEMENT GRILLE -->
+            <div id="notif-grille-change" style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i data-lucide="help-circle" style="color: #d97706; width: 24px; height: 24px;"></i>
+                    <div>
+                        <div style="font-weight: 700; color: #92400e; font-size: 0.95rem;">Avez-vous une nouvelle grille tarifaire pour la simulation ?</div>
+                        <div style="font-size: 0.85rem; color: #b45309; margin-top: 2px;">Si oui, vous devez d'abord la charger pour que l'impact soit calculé avec vos nouveaux tarifs.</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="document.getElementById('notif-grille-change').style.display='none'" style="background: transparent; border: 1px solid #d97706; color: #b45309; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">
+                        Non, continuer
+                    </button>
+                    <button onclick="document.getElementById('notif-grille-change').style.display='none'; switchPage('parametres', document.querySelectorAll('.nav-item')[6])" style="background: #d97706; border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);">
+                        <i data-lucide="upload" style="width: 16px; height: 16px;"></i> Oui, changer la grille
                     </button>
                 </div>
             </div>
