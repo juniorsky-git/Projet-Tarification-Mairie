@@ -296,7 +296,7 @@
 
             <div class="nav-item" onclick="switchPage('impact-familles', this)">
                 <i data-lucide="users"></i>
-                <span>Impact Familles</span>
+                <span>Simulation Famille</span>
             </div>
             <div class="nav-item" onclick="switchPage('diagnostic-energie', this)">
                 <i data-lucide="zap"></i>
@@ -704,7 +704,7 @@
                     <div style="width: 64px; height: 64px; background: #fffbeb; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
                         <i data-lucide="users" style="color: #f59e0b; width: 32px; height: 32px;"></i>
                     </div>
-                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">3. Impact Familles</h3>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 10px; color: #1e293b;">3. Simulation Famille</h3>
                     <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">L'outil magique pour simuler une augmentation de prix et voir immédiatement le surcoût mensuel pour les parents.</p>
                 </div>
 
@@ -747,14 +747,14 @@
             </div>
         </div>
 
-        <!-- PAGE : IMPACT FAMILLES (SIMULATEUR ACCUEIL DE LOISIRS) -->
+        <!-- PAGE : SIMULATION FAMILLE (SIMULATEUR ACCUEIL DE LOISIRS) -->
         <div id="page-impact-familles" class="content-page">
 
             <!-- EN-TÊTE + SÉLECTEUR DE VUE -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 20px;">
                 <div>
-                    <h1>Simulateur d'Impact Tarifaire — Accueil de Loisirs</h1>
-                    <p class="subtitle">Calculez le surcoût mensuel pour une famille selon sa tranche de QF et un scénario de hausse de la grille 2025.</p>
+                    <h1>Simulation d'Impact Tarifaire — Accueil de Loisirs</h1>
+                    <p class="subtitle">Calculez le surcoût mensuel pour une famille selon sa tranche de QF et un scénario de hausse de la grille <span class="sim-annee-ref-label">2025</span>.</p>
                 </div>
                 <!-- BOUTONS DROITE : toggle vue + export PDF -->
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; margin-top: 8px;">
@@ -861,7 +861,7 @@
                 <div class="form-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                         <h3 id="al-detail-title" style="margin: 0;">Détail par prestation</h3>
-                        <span style="font-size: 0.75rem; color: var(--text-muted);">Grille tarifaire 2025 — Fréquences mensuelles de référence</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Grille tarifaire <span class="sim-annee-ref-label">2025</span> — Fréquences mensuelles de référence</span>
                     </div>
                     <div class="table-container" style="margin: 0;">
                         <table id="al-detail-table" style="width: 100%;">
@@ -869,7 +869,7 @@
                                 <tr>
                                     <th style="width: 60px; text-align: center;">Inclure</th>
                                     <th style="text-align: left;">Prestation</th>
-                                    <th style="text-align: center;">Qté / mois</th>
+                                    <th style="text-align: center; width: 120px;">Qté / mois</th>
                                     <th style="text-align: right;">Tarif unitaire</th>
                                     <th style="text-align: right;">Facture base</th>
                                     <th style="text-align: right;">Facture simulée</th>
@@ -1007,10 +1007,20 @@
             <div class="form-card" style="margin-top: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3>Grilles disponibles</h3>
-                    <button class="btn-tab" onclick="resetGrille()">R&#233;initialiser (2025)</button>
+                    <button class="btn-tab" onclick="resetGrille()">Réinitialiser (2025)</button>
                 </div>
-                <div id="grilleActive" style="padding: 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
+                <div id="grilleActive" style="padding: 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-soft); margin-bottom: 16px;">
                     <!-- Info grille active -->
+                </div>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border-soft);">
+                    <div>
+                        <h4 style="margin-bottom: 4px;">Année de référence (Simulations)</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Sélectionnez l'année de référence à afficher dans la simulation.</p>
+                    </div>
+                    <select id="param-annee-ref" onchange="changerAnneeRefGlobale()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600;">
+                        <option value="2025">2025</option>
+                    </select>
                 </div>
             </div>
 
@@ -1078,6 +1088,23 @@
             }
         };
 
+        window.updatePrestationQte = function(cle, val) {
+            const pres = AL_PRESTATIONS.find(p => p.cle === cle);
+            if (pres) {
+                pres.qte = parseInt(val) || 0;
+                calculerImpactLoisirs();
+                calculerSynthetique();
+            }
+        };
+
+        function changerAnneeRefGlobale() {
+            const select = document.getElementById('param-annee-ref');
+            const val = select.value;
+            localStorage.setItem('mairie_annee_ref', val);
+            // Mettre à jour les labels
+            document.querySelectorAll('.sim-annee-ref-label').forEach(el => el.textContent = val);
+        }
+
         function calculerImpactLoisirs() {
             const tranche  = document.getElementById('al-tranche').value;
             const pct      = parseFloat(document.getElementById('al-slider').value) / 100;
@@ -1130,7 +1157,12 @@
                             <input type="checkbox" onchange="togglePrestation('${p.cle}', this.checked)" ${p.inTotal ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);">
                         </td>
                         <td style="padding-left: 20px;">${p.label}</td>
-                        <td style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">${p.qte}</td>
+                        <td style="text-align: center; padding: 4px;">
+                            <input type="number" min="0" max="40" value="${p.qte}"
+                                onchange="updatePrestationQte('${p.cle}', this.value)"
+                                style="width: 55px; padding: 4px; border: 1px solid var(--border); border-radius: 4px; text-align: center; font-size: 0.85rem;"
+                                ${!p.inTotal ? 'disabled' : ''}>
+                        </td>
                         <td style="text-align: right; font-variant-numeric: tabular-nums;">${fmt(tarifBase)}</td>
                         <td style="text-align: right; font-variant-numeric: tabular-nums;">${fmt(base)}</td>
                         <td style="text-align: right; font-variant-numeric: tabular-nums; color: ${p.inTotal ? 'var(--primary)' : 'inherit'}; font-weight: 600;">${fmt(simule)}</td>
@@ -1398,6 +1430,7 @@
         function buildGenericPDFContent(titre, sstitre, tableHTML, printAreaId = 'impact-print-area') {
             const now = new Date();
             const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const anneeRef = localStorage.getItem('mairie_annee_ref') || '2025';
             return `
                 <div style="font-family:'DM Sans',Arial,sans-serif; padding:0;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #1e293b; padding-bottom:10px; margin-bottom:14px;">
@@ -1409,7 +1442,7 @@
                                 <div style="font-size:9px; color:#64748b; margin-top:3px;">${sstitre}</div>
                             </div>
                         </div>
-                        <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}</div>
+                        <div style="text-align:right; font-size:9px; color:#94a3b8;">${dateStr}<br>Grille tarifaire ${anneeRef}</div>
                     </div>
                     ${tableHTML}
                     <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:8px; font-size:8px; color:#94a3b8; display:flex; justify-content:space-between;">
@@ -1872,6 +1905,28 @@
                 document.getElementById("grilleActive").innerHTML = `Grille active : <strong>${data}</strong>`;
                 const miniNom = document.getElementById("grilleActiveNom");
                 if (miniNom) miniNom.innerText = data;
+
+                // Charger aussi les années disponibles pour le sélecteur
+                const anneeResponse = await apiFetch("/api/saisie/annees");
+                if (anneeResponse.ok) {
+                    const annees = await anneeResponse.json();
+                    const select = document.getElementById('param-annee-ref');
+                    if (select) {
+                        const anneeRefActuelle = localStorage.getItem('mairie_annee_ref') || '2025';
+                        select.innerHTML = '';
+                        if (!annees.includes(2025)) annees.unshift(2025); // Toujours proposer 2025
+                        // Trier par ordre décroissant
+                        annees.sort((a,b) => b - a);
+                        annees.forEach(a => {
+                            const opt = document.createElement('option');
+                            opt.value = a;
+                            opt.textContent = a;
+                            if (a.toString() === anneeRefActuelle) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+                        document.querySelectorAll('.sim-annee-ref-label').forEach(el => el.textContent = anneeRefActuelle);
+                    }
+                }
             } catch(e) {}
         }
 
