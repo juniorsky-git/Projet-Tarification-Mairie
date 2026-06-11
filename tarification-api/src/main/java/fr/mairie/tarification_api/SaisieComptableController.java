@@ -52,15 +52,22 @@ public class SaisieComptableController {
      * Idempotent : si l'année existe déjà, retourne 0 lignes créées.
      */
     @PostMapping("/{annee}/initialiser")
-    public ResponseEntity<Map<String, Object>> initialiserAnnee(@PathVariable Integer annee) {
-        int nbLignes = service.initialiserAnnee(annee);
-        return ResponseEntity.ok(Map.of(
+    public ResponseEntity<?> initialiserAnnee(@PathVariable Integer annee) {
+        if (annee == null || annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
+        try {
+            int nbLignes = service.initialiserAnnee(annee);
+            return ResponseEntity.ok(Map.of(
             "annee", annee,
             "lignesCreees", nbLignes,
             "message", nbLignes > 0
                 ? annee + " initialisée avec " + nbLignes + " lignes depuis la référence 2025."
                 : "L'année " + annee + " avait déjà des données — aucune modification."
-        ));
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de l'initialisation : " + e.getMessage());
+        }
     }
 
     // =========================================================================
@@ -71,7 +78,10 @@ public class SaisieComptableController {
      * Retourne toutes les lignes d'une année en liste plate (pour le formulaire JS).
      */
     @GetMapping("/{annee}")
-    public ResponseEntity<List<LigneSaisie>> getLignes(@PathVariable Integer annee) {
+    public ResponseEntity<?> getLignes(@PathVariable Integer annee) {
+        if (annee == null || annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
         return ResponseEntity.ok(service.getLignesBrutes(annee));
     }
 
@@ -80,18 +90,32 @@ public class SaisieComptableController {
      * Utilisé par le dashboard pour se rafraîchir.
      */
     @GetMapping("/{annee}/totaux")
-    public ResponseEntity<Map<String, Map<String, Double>>> getTotaux(@PathVariable Integer annee) {
-        return ResponseEntity.ok(service.getTotauxParPole(annee));
+    public ResponseEntity<?> getTotaux(@PathVariable Integer annee) {
+        if (annee == null || annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
+        try {
+            return ResponseEntity.ok(service.getTotauxParPole(annee));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors du calcul des totaux : " + e.getMessage());
+        }
     }
 
     /**
      * Retourne le comparatif entre l'année de référence et l'année saisie.
      */
     @GetMapping("/{annee}/comparatif")
-    public ResponseEntity<List<Map<String, Object>>> getComparatif(
+    public ResponseEntity<?> getComparatif(
             @PathVariable Integer annee,
             @RequestParam(required = false) Integer anneeRef) {
-        return ResponseEntity.ok(service.getComparatif(annee, anneeRef));
+        if (annee == null || annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
+        try {
+            return ResponseEntity.ok(service.getComparatif(annee, anneeRef));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors du comparatif : " + e.getMessage());
+        }
     }
 
     // =========================================================================
@@ -103,9 +127,16 @@ public class SaisieComptableController {
      * Les lignes avec ID null sont créées, celles avec ID sont mises à jour.
      */
     @PostMapping("/lignes")
-    public ResponseEntity<List<LigneSaisie>> sauvegarder(@RequestBody List<LigneSaisie> lignes) {
-        List<LigneSaisie> sauvegardees = service.sauvegarder(lignes);
-        return ResponseEntity.ok(sauvegardees);
+    public ResponseEntity<?> sauvegarder(@RequestBody List<LigneSaisie> lignes) {
+        if (lignes == null || lignes.isEmpty()) {
+            return ResponseEntity.badRequest().body("Aucune ligne à sauvegarder.");
+        }
+        try {
+            List<LigneSaisie> sauvegardees = service.sauvegarder(lignes);
+            return ResponseEntity.ok(sauvegardees);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur de sauvegarde : " + e.getMessage());
+        }
     }
 
     /**
@@ -130,13 +161,20 @@ public class SaisieComptableController {
      * et en recréant les lignes de référence depuis 2025.
      */
     @PostMapping("/{annee}/reinitialiser")
-    public ResponseEntity<Map<String, Object>> reinitialiserAnnee(@PathVariable Integer annee) {
-        int nbLignes = service.reinitialiserAnnee(annee);
-        return ResponseEntity.ok(Map.of(
-            "annee", annee,
-            "lignesRecreees", nbLignes,
-            "message", "Données de " + annee + " réinitialisées depuis la référence 2025 (" + nbLignes + " lignes)."
-        ));
+    public ResponseEntity<?> reinitialiserAnnee(@PathVariable Integer annee) {
+        if (annee == null || annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
+        try {
+            int nbLignes = service.reinitialiserAnnee(annee);
+            return ResponseEntity.ok(Map.of(
+                "annee", annee,
+                "lignesRecreees", nbLignes,
+                "message", "Données de " + annee + " réinitialisées depuis la référence 2025 (" + nbLignes + " lignes)."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de la réinitialisation : " + e.getMessage());
+        }
     }
 
     // =========================================================================

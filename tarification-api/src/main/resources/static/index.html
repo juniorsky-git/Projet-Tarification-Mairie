@@ -315,6 +315,10 @@
                 <i data-lucide="settings"></i>
                 <span>Paramètres</span>
             </div>
+            <div class="nav-item" onclick="switchPage('support', this)">
+                <i data-lucide="life-buoy"></i>
+                <span>Support Technique</span>
+            </div>
         </nav>
 
         <!-- USER BLOCK BOTTOM — style Squire -->
@@ -1041,6 +1045,33 @@
                         <div style="font-weight: 600; font-size: 0.9rem;">Mairie de Crosne</div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- PAGE : SUPPORT -->
+        <div id="page-support" class="content-page">
+            <h1>Support Technique</h1>
+            <p class="subtitle">Ouvrez un ticket d'incident ou de demande d'évolution.</p>
+
+            <div class="form-card" style="max-width: 600px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <i data-lucide="mail" style="width:24px;height:24px;color:var(--accent);"></i>
+                    <h3 style="margin: 0;">Nouveau ticket</h3>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Objet du ticket *</label>
+                    <input type="text" id="supportSujet" placeholder="Ex: Bug sur l'export Excel" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit;">
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary);">Description du problème *</label>
+                    <textarea id="supportDescription" rows="6" placeholder="Détaillez votre problème ou demande ici..." style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="envoyerTicketSupport()" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="send" style="width:16px;height:16px;"></i> Ouvrir le ticket via mon Client Mail
+                </button>
             </div>
         </div>
     </main>
@@ -3554,6 +3585,21 @@
                 el.style.transition = 'opacity 0.4s';
                 setTimeout(() => el.remove(), 400);
             }, 3000);
+        }
+
+        /** Ouvre le client mail pour le support */
+        function envoyerTicketSupport() {
+            const sujet = document.getElementById('supportSujet').value.trim();
+            const desc = document.getElementById('supportDescription').value.trim();
+            
+            if (!sujet || !desc) {
+                alert("Veuillez remplir l'objet et la description du ticket.");
+                return;
+            }
+
+            const email = "seriylu91@gmail.com";
+            const mailtoLink = `mailto:${email}?subject=[SUPPORT MAIRIE] ${encodeURIComponent(sujet)}&body=${encodeURIComponent(desc + "\n\n--\nTicket généré depuis Mairie Tarification Bêta")}`;
+            window.location.href = mailtoLink;
         }
 
     </script>

@@ -88,6 +88,12 @@ public class DashboardController {
             @RequestParam String pole,
             @RequestParam(required = false, defaultValue = "A") String source,
             @RequestParam(required = false) Integer annee) {
+        if (pole == null || pole.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Le paramètre 'pole' est obligatoire.");
+        }
+        if (annee != null && annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
         try {
             String decodedPole = URLDecoder.decode(pole, StandardCharsets.UTF_8).replace("+", " ").trim();
 

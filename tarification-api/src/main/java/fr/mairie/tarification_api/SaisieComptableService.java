@@ -130,6 +130,7 @@ public class SaisieComptableService {
      * Structure : { "Restauration": { "DEPENSE": [...], "RECETTE": [...] }, ... }
      */
     public Map<String, Map<String, List<LigneSaisie>>> getLignesParAnnee(Integer annee) {
+        if (annee == null || annee <= 0) throw new IllegalArgumentException("Année invalide.");
         List<LigneSaisie> lignes = repository.findByAnneeOrderByPoleAscLibelleAsc(annee);
         Map<String, Map<String, List<LigneSaisie>>> result = new LinkedHashMap<>();
 
@@ -145,6 +146,7 @@ public class SaisieComptableService {
      * Retourne la liste plate de toutes les lignes d'une année.
      */
     public List<LigneSaisie> getLignesBrutes(Integer annee) {
+        if (annee == null || annee <= 0) throw new IllegalArgumentException("Année invalide.");
         return repository.findByAnneeOrderByPoleAscLibelleAsc(annee);
     }
 
@@ -160,6 +162,7 @@ public class SaisieComptableService {
      * Utilisé pour mettre à jour le dashboard.
      */
     public Map<String, Map<String, Double>> getTotauxParPole(Integer annee) {
+        if (annee == null || annee <= 0) throw new IllegalArgumentException("Année invalide.");
         Map<String, Map<String, Double>> totaux = new LinkedHashMap<>();
         for (String pole : POLES) {
             Map<String, Double> t = new LinkedHashMap<>();

@@ -123,8 +123,12 @@ public class AnalytiqueFluideService {
 
             resultats.sort((a, b) -> Double.compare(b.montantReel(), a.montantReel()));
         } catch (Exception e) {
-            System.err.println("[AnalytiqueFluideService] Erreur lecture fluides.json: " + e.getMessage());
-            e.printStackTrace();
+            String msg = "Erreur lecture fluides.json: " + e.getMessage();
+            if (logService != null) {
+                logService.log(msg);
+            } else {
+                System.err.println("[AnalytiqueFluideService] " + msg);
+            }
         }
         return resultats;
     }
@@ -156,7 +160,12 @@ public class AnalytiqueFluideService {
                         n.path("reelS1").asDouble(),  n.path("reelS2").asDouble()));
             }
         } catch (Exception e) {
-            System.err.println("[AnalytiqueFluideService] Erreur lecture biSemestriel: " + e.getMessage());
+            String msg = "Erreur lecture biSemestriel: " + e.getMessage();
+            if (logService != null) {
+                logService.log(msg);
+            } else {
+                System.err.println("[AnalytiqueFluideService] " + msg);
+            }
         }
         return resultats;
     }
