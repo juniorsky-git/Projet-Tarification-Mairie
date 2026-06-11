@@ -52,6 +52,7 @@ public class DashboardController {
             List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
             Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
             Map<String, Map<String, Double>> totauxSaisie = annee != null ? saisieService.getTotauxParPole(annee) : null;
+            List<Map<String, Object>> comparatifData = annee != null ? saisieService.getComparatif(annee) : List.of();
             
             // On reconstruit la liste des réponses Dashboard pour l'export
             List<DashboardResponse> dashboardResponses = poles.stream().map(p -> {
@@ -62,7 +63,7 @@ public class DashboardController {
                 return null;
             }).filter(r -> r != null).collect(Collectors.toList());
 
-            byte[] excelData = excelExportService.exporterDashboard(annee, poles, recettesReelles, totauxSaisie, dashboardResponses);
+            byte[] excelData = excelExportService.exporterDashboard(annee, poles, recettesReelles, totauxSaisie, dashboardResponses, comparatifData);
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=\"Tableau_de_Bord_" + (annee != null ? annee : "2025") + ".xlsx\"")
                     .body(excelData);

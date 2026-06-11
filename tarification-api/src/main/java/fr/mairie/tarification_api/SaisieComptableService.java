@@ -418,6 +418,100 @@ public class SaisieComptableService {
                 rowIdx++; // Ligne vide de séparation
             }
 
+            // === FEUILLE 2 : COMPARATIF ===
+            List<Map<String, Object>> comparatifData = getComparatif(annee);
+            if (!comparatifData.isEmpty()) {
+                Sheet sheetComp = workbook.createSheet("Comparatif " + annee);
+                sheetComp.setColumnWidth(0, 8000); // Pôle
+                sheetComp.setColumnWidth(1, 4000); // Dép. Réf
+                sheetComp.setColumnWidth(2, 4000); // Dép. Année
+                sheetComp.setColumnWidth(3, 4000); // Écart Dép.
+                sheetComp.setColumnWidth(4, 4000); // Rec. Réf
+                sheetComp.setColumnWidth(5, 4000); // Rec. Année
+                sheetComp.setColumnWidth(6, 4000); // Écart Rec.
+                sheetComp.setColumnWidth(7, 3000); // TC Réf
+                sheetComp.setColumnWidth(8, 3000); // TC Année
+
+                // Styles spécifiques Comparatif
+                CellStyle styleEcartPositif = workbook.createCellStyle();
+                styleEcartPositif.cloneStyleFrom(styleMontant);
+                Font fontPositif = workbook.createFont();
+                fontPositif.setColor(IndexedColors.RED.getIndex());
+                fontPositif.setBold(true);
+                styleEcartPositif.setFont(fontPositif);
+
+                CellStyle styleEcartNegatif = workbook.createCellStyle();
+                styleEcartNegatif.cloneStyleFrom(styleMontant);
+                Font fontNegatif = workbook.createFont();
+                fontNegatif.setColor(IndexedColors.GREEN.getIndex());
+                fontNegatif.setBold(true);
+                styleEcartNegatif.setFont(fontNegatif);
+
+                CellStyle styleEcartNeutre = workbook.createCellStyle();
+                styleEcartNeutre.cloneStyleFrom(styleMontant);
+                Font fontNeutre = workbook.createFont();
+                fontNeutre.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+                styleEcartNeutre.setFont(fontNeutre);
+
+                CellStyle stylePourcent = workbook.createCellStyle();
+                stylePourcent.setDataFormat(workbook.createDataFormat().getFormat("0.0%"));
+
+                Row rowTitreComp = sheetComp.createRow(0);
+                Cell cellTitreComp = rowTitreComp.createCell(0);
+                cellTitreComp.setCellValue("COMPARATIF ANNÉE PRÉCÉDENTE VS SAISIE " + annee);
+                cellTitreComp.setCellStyle(styleTitre);
+
+                Row rowHeaderComp = sheetComp.createRow(2);
+                String[] headersComp = {
+                    "PÔLE", "DÉP. RÉF.", "DÉP. " + annee, "ÉCART DÉP.", 
+                    "REC. RÉF.", "REC. " + annee, "ÉCART REC.", 
+                    "TC RÉF.", "TC " + annee
+                };
+                for (int i = 0; i < headersComp.length; i++) {
+                    Cell c = rowHeaderComp.createCell(i);
+                    c.setCellValue(headersComp[i]);
+                    c.setCellStyle(styleEntete);
+                }
+
+                int rowIdxComp = 3;
+                for (Map<String, Object> ligne : comparatifData) {
+                    Row row = sheetComp.createRow(rowIdxComp++);
+                    
+                    Cell cPole = row.createCell(0);
+                    cPole.setCellValue((String) ligne.get("pole"));
+                    cPole.setCellStyle(stylePredefini);
+
+                    row.createCell(1).setCellValue((Double) ligne.get("dep2025"));
+                    row.getCell(1).setCellStyle(styleMontant);
+                    
+                    row.createCell(2).setCellValue((Double) ligne.get("depN"));
+                    row.getCell(2).setCellStyle(styleMontant);
+
+                    double ecartDep = (Double) ligne.get("ecartDep");
+                    Cell cEcartDep = row.createCell(3);
+                    cEcartDep.setCellValue(ecartDep);
+                    cEcartDep.setCellStyle(ecartDep > 0 ? styleEcartPositif : (ecartDep < 0 ? styleEcartNegatif : styleEcartNeutre));
+
+                    row.createCell(4).setCellValue((Double) ligne.get("rec2025"));
+                    row.getCell(4).setCellStyle(styleMontant);
+                    
+                    row.createCell(5).setCellValue((Double) ligne.get("recN"));
+                    row.getCell(5).setCellStyle(styleMontant);
+
+                    double ecartRec = (Double) ligne.get("ecartRec");
+                    Cell cEcartRec = row.createCell(6);
+                    cEcartRec.setCellValue(ecartRec);
+                    // Pour les recettes, un écart positif est "vert", négatif est "rouge"
+                    cEcartRec.setCellStyle(ecartRec > 0 ? styleEcartNegatif : (ecartRec < 0 ? styleEcartPositif : styleEcartNeutre));
+
+                    row.createCell(7).setCellValue((Double) ligne.get("tc2025"));
+                    row.getCell(7).setCellStyle(stylePourcent);
+
+                    row.createCell(8).setCellValue((Double) ligne.get("tcN"));
+                    row.getCell(8).setCellStyle(stylePourcent);
+                }
+            }
+
             workbook.write(out);
             return out.toByteArray();
         }
