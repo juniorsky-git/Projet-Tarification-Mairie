@@ -47,12 +47,13 @@ public class DashboardController {
     @GetMapping(value = "/dashboard/export-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public ResponseEntity<byte[]> exportDashboardExcel(
             @RequestParam(required = false, defaultValue = "A") String source,
-            @RequestParam(required = false) Integer annee) {
+            @RequestParam(required = false) Integer annee,
+            @RequestParam(required = false) Integer anneeRef) {
         try {
             List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
             Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
             Map<String, Map<String, Double>> totauxSaisie = annee != null ? saisieService.getTotauxParPole(annee) : null;
-            List<Map<String, Object>> comparatifData = annee != null ? saisieService.getComparatif(annee) : List.of();
+            List<Map<String, Object>> comparatifData = annee != null ? saisieService.getComparatif(annee, anneeRef) : List.of();
             
             // On reconstruit la liste des réponses Dashboard pour l'export
             List<DashboardResponse> dashboardResponses = poles.stream().map(p -> {

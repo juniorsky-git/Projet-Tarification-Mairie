@@ -85,11 +85,13 @@ public class SaisieComptableController {
     }
 
     /**
-     * Retourne le comparatif entre 2025 (Excel) et l'année saisie.
+     * Retourne le comparatif entre l'année de référence et l'année saisie.
      */
     @GetMapping("/{annee}/comparatif")
-    public ResponseEntity<List<Map<String, Object>>> getComparatif(@PathVariable Integer annee) {
-        return ResponseEntity.ok(service.getComparatif(annee));
+    public ResponseEntity<List<Map<String, Object>>> getComparatif(
+            @PathVariable Integer annee,
+            @RequestParam(required = false) Integer anneeRef) {
+        return ResponseEntity.ok(service.getComparatif(annee, anneeRef));
     }
 
     // =========================================================================

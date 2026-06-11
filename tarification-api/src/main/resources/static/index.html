@@ -483,9 +483,12 @@
 
                     <!-- Tableau Comparatif 2025 vs Saisie -->
                     <div class="saisie-comparatif" id="saisie-comparatif-zone" style="display:none;">
-                        <div class="saisie-comparatif-title">
+                        <div class="saisie-comparatif-title" style="display:flex; align-items:center; gap:8px;">
                             <i data-lucide="bar-chart-2"></i>
-                            Comparatif <span id="saisie-comparatif-ref-label">Année précédente</span> - <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
+                            Comparatif
+                            <select id="saisie-comparatif-ref-select" onchange="saisieRafraichirComparatif()" class="form-select" style="width:auto; padding:2px 8px; font-weight:bold; cursor:pointer;">
+                            </select>
+                            - <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
                         </div>
                         <div id="saisie-comparatif-content">
                             <!-- Généré dynamiquement -->
@@ -3379,20 +3382,43 @@
             }
         }
 
+        async function saisieRafraichirComparatif() {
+            if (saisie.anneeActive) {
+                await saisieRendreComparatif(saisie.anneeActive);
+            }
+        }
+
         /** Charge et affiche le comparatif 2025 vs année saisie */
         async function saisieRendreComparatif(annee) {
-            if (!annee || annee === 2025) {
-                document.getElementById('saisie-comparatif-zone').style.display = 'none';
-                return;
-            }
-
             try {
-                const resp = await apiFetch(`/api/saisie/${annee}/comparatif`);
+                if (annee === 2025) {
+                    document.getElementById('saisie-comparatif-zone').style.display = 'none';
+                    return;
+                }
+
+                const selectRef = document.getElementById('saisie-comparatif-ref-select');
+                let anneeRefForcee = selectRef ? selectRef.value : '';
+                
+                // Si aucune option n'est sélectionnée, on choisit n-1 par défaut
+                if (!anneeRefForcee || anneeRefForcee >= annee) {
+                    anneeRefForcee = (annee - 1).toString();
+                }
+
+                // Peupler le sélecteur avec les années possibles (2025 jusqu'à annee - 1)
+                if (selectRef) {
+                    let optionsHtml = '';
+                    for (let a = 2025; a < annee; a++) {
+                        optionsHtml += `<option value="${a}" ${a.toString() === anneeRefForcee ? 'selected' : ''}>${a}</option>`;
+                    }
+                    selectRef.innerHTML = optionsHtml;
+                    anneeRefForcee = selectRef.value; // MAJ au cas où
+                }
+
+                const resp = await apiFetch(`/api/saisie/${annee}/comparatif?anneeRef=${anneeRefForcee}`);
                 const data = await resp.json();
 
                 document.getElementById('saisie-comparatif-annee-label').textContent = annee;
-                const anneeRefStr = (annee - 1).toString();
-                document.getElementById('saisie-comparatif-ref-label').textContent = anneeRefStr;
+                const anneeRefStr = anneeRefForcee;
 
                 let html = `<table class="comparatif-table">
                     <thead><tr>

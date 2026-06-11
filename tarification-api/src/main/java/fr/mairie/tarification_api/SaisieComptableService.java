@@ -172,8 +172,8 @@ public class SaisieComptableService {
         return totaux;
     }
 
-    public List<Map<String, Object>> getComparatif(Integer anneeSource) {
-        Integer anneeRef = anneeSource - 1;
+    public List<Map<String, Object>> getComparatif(Integer anneeSource, Integer anneeRefForcee) {
+        Integer anneeRef = anneeRefForcee != null ? anneeRefForcee : (anneeSource - 1);
         
         // On récupère d d'abord la structure des pôles depuis 2025 pour avoir la liste complète
         List<DepensePole> poles2025 = budgetService.chargerPolesDynamiques("A");
@@ -419,7 +419,7 @@ public class SaisieComptableService {
             }
 
             // === FEUILLE 2 : COMPARATIF ===
-            List<Map<String, Object>> comparatifData = getComparatif(annee);
+            List<Map<String, Object>> comparatifData = getComparatif(annee, null);
             if (!comparatifData.isEmpty()) {
                 Sheet sheetComp = workbook.createSheet("Comparatif " + annee);
                 sheetComp.setColumnWidth(0, 8000); // Pôle
