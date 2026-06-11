@@ -323,10 +323,10 @@
 
         <!-- USER BLOCK BOTTOM — style Squire -->
         <div class="sidebar-user">
-            <div class="sidebar-user-avatar">JD</div>
+            <div class="sidebar-user-avatar">BC</div>
             <div>
-                <div class="sidebar-user-name">Mairie de Crosne</div>
-                <div class="sidebar-user-role">Administrateur</div>
+                <div class="sidebar-user-name">Bruno Crampé</div>
+                <div class="sidebar-user-role">DGS (Finances)</div>
             </div>
         </div>
         <div class="nav-item logout-btn" onclick="handleLogout()" style="margin: 8px 10px 4px;">
@@ -340,10 +340,10 @@
         <header>
             <div></div>
             <div class="user-profile">
-                <div class="avatar">JD</div>
+                <div class="avatar">BC</div>
                 <div class="user-info">
-                    <div class="user-name">Mairie de Crosne</div>
-                    <div class="user-role">Administrateur</div>
+                    <div class="user-name">Bruno Crampé</div>
+                    <div class="user-role">DGS (Finances)</div>
                 </div>
             </div>
         </header>
@@ -368,17 +368,7 @@
                             <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Exporter Excel
                         </button>
                     </div>
-                    <!-- SÉLECTEUR DE SOURCE BUDGÉTAIRE -->
-                    <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px;">
-                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
-                            <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">Source budgétaire</span>
-                        </div>
-                        <select id="budgetSourceSelect" onchange="changerSourceBudget()"
-                            style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 0.8rem; font-weight: 600; color: var(--text-main); background: #fff; cursor: pointer; min-width: 250px;">
-                            <option value="A" selected>Source A — CALC DEP(4) + Depenses recettes nf</option>
-                            <option value="B">Source B — VF_REC_DEP.xlsx (Hybride)</option>
-                        </select>
-                    </div>
+
                 </div>
             </div>
 
@@ -992,6 +982,20 @@
         <div id="page-parametres" class="content-page">
             <h1>Param&#232;tres</h1>
             <p class="subtitle">Configuration de la plateforme et gestion des grilles tarifaires.</p>
+
+            <!-- SÉLECTEUR DE SOURCE BUDGÉTAIRE -->
+            <div class="form-card" style="margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <i data-lucide="database" style="width:20px;height:20px;color:var(--accent);"></i>
+                    <h3 style="margin: 0;">Source budgétaire globale</h3>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">Sélectionnez la source de données à utiliser pour les calculs du tableau de bord et des analyses.</p>
+                <select id="budgetSourceSelect" onchange="changerSourceBudget()"
+                    style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 0.9rem; font-weight: 600; color: var(--text-main); background: #fff; cursor: pointer; width: 100%; max-width: 500px;">
+                    <option value="A" selected>Source A — CALC DEP(4) + Depenses recettes nf</option>
+                    <option value="B">Source B — VF_REC_DEP.xlsx (Hybride)</option>
+                </select>
+            </div>
 
             <!-- Section Grilles Excel intégrée -->
             <div class="form-card">

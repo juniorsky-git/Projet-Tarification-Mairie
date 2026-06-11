@@ -27,5 +27,15 @@ public class DataInitializer implements CommandLineRunner {
         admin.setActif(true);
         repository.save(admin);
         System.out.println("✅ Compte 'admin' prêt et synchronisé (Mot de passe: admin)");
+
+        // Compte pour le DGS Bruno Crampé
+        Utilisateur bruno = repository.findByUsername("crosne.bcrampé").orElse(new Utilisateur());
+        bruno.setUsername("crosne.bcrampé");
+        bruno.setPassword("Fin30!67#crsn"); 
+        bruno.setNom("Bruno Crampé");
+        bruno.setRole("DGS (Finances)");
+        bruno.setActif(true);
+        repository.save(bruno);
+        System.out.println("✅ Compte 'crosne.bcrampé' prêt (Mot de passe: Fin30!67#crsn)");
     }
 }
