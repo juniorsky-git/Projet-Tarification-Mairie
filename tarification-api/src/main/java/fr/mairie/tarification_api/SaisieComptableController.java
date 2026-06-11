@@ -191,7 +191,8 @@ public class SaisieComptableController {
             @RequestParam(required = false) Integer anneeRef) {
         try {
             byte[] xlsx = service.exporterXlsx(annee, anneeRef);
-            String nomFichier = "SAISIE_COMPTABLE_" + annee + "_" + LocalDate.now() + ".xlsx";
+            Integer anneeRefAffichee = anneeRef != null ? anneeRef : (annee - 1);
+            String nomFichier = "SAISIE_COMPTABLE_" + anneeRefAffichee + "_VS_" + annee + "_" + LocalDate.now() + ".xlsx";
 
             return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nomFichier + "\"")
