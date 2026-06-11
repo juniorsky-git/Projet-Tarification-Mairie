@@ -485,8 +485,7 @@
                     <div class="saisie-comparatif" id="saisie-comparatif-zone" style="display:none;">
                         <div class="saisie-comparatif-title">
                             <i data-lucide="bar-chart-2"></i>
-                            Comparatif Année précédente vs Saisie
-                            <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
+                            Comparatif <span id="saisie-comparatif-ref-label">Année précédente</span> - <span id="saisie-comparatif-annee-label" style="color:var(--primary)"></span>
                         </div>
                         <div id="saisie-comparatif-content">
                             <!-- Généré dynamiquement -->
@@ -2222,22 +2221,23 @@
                     const respComp = await apiFetch(`/api/saisie/${dashboardAnneeActive}/comparatif`);
                     const compData = await respComp.json();
                     
+                    const anneeRefStr = (dashboardAnneeActive - 1).toString();
                     contentHTML += `
                         <div style="margin-top: 40px; page-break-before: auto;">
                             <h2 style="font-size: 16px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                                Comparatif Année précédente vs Saisie ${dashboardAnneeActive}
+                                Comparatif ${anneeRefStr} - ${dashboardAnneeActive}
                             </h2>
                             <table style="width: 100%; border-collapse: collapse; font-size: 10px; border: 1px solid #e2e8f0;">
                                 <thead>
                                     <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
                                         <th style="padding: 8px; text-align: left; font-weight: 700; color: #475569;">Pôle</th>
-                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Dép. Réf.</th>
+                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Dép. ${anneeRefStr}</th>
                                         <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Dép. ${dashboardAnneeActive}</th>
                                         <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Écart Dép.</th>
-                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Rec. Réf.</th>
+                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Rec. ${anneeRefStr}</th>
                                         <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Rec. ${dashboardAnneeActive}</th>
                                         <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">Écart Rec.</th>
-                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">TC Réf.</th>
+                                        <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">TC ${anneeRefStr}</th>
                                         <th style="padding: 8px; text-align: right; font-weight: 700; color: #475569;">TC ${dashboardAnneeActive}</th>
                                     </tr>
                                 </thead>
@@ -3391,17 +3391,19 @@
                 const data = await resp.json();
 
                 document.getElementById('saisie-comparatif-annee-label').textContent = annee;
+                const anneeRefStr = (annee - 1).toString();
+                document.getElementById('saisie-comparatif-ref-label').textContent = anneeRefStr;
 
                 let html = `<table class="comparatif-table">
                     <thead><tr>
                         <th>Pôle</th>
-                        <th>Dép. Réf.</th>
+                        <th>Dép. ${anneeRefStr}</th>
                         <th>Dép. ${annee}</th>
                         <th>Écart Dép.</th>
-                        <th>Rec. Réf.</th>
+                        <th>Rec. ${anneeRefStr}</th>
                         <th>Rec. ${annee}</th>
                         <th>Écart Rec.</th>
-                        <th>TC Réf.</th>
+                        <th>TC ${anneeRefStr}</th>
                         <th>TC ${annee}</th>
                     </tr></thead><tbody>`;
 
