@@ -173,6 +173,9 @@ public class SaisieComptableService {
     }
 
     public List<Map<String, Object>> getComparatif(Integer anneeSource, Integer anneeRefForcee) {
+        if (anneeSource == null || anneeSource <= 0) {
+            throw new IllegalArgumentException("L'année source ne peut pas être négative, nulle ou indéfinie.");
+        }
         Integer anneeRef = anneeRefForcee != null ? anneeRefForcee : (anneeSource - 1);
         
         // On récupère d d'abord la structure des pôles depuis 2025 pour avoir la liste complète
@@ -273,7 +276,7 @@ public class SaisieComptableService {
      * @param annee L'année à exporter.
      * @return Le contenu binaire du fichier XLSX.
      */
-    public byte[] exporterXlsx(Integer annee) throws IOException {
+    public byte[] exporterXlsx(Integer annee, Integer anneeRefForcee) throws IOException {
         Map<String, Map<String, List<LigneSaisie>>> donnees = getLignesParAnnee(annee);
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -419,7 +422,7 @@ public class SaisieComptableService {
             }
 
             // === FEUILLE 2 : COMPARATIF ===
-            List<Map<String, Object>> comparatifData = getComparatif(annee, null);
+            List<Map<String, Object>> comparatifData = getComparatif(annee, anneeRefForcee);
             if (!comparatifData.isEmpty()) {
                 Sheet sheetComp = workbook.createSheet("Comparatif " + annee);
                 sheetComp.setColumnWidth(0, 8000); // Pôle
@@ -431,6 +434,15 @@ public class SaisieComptableService {
                 sheetComp.setColumnWidth(6, 4000); // Écart Rec.
                 sheetComp.setColumnWidth(7, 3000); // TC Réf
                 sheetComp.setColumnWidth(8, 3000); // TC Année
+
+                Integer anneeRefAffichee = anneeRefForcee != null ? anneeRefForcee : (annee - 1);
+
+                // Ligne de titre principale
+                Row rowCompTitre = sheetComp.createRow(0);
+                Cell cCompTitre = rowCompTitre.createCell(0);
+                cCompTitre.setCellValue("COMPARATIF " + anneeRefAffichee + " VS " + annee);
+                cCompTitre.setCellStyle(styleTitre);
+                sheetComp.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 8));
 
                 // Styles spécifiques Comparatif
                 CellStyle styleEcartPositif = workbook.createCellStyle();
@@ -458,14 +470,14 @@ public class SaisieComptableService {
 
                 Row rowTitreComp = sheetComp.createRow(0);
                 Cell cellTitreComp = rowTitreComp.createCell(0);
-                cellTitreComp.setCellValue("COMPARATIF ANNÉE PRÉCÉDENTE VS SAISIE " + annee);
+                cellTitreComp.setCellValue("COMPARATIF " + anneeRefAffichee + " VS " + annee);
                 cellTitreComp.setCellStyle(styleTitre);
 
                 Row rowHeaderComp = sheetComp.createRow(2);
                 String[] headersComp = {
-                    "PÔLE", "DÉP. RÉF.", "DÉP. " + annee, "ÉCART DÉP.", 
-                    "REC. RÉF.", "REC. " + annee, "ÉCART REC.", 
-                    "TC RÉF.", "TC " + annee
+                    "PÔLE", "DÉP. " + anneeRefAffichee, "DÉP. " + annee, "ÉCART DÉP.", 
+                    "REC. " + anneeRefAffichee, "REC. " + annee, "ÉCART REC.", 
+                    "TC " + anneeRefAffichee, "TC " + annee
                 };
                 for (int i = 0; i < headersComp.length; i++) {
                     Cell c = rowHeaderComp.createCell(i);

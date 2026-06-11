@@ -3434,6 +3434,11 @@
                     </tr></thead><tbody>`;
 
                 data.forEach(ligne => {
+                    if (Math.abs(ligne.ecartDep) < 0.01) ligne.ecartDep = 0;
+                    if (Math.abs(ligne.ecartRec) < 0.01) ligne.ecartRec = 0;
+                    if (Math.abs(ligne.ecartDepPct) < 0.1) ligne.ecartDepPct = 0;
+                    if (Math.abs(ligne.ecartRecPct) < 0.1) ligne.ecartRecPct = 0;
+
                     const ecartDClass = ligne.ecartDep > 0 ? 'ecart-positif' : (ligne.ecartDep < 0 ? 'ecart-negatif' : 'ecart-neutre');
                     const ecartRClass = ligne.ecartRec > 0 ? 'ecart-negatif' : (ligne.ecartRec < 0 ? 'ecart-positif' : 'ecart-neutre');
                     const signe = v => v > 0 ? '+' : '';
@@ -3488,7 +3493,12 @@
                 return;
             }
             saisieAfficherNotif('⏳ Génération du fichier XLSX...');
-            window.location.href = `/api/saisie/${saisie.anneeActive}/export`;
+            const selectRef = document.getElementById('saisie-comparatif-ref-select');
+            let url = `/api/saisie/${saisie.anneeActive}/export`;
+            if (selectRef && selectRef.value) {
+                url += `?anneeRef=${selectRef.value}`;
+            }
+            window.location.href = url;
             setTimeout(() => saisieAfficherNotif('✓ Téléchargement démarré.'), 1500);
         }
 

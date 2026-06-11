@@ -148,9 +148,11 @@ public class SaisieComptableController {
      * avec toutes les données saisies pour l'année donnée.
      */
     @GetMapping("/{annee}/export")
-    public ResponseEntity<byte[]> exporterXlsx(@PathVariable Integer annee) {
+    public ResponseEntity<byte[]> exporterXlsx(
+            @PathVariable Integer annee,
+            @RequestParam(required = false) Integer anneeRef) {
         try {
-            byte[] xlsx = service.exporterXlsx(annee);
+            byte[] xlsx = service.exporterXlsx(annee, anneeRef);
             String nomFichier = "SAISIE_COMPTABLE_" + annee + "_" + LocalDate.now() + ".xlsx";
 
             return ResponseEntity.ok()
