@@ -27,15 +27,48 @@ public class DashboardController {
     private final DonneesBudgetaires budgetService;
     private final LogService logService;
     private final SaisieComptableService saisieService;
+    private final DashboardExcelExportService excelExportService;
 
     public DashboardController(AnalytiqueFluideService analytiqueFluideService,
                                DonneesBudgetaires budgetService,
                                LogService logService,
-                               SaisieComptableService saisieService) {
+                               SaisieComptableService saisieService,
+                               DashboardExcelExportService excelExportService) {
         this.analytiqueFluideService = analytiqueFluideService;
         this.budgetService = budgetService;
         this.logService = logService;
         this.saisieService = saisieService;
+        this.excelExportService = excelExportService;
+    }
+
+    /**
+     * Endpoint d'export Excel du Dashboard, avec formatage natif (Apache POI).
+     */
+    @GetMapping(value = "/dashboard/export-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public ResponseEntity<byte[]> exportDashboardExcel(
+            @RequestParam(required = false, defaultValue = "A") String source,
+            @RequestParam(required = false) Integer annee) {
+        try {
+            List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
+            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
+            Map<String, Map<String, Double>> totauxSaisie = annee != null ? saisieService.getTotauxParPole(annee) : null;
+            
+            // On reconstruit la liste des réponses Dashboard pour l'export
+            List<DashboardResponse> dashboardResponses = poles.stream().map(p -> {
+                ResponseEntity<?> responseEntity = getDashboard(p.nom(), source, annee);
+                if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() instanceof DashboardResponse) {
+                    return (DashboardResponse) responseEntity.getBody();
+                }
+                return null;
+            }).filter(r -> r != null).collect(Collectors.toList());
+
+            byte[] excelData = excelExportService.exporterDashboard(annee, poles, recettesReelles, totauxSaisie, dashboardResponses);
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"Tableau_de_Bord_" + (annee != null ? annee : "2025") + ".xlsx\"")
+                    .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
