@@ -31,11 +31,11 @@ public class DataInitializer implements CommandLineRunner {
         // Compte pour le DGS Bruno Crampé
         Utilisateur bruno = repository.findByUsername("crosne.bcrampe").orElse(new Utilisateur());
         bruno.setUsername("crosne.bcrampe");
-        bruno.setPassword("Fin30!67#crsn"); 
+        bruno.setPassword("BC.ange1"); 
         bruno.setNom("Bruno Crampé");
         bruno.setRole("DGS (Finances)");
         bruno.setActif(true);
         repository.save(bruno);
-        System.out.println("✅ Compte 'crosne.bcrampe' prêt (Mot de passe: Fin30!67#crsn)");
+        System.out.println("✅ Compte 'crosne.bcrampe' prêt (Mot de passe: BC.ange1)");
     }
 }
