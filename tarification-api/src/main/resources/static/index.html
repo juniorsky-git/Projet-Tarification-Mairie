@@ -2037,30 +2037,100 @@
         }
 
         // --- EXPORT DASHBOARD ---
-        function exporterDashboardExcel() {
-            const cards = Array.from(document.querySelectorAll('#dashboardBudgetSummary .stat-card'));
-            if (cards.length === 0) {
-                alert("Aucune donnée à exporter.");
-                return;
-            }
-
-            const data = cards.map(c => {
-                return {
-                    "Pôle": c.getAttribute('data-pole'),
-                    "Dépenses Réelles (€)": parseFloat(c.getAttribute('data-depenses')),
-                    "Taux de Couverture (%)": parseInt(c.getAttribute('data-couverture'), 10)
-                };
-            });
-
-            // On peut aussi rajouter le détail du pôle actuellement ouvert si on le souhaite, 
-            // mais ici on exporte le résumé global du tableau de bord.
-            
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Résumé Budgétaire");
-            
+        async function exporterDashboardExcel() {
             const annee = dashboardAnneeActive ? dashboardAnneeActive : "2025";
-            XLSX.writeFile(wb, `Tableau_de_Bord_Mairie_${annee}.xlsx`);
+            
+            const btnXls = document.querySelector('button[onclick="exporterDashboardExcel()"]');
+            const originalHtml = btnXls.innerHTML;
+            btnXls.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Préparation Excel...';
+
+            try {
+                // 1. Récupération des données globales
+                let url = dashboardAnneeActive ? `/api/poles?source=${currentSource}&annee=${dashboardAnneeActive}` : `/api/poles?source=${currentSource}`;
+                const response = await apiFetch(url);
+                const poles = await response.json();
+
+                const dataResume = [];
+                const dataDetails = [];
+
+                // 2. Récupération des détails par pôle
+                for (const p of poles) {
+                    try {
+                        let urlDetails = `/api/dashboard?pole=${encodeURIComponent(p.nom)}&source=${currentSource}`;
+                        if (dashboardAnneeActive && dashboardAnneeActive !== null) {
+                            urlDetails += `&annee=${dashboardAnneeActive}`;
+                        }
+                        const respDet = await apiFetch(urlDetails);
+                        const det = await respDet.json();
+
+                        // Alimentation du Résumé
+                        dataResume.push({
+                            "Pôle": p.nom,
+                            "Dépenses Réelles (€)": det.depensesTotales,
+                            "Recettes Réelles (€)": det.recettesTotales,
+                            "Taux de Couverture (%)": parseFloat((det.tauxCouverture * 100).toFixed(1)),
+                            "Subvention Ville (€)": det.ecart,
+                            "Coût unitaire (€ / enf.)": det.coutUnitaire
+                        });
+
+                        // Alimentation des Détails
+                        for (const [cle, valeur] of Object.entries(det.detailsCharges || {})) {
+                            dataDetails.push({
+                                "Pôle": p.nom,
+                                "Type de charge": cle,
+                                "Montant (€)": valeur
+                            });
+                        }
+                    } catch(err) {
+                        console.error("Erreur lors de la récupération des détails pour le pôle", p.nom, err);
+                    }
+                }
+
+                const wb = XLSX.utils.book_new();
+
+                // Feuille 1 : Résumé
+                const wsResume = XLSX.utils.json_to_sheet(dataResume);
+                XLSX.utils.book_append_sheet(wb, wsResume, "Résumé Budgétaire");
+
+                // Feuille 2 : Détails des charges
+                const wsDetails = XLSX.utils.json_to_sheet(dataDetails);
+                XLSX.utils.book_append_sheet(wb, wsDetails, "Détail des Charges");
+
+                // Feuille 3 : Comparatif (si applicable)
+                if (dashboardAnneeActive && dashboardAnneeActive !== 2025) {
+                    try {
+                        const respComp = await apiFetch(`/api/saisie/${dashboardAnneeActive}/comparatif`);
+                        const compData = await respComp.json();
+                        
+                        const dataComp = compData.map(ligne => ({
+                            "Pôle": ligne.pole,
+                            "Dép. Réf. (€)": ligne.dep2025,
+                            [`Dép. ${dashboardAnneeActive} (€)`]: ligne.depN,
+                            "Écart Dép. (€)": ligne.ecartDep,
+                            "Rec. Réf. (€)": ligne.rec2025,
+                            [`Rec. ${dashboardAnneeActive} (€)`]: ligne.recN,
+                            "Écart Rec. (€)": ligne.ecartRec,
+                            "TC Réf. (%)": parseFloat((ligne.tc2025 * 100).toFixed(1)),
+                            [`TC ${dashboardAnneeActive} (%)`]: parseFloat((ligne.tcN * 100).toFixed(1))
+                        }));
+                        
+                        const wsComp = XLSX.utils.json_to_sheet(dataComp);
+                        XLSX.utils.book_append_sheet(wb, wsComp, `Comparatif ${dashboardAnneeActive}`);
+                    } catch(e) {
+                        console.error("Erreur génération comparatif Excel", e);
+                    }
+                }
+
+                // Génération du fichier
+                XLSX.writeFile(wb, `Tableau_de_Bord_Mairie_${annee}.xlsx`);
+
+            } catch(e) {
+                console.error("Erreur lors de l'export Excel", e);
+                alert("Erreur lors de la génération du fichier Excel.");
+            } finally {
+                btnXls.innerHTML = originalHtml;
+                lucide.createIcons();
+            }
         }
 
         async function genererRapportHtmlDashboard() {
