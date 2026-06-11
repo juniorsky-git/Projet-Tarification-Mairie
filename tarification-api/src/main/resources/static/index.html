@@ -1075,33 +1075,23 @@
         // serveur et garantir la durabilité (mise à jour = changer ce bloc).
         // ============================================================
 
-        const AL_TARIFS_2025 = {
-            A:  { journeeAvecRepas: 16.63, demiJourneeAvecRepas: 11.08, matinEtSoir: 5.54,  matinOuSoir: 2.79,  forfaitMensuel: null, demiForFait: null,   postEtudes: 2.22,  journeeAvecRepas5j: 16.63, journeeSansRepas5j: 11.08, demiJourneeAvecRepas5j: 11.08, demiJourneeSansRepas5j: 7.39, sortieDemi: 5.18, sortieJournee: 8.64, sejour5j: 48.00, sejour6j: 64.00 },
-            B:  { journeeAvecRepas: 14.73, demiJourneeAvecRepas:  9.78, matinEtSoir: 4.89,  matinOuSoir: 2.43,  forfaitMensuel: null, demiForFait: null,   postEtudes: 1.93,  journeeAvecRepas5j: 14.73, journeeSansRepas5j:  9.78, demiJourneeAvecRepas5j:  9.78, demiJourneeSansRepas5j: 6.51, sortieDemi: 4.54, sortieJournee: 7.56, sejour5j: 42.00, sejour6j: 56.00 },
-            B2: { journeeAvecRepas: 12.46, demiJourneeAvecRepas:  8.34, matinEtSoir: 4.17,  matinOuSoir: 2.11,  forfaitMensuel: null, demiForFait: null,   postEtudes: 1.68,  journeeAvecRepas5j: 12.46, journeeSansRepas5j:  8.34, demiJourneeAvecRepas5j:  8.34, demiJourneeSansRepas5j: 5.56, sortieDemi: 3.89, sortieJournee: 6.48, sejour5j: 36.00, sejour6j: 48.00 },
-            C:  { journeeAvecRepas: 12.46, demiJourneeAvecRepas:  8.34, matinEtSoir: 4.17,  matinOuSoir: 2.11,  forfaitMensuel: null, demiForFait: null,   postEtudes: 1.68,  journeeAvecRepas5j: 12.46, journeeSansRepas5j:  8.34, demiJourneeAvecRepas5j:  8.34, demiJourneeSansRepas5j: 5.56, sortieDemi: 3.89, sortieJournee: 6.48, sejour5j: 36.00, sejour6j: 48.00 },
-            D:  { journeeAvecRepas: 10.55, demiJourneeAvecRepas:  7.02, matinEtSoir: 3.51,  matinOuSoir: 1.76,  forfaitMensuel: null, demiForFait: null,   postEtudes: 1.40,  journeeAvecRepas5j: 10.55, journeeSansRepas5j:  7.02, demiJourneeAvecRepas5j:  7.02, demiJourneeSansRepas5j: 4.68, sortieDemi: 3.24, sortieJournee: 5.40, sejour5j: 30.00, sejour6j: 40.00 },
-            E:  { journeeAvecRepas:  8.82, demiJourneeAvecRepas:  5.83, matinEtSoir: 2.92,  matinOuSoir: 1.48,  forfaitMensuel: null, demiForFait: null,   postEtudes: 1.20,  journeeAvecRepas5j:  8.82, journeeSansRepas5j:  5.83, demiJourneeAvecRepas5j:  5.83, demiJourneeSansRepas5j: 3.89, sortieDemi: 2.59, sortieJournee: 4.32, sejour5j: 24.00, sejour6j: 32.00 },
-            F:  { journeeAvecRepas:  6.50, demiJourneeAvecRepas:  4.32, matinEtSoir: 2.16,  matinOuSoir: 1.08,  forfaitMensuel: null, demiForFait: null,   postEtudes: 0.86,  journeeAvecRepas5j:  6.50, journeeSansRepas5j:  4.32, demiJourneeAvecRepas5j:  4.32, demiJourneeSansRepas5j: 2.88, sortieDemi: 1.94, sortieJournee: 3.24, sejour5j: 18.00, sejour6j: 24.00 },
-            F2: { journeeAvecRepas:  6.50, demiJourneeAvecRepas:  4.32, matinEtSoir: 2.16,  matinOuSoir: 1.08,  forfaitMensuel: null, demiForFait: null,   postEtudes: 0.86,  journeeAvecRepas5j:  6.50, journeeSansRepas5j:  4.32, demiJourneeAvecRepas5j:  4.32, demiJourneeSansRepas5j: 2.88, sortieDemi: 1.94, sortieJournee: 3.24, sejour5j: 18.00, sejour6j: 24.00 },
-            G:  { journeeAvecRepas:  4.35, demiJourneeAvecRepas:  2.85, matinEtSoir: 1.43,  matinOuSoir: 0.70,  forfaitMensuel: null, demiForFait: null,   postEtudes: 0.56,  journeeAvecRepas5j:  4.35, journeeSansRepas5j:  2.85, demiJourneeAvecRepas5j:  2.85, demiJourneeSansRepas5j: 1.90, sortieDemi: 1.30, sortieJournee: 2.16, sejour5j: 12.00, sejour6j: 16.00 }
-        };
+        // Tarifs embarqués supprimés : on utilise impactGrilleComplete (API)
 
         // Définition des 15 prestations avec leur libellé, clé tarifaire et quantité mensuelle de référence.
         const AL_PRESTATIONS = [
-            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "Journée avec repas (mercredi)",         cle: "journeeAvecRepas",         qte: 4, inTotal: true },
-            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "1/2 journée avec repas (mercredi)",     cle: "demiJourneeAvecRepas",     qte: 4, inTotal: false },
-            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin et soir",                          cle: "matinEtSoir",              qte: 16, inTotal: true },
-            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin ou soir",                          cle: "matinOuSoir",              qte: 16, inTotal: false },
-            { supergroupe: "Temps scolaire", groupe: "Post-études",              label: "Post-études sans goûter",               cle: "postEtudes",              qte: 16, inTotal: true },
-            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée avec repas (5 j)",              cle: "journeeAvecRepas5j",       qte: 5, inTotal: true },
-            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée sans repas (5 j)",              cle: "journeeSansRepas5j",       qte: 5, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée avec repas (5 j)",          cle: "demiJourneeAvecRepas5j",   qte: 5, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée sans repas (5 j)",          cle: "demiJourneeSansRepas5j",   qte: 5, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie 1/2 journée IDF / Stage",        cle: "sortieDemi",              qte: 1, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie journée / Stage",                cle: "sortieJournee",           qte: 1, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 5 jours",                        cle: "sejour5j",               qte: 1, inTotal: false },
-            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 6 jours",                        cle: "sejour6j",               qte: 1, inTotal: false }
+            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "Journée avec repas (mercredi)",         cle: "accueilJournee",         qte: 4, inTotal: true },
+            { supergroupe: "Temps scolaire", groupe: "Mercredis",                label: "1/2 journée avec repas (mercredi)",     cle: "accueilDemiRepas",     qte: 4, inTotal: false },
+            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin et soir",                          cle: "periscolaireMatinSoir",              qte: 16, inTotal: true },
+            { supergroupe: "Temps scolaire", groupe: "Périscolaire",             label: "Matin ou soir",                          cle: "periscolaireMatinOuSoir",              qte: 16, inTotal: false },
+            { supergroupe: "Temps scolaire", groupe: "Post-études",              label: "Post-études sans goûter",               cle: "tarifPostEtudes",              qte: 16, inTotal: true },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée avec repas (5 j)",              cle: "adosVacJourneeRepas",       qte: 5, inTotal: true },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "Journée sans repas (5 j)",              cle: "adosVacJourneeSans",       qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée avec repas (5 j)",          cle: "adosVacDemiRepas",   qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "5 jours consécutifs",      label: "1/2 journée sans repas (5 j)",          cle: "adosVacDemiSans",   qte: 5, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie 1/2 journée IDF / Stage",        cle: "adosSortieDemi",              qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Sorties / Stages",         label: "Sortie journée / Stage",                cle: "adosSortieJournee",           qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 5 jours",                        cle: "sejour5Jours",               qte: 1, inTotal: false },
+            { supergroupe: "Vacances",       groupe: "Séjours",                  label: "Séjour 6 jours",                        cle: "sejour6Jours",               qte: 1, inTotal: false }
         ];
 
         window.togglePrestation = function(cle, estCoche) {
@@ -1133,8 +1123,10 @@
         function calculerImpactLoisirs() {
             const tranche  = document.getElementById('al-tranche').value;
             const pct      = parseFloat(document.getElementById('al-slider').value) / 100;
-            const tarifs   = AL_TARIFS_2025[tranche];
-            if (!tarifs) return;
+            const tarifObj = impactGrilleComplete.find(t => t.tranche.toUpperCase() === tranche.toUpperCase() || 
+                                                           (tranche === 'Extérieur' && t.tranche.toLowerCase().includes('ext')));
+            if (!tarifObj) return;
+            const tarifs   = tarifObj;
 
             const fmt = (v) => v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac';
 
@@ -1267,12 +1259,14 @@
 
                 // Calcul des montants par tranche
                 const vals = tranches.map(t => {
-                    const tarif = AL_TARIFS_2025[t][p.cle];
+                    const tarifObj = impactGrilleComplete.find(tg => tg.tranche.toUpperCase() === t.toUpperCase());
+                    const tarif = tarifObj ? tarifObj[p.cle] : null;
                     return (tarif !== null && tarif !== undefined) ? tarif * p.qte * coef : null;
                 });
                 
                 const origVals = tranches.map(t => {
-                    const tarif = AL_TARIFS_2025[t][p.cle];
+                    const tarifObj = impactGrilleComplete.find(tg => tg.tranche.toUpperCase() === t.toUpperCase());
+                    const tarif = tarifObj ? tarifObj[p.cle] : null;
                     return (tarif !== null && tarif !== undefined) ? tarif * p.qte : null;
                 });
 
@@ -1636,7 +1630,17 @@
 
             if (pageId === 'dashboard') { chargerDashboardData(); initDashboardYearSwitcher(); }
             if (pageId === 'simulation') chargerSimulationRestauration();
-            if (pageId === 'impact-familles') { calculerImpactLoisirs(); calculerSynthetique(); }
+            if (pageId === 'impact-familles') { 
+                if (!impactGrilleComplete || impactGrilleComplete.length === 0) {
+                    chargerImpactFamilles().then(() => {
+                        calculerImpactLoisirs();
+                        calculerSynthetique();
+                    });
+                } else {
+                    calculerImpactLoisirs();
+                    calculerSynthetique();
+                }
+            }
             if (pageId === 'diagnostic-energie') initialiserDiagnosticEnergie();
             if (pageId === 'fluides-audit') chargerAuditFluides();
             if (pageId === 'historique') afficherHistorique();
