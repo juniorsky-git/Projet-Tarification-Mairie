@@ -244,14 +244,10 @@ public class SaisieComptableService {
 
     /**
      * Supprime une ligne par son ID.
-     * Ne peut pas supprimer une ligne prédéfinie (sécurité).
      */
     @Transactional
     public boolean supprimerLigne(Long id) {
         return repository.findById(id).map(ligne -> {
-            if (Boolean.TRUE.equals(ligne.getPredefinie())) {
-                return false; // Refus : ligne système
-            }
             repository.deleteById(id);
             return true;
         }).orElse(false);

@@ -2954,22 +2954,16 @@
 
             // Trouver l'année max actuelle (ex: 2027)
             const anneesSaisies = saisie.anneesDispo.filter(a => a !== 2025).sort((a,b) => a - b);
-            const maxAnnee = anneesSaisies.length > 0 ? Math.max(...anneesSaisies) : 2025;
             
-            // On affiche toutes les années de 2026 jusqu'à maxAnnee + 1
-            const prochaineACreer = Math.max(saisie.ANNEE_DEBUT, maxAnnee + 1);
-            
-            for (let a = saisie.ANNEE_DEBUT; a <= prochaineACreer; a++) {
-                if (saisie.anneesDispo.includes(a)) {
-                    // Année existe
-                    html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">${a}</button>`;
-                } else {
-                    // Année manquante (à créer)
-                    html += `<button class="saisie-tab" onclick="saisieCreerAnnee(${a})" title="Créer les données ${a} à partir de 2025" style="border:1px dashed var(--border); color:var(--text-muted);">
-                        <i data-lucide="plus" style="width:12px;height:12px;"></i> ${a}
-                    </button>`;
-                }
+            // Afficher les années existantes
+            for (let a of anneesSaisies) {
+                html += `<button class="saisie-tab ${saisie.anneeActive === a ? 'active' : ''}" onclick="saisieSelectAnnee(${a})">${a}</button>`;
             }
+
+            // Bouton générique pour ajouter une année
+            html += `<button class="saisie-tab" onclick="promptNouvelleAnnee()" title="Initialiser une nouvelle année" style="border:1px dashed var(--border); color:var(--text-muted);">
+                <i data-lucide="plus" style="width:12px;height:12px;"></i> Nouvelle année
+            </button>`;
 
             container.innerHTML = html;
             lucide.createIcons();
@@ -2992,6 +2986,25 @@
             // Afficher/masquer le badge "données saisie actives"
             const badge = document.getElementById('saisie-source-badge');
             badge.style.display = saisie.anneesDispo.includes(annee) && annee !== 2025 ? 'inline' : 'none';
+        }
+
+        /** Demande à l'utilisateur l'année à créer */
+        function promptNouvelleAnnee() {
+            const anneeMax = saisie.anneesDispo.length > 0 ? Math.max(...saisie.anneesDispo) : 2025;
+            const suggeree = Math.max(2026, anneeMax + 1);
+            const saisieUtilisateur = prompt("Saisissez l'année à initialiser :", suggeree);
+            if (saisieUtilisateur) {
+                const a = parseInt(saisieUtilisateur.trim());
+                if (!isNaN(a) && a >= 2025) {
+                    if (saisie.anneesDispo.includes(a)) {
+                        saisieSelectAnnee(a);
+                    } else {
+                        saisieCreerAnnee(a);
+                    }
+                } else {
+                    alert("Année invalide.");
+                }
+            }
         }
 
         /** Crée une nouvelle année en l'initialisant depuis 2025 */
@@ -3194,7 +3207,7 @@
                     <input class="saisie-input" type="text"
                         value="${(ligne.libelle||'').replace(/"/g,'&quot;')}"
                         placeholder="Libellé de la charge..."
-                        ${predefini ? 'readonly style="font-weight:600;"' : ''}
+                        ${predefini ? 'style="font-weight:600;"' : ''}
                         oninput="saisieMarquerModifie()"
                         data-field="libelle">
                     ${predefini ? '<span class="saisie-predefini-badge">Système</span>' : ''}
@@ -3213,9 +3226,9 @@
                         data-field="commentaire">
                 </td>
                 <td>
-                    ${!predefini ? `<button class="btn-supprimer-ligne" onclick="saisieSupprimerLigne(this, '${ligne.id}')" title="Supprimer cette ligne">
+                    <button class="btn-supprimer-ligne" onclick="saisieSupprimerLigne(this, '${ligne.id}')" title="Supprimer cette ligne">
                         <i data-lucide="trash-2"></i>
-                    </button>` : ''}
+                    </button>
                 </td>
             </tr>`;
         }

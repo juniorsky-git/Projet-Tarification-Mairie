@@ -139,19 +139,15 @@ public class SaisieComptableController {
         }
     }
 
-    /**
-     * Supprime une ligne par son ID.
-     * Refuse la suppression si la ligne est prédéfinie (code 403).
-     */
     @DeleteMapping("/lignes/{id}")
     public ResponseEntity<Map<String, Object>> supprimerLigne(@PathVariable Long id) {
         boolean supprime = service.supprimerLigne(id);
         if (supprime) {
             return ResponseEntity.ok(Map.of("succes", true, "message", "Ligne supprimée."));
         } else {
-            return ResponseEntity.status(403).body(Map.of(
+            return ResponseEntity.status(404).body(Map.of(
                 "succes", false,
-                "message", "Impossible de supprimer une ligne système prédéfinie."
+                "message", "Ligne introuvable ou impossible à supprimer."
             ));
         }
     }
