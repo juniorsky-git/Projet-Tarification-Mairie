@@ -1,0 +1,8 @@
+feat(donnees): migration des effectifs 2025 vers JSON
+
+Cette mise à jour amorce la transition des données "en dur" (Excel) vers un format plus pérenne et structuré (JSON).
+
+Détail des changements :
+- Création du fichier 'Donnees/consommations_2025.json' contenant les véritables volumes de l'année 2025 par pôle et sous-catégorie (Restauration, Loisirs, Ados, Séjours, etc.).
+- Ajout de la librairie Jackson (jackson-databind) dans 'pom.xml' pour permettre la lecture native du JSON par l'API Spring Boot.
+- Modification de 'DonneesBudgetaires.java' pour charger les données du fichier JSON et écraser (prioriser) celles lues historiquement dans les fichiers Excel (VF_REC_DEP).

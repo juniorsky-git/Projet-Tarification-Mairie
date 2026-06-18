@@ -1,121 +1,64 @@
 package fr.mairie.tarification_api;
 
-import org.apache.poi.ss.usermodel.*;
-import java.io.FileInputStream;
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.InputStream;
+import java.util.*;
 
 /**
- * Moteur de calcul financier pour la tarification municipale (Version API).
- * Lit directement le fichier Excel source pour alimenter le Dashboard.
+ * Moteur de calcul financier pour la tarification municipale.
+ * Lit directement synthese.json (généré localement depuis CALC DEP (3).xlsx).
+ * Zéro lecture Excel → zéro OutOfMemoryError sur Railway.
  */
 public class Calculateur {
 
-    private static final String FICHIER = new File("Donnees/Autres/CALC DEP (3).xlsx").exists() 
-        ? "Donnees/Autres/CALC DEP (3).xlsx" 
-        : new File("../Donnees/Autres/CALC DEP (3).xlsx").exists() 
-            ? "../Donnees/Autres/CALC DEP (3).xlsx"
-            : "CALC DEP (3).xlsx"; // fallback au cas où
-    
-    private static final String ONGLET_SYNTHESE = "syntheses charges";
-
     public static class SyntheseGlobale {
-        public Map<String, Map<String, Double>> depenses = new LinkedHashMap<>();
-        public Map<String, Map<String, Double>> tarifs = new LinkedHashMap<>();
-        public Map<String, Double> effectifs = new LinkedHashMap<>();
-        public Map<String, Double> totauxDepenses = new HashMap<>();
+        public Map<String, Map<String, Double>> depenses      = new LinkedHashMap<>();
+        public Map<String, Map<String, Double>> tarifs        = new LinkedHashMap<>();
+        public Map<String, Double>              effectifs     = new LinkedHashMap<>();
+        public Map<String, Double>              totauxDepenses = new HashMap<>();
     }
 
     private SyntheseGlobale syntheseCachee = null;
 
     public SyntheseGlobale getSynthese() {
-        if (syntheseCachee != null) {
-            return syntheseCachee;
-        }
-        
+        if (syntheseCachee != null) return syntheseCachee;
+
         SyntheseGlobale sg = new SyntheseGlobale();
-        File f = new File(FICHIER);
-        if (!f.exists()) {
-            System.err.println("CRITIQUE : Fichier source manquant à : " + f.getAbsolutePath());
-            return sg;
-        }
-        
-        try (FileInputStream fis = new FileInputStream(f);
-             Workbook wb = WorkbookFactory.create(fis)) {
+        try {
+            ClassPathResource res = new ClassPathResource("synthese.json");
+            try (InputStream is = res.getInputStream()) {
+                JsonNode root = new ObjectMapper().readTree(is);
 
-            Sheet s = wb.getSheet(ONGLET_SYNTHESE);
-            if (s == null) {
-                System.err.println("ERREUR : Onglet '" + ONGLET_SYNTHESE + "' absent du fichier.");
-                return sg;
+                // depenses : { "Restauration": { "Personnel": 12345.0, ... }, ... }
+                root.path("depenses").fields().forEachRemaining(e -> {
+                    Map<String, Double> charges = new LinkedHashMap<>();
+                    e.getValue().fields().forEachRemaining(c -> charges.put(c.getKey(), c.getValue().asDouble()));
+                    sg.depenses.put(e.getKey(), charges);
+                });
+
+                // totauxDepenses
+                root.path("totauxDepenses").fields()
+                        .forEachRemaining(e -> sg.totauxDepenses.put(e.getKey(), e.getValue().asDouble()));
+
+                // effectifs
+                root.path("effectifs").fields()
+                        .forEachRemaining(e -> sg.effectifs.put(e.getKey(), e.getValue().asDouble()));
+
+                // tarifs : { "Tranche A": { "Restauration": 4.5, ... }, ... }
+                root.path("tarifs").fields().forEachRemaining(e -> {
+                    Map<String, Double> t = new HashMap<>();
+                    e.getValue().fields().forEachRemaining(c -> t.put(c.getKey(), c.getValue().asDouble()));
+                    sg.tarifs.put(e.getKey(), t);
+                });
             }
-
-            String[] poles = {"Restauration", "Accueil de Loisirs", "Accueil periscolaire", "Etudes surveillees", "Espace Ados", "Sejours"};
-            int[] colIndices = {3, 4, 5, 6, 7, 8};
-
-            // Extraction des charges
-            for (int i = 3; i <= 20; i++) {
-                Row row = s.getRow(i);
-                if (row == null) continue;
-                
-                String nature = getValeurTexte(row.getCell(1));
-                if (nature.isEmpty()) nature = getValeurTexte(row.getCell(0));
-                if (nature.isEmpty()) continue;
-                
-                for (int j = 0; j < poles.length; j++) {
-                    double montant = Math.abs(getValeurNumerique(row.getCell(colIndices[j])));
-                    if (montant > 0) {
-                        sg.depenses.computeIfAbsent(poles[j], k -> new LinkedHashMap<>()).put(nature, montant);
-                    }
-                }
-            }
-
-            // Extraction des totaux
-            Row totalRow = s.getRow(21);
-            if (totalRow != null) {
-                for (int j = 0; j < poles.length; j++) {
-                    sg.totauxDepenses.put(poles[j], getValeurNumerique(totalRow.getCell(colIndices[j])));
-                }
-            }
-
-            // Extraction effectifs et tarifs
-            for (int i = 29; i <= 38; i++) {
-                Row row = s.getRow(i);
-                if (row == null) continue;
-                
-                String tranche = getValeurTexte(row.getCell(1));
-                if (tranche.isEmpty()) tranche = getValeurTexte(row.getCell(0));
-                
-                sg.effectifs.put(tranche, getValeurNumerique(row.getCell(2)));
-                
-                for (int j = 0; j < poles.length; j++) {
-                    sg.tarifs.computeIfAbsent(tranche, k -> new HashMap<>()).put(poles[j], getValeurNumerique(row.getCell(colIndices[j])));
-                }
-            }
-            
             syntheseCachee = sg;
-            
         } catch (Exception e) {
-            System.err.println("Erreur de chargement Excel : " + e.getMessage());
+            System.err.println("[Calculateur] Erreur lecture synthese.json: " + e.getMessage());
+            e.printStackTrace();
         }
         return sg;
-    }
-
-    private String getValeurTexte(Cell c) {
-        return (c == null) ? "" : c.toString().trim();
-    }
-
-    private double getValeurNumerique(Cell c) {
-        if (c == null) return 0;
-        try {
-            if (c.getCellType() == CellType.NUMERIC || c.getCellType() == CellType.FORMULA) {
-                return c.getNumericCellValue();
-            }
-            String s = c.toString().trim().replace(",", ".");
-            return s.isEmpty() ? 0 : Double.parseDouble(s);
-        } catch (Exception e) { 
-            return 0; 
-        }
     }
 }

@@ -3,3 +3,11 @@
 lib/
 .~lock*.xlsx#
 .~lock*.csv#
+node_modules/  
+package-lock.json  
+package.json  
+
+# Ignore huge files
+*.bundle
+*.rar
+*.zip

@@ -1,0 +1,126 @@
+---
+
+# Rapport d'activité de stage — Semaine 4 (Version Exhaustive Finale)
+## Séri-khane YOLOU | BUT 2 Informatique | Ville de Crosne
+### Période : Du 27 au 30 Avril 2026
+### Maître de stage : M. Bruno CRAMPE — Directeur Général des Services
+
+---
+
+## Contexte et objectifs de la semaine
+
+Cette quatrième semaine, bien qu'écourtée par le jour férié du 1er mai, a été la plus dense en termes de conception logicielle. Le projet est passé d'un outil fonctionnel à un véritable produit de qualité professionnelle (SaaS).
+
+Trois axes majeurs ont dicté la semaine :
+1. **La haute-fidélité (HiFi) et la robustesse** : Migration totale vers la lecture native d'Excel et sécurisation de la persistance des données.
+2. **Le socle de production** : Implémentation d'une base de données relationnelle (PostgreSQL) et de Spring Security.
+3. **L'Assistance à Maîtrise d'Ouvrage (AMOA)** : Intervention technique en direct auprès de la direction générale (DGS) le jeudi 30 avril.
+
+---
+
+## Lundi 27 Avril — La Simulation HiFi et la Persistance "Anti-Amnésie"
+
+Le lundi a été consacré à la finalisation du simulateur budgétaire interactif ("What-If"), documenté exhaustivement dans le `RETEX_Issue_41_Simulation.md` et le `RAPPORT_COMPLET_SIMULATION_HIFI.md`.
+
+### 1. La Saga de l'Excel Natif (Apache POI)
+- **Le Problème** : Une erreur bloquante `FileNotFoundException` survenait régulièrement car le programme dépendait d'un export `.csv` manuel de l'onglet de simulation.
+- **La Décision Technique** : J'ai abandonné le format intermédiaire CSV pour implémenter **Apache POI**. Le programme lit désormais directement et nativement l'onglet `"CALC DEP(4)"` du fichier `.xlsx`. Cela sécurise le processus et évite les erreurs humaines d'encodage (ANSI vs UTF-8).
+
+### 2. Le Sauvetage des Lignes "EXT" et "Total"
+- **Le Problème** : Le parseur initial ignorait les effectifs de la tranche "Extérieur" (EXT) et le "Total général".
+- **L'Analyse** : Le code cherchait systématiquement un code tranche en *colonne B*. Or, dans l'Excel de la mairie, les lignes EXT et Total ont leur libellé en *colonne A* et une colonne B vide.
+- **La Solution** : Ajout d'une logique algorithmique "fallback" : si la colonne B est vide, le programme lit la colonne A. De plus, j'ai isolé la ligne "Total" côté JavaScript pour l'utiliser comme source de vérité des cartes KPI sans la compter en double.
+
+### 3. Fiabilisation du localStorage (Faille [P1] corrigée)
+Le simulateur What-If avait un défaut : une simple actualisation de page (F5) effaçait toutes les saisies de l'élu (amnésie). J'ai implémenté une sauvegarde locale dans le navigateur (`localStorage`).
+- **L'Alerte de sécurité** : Une revue de code a identifié que sauvegarder les prix modifiés avec leur index numérique (ex: `{"0": 2.50}`) risquait de corrompre silencieusement les données si la Mairie insérait une nouvelle ligne dans son Excel l'année suivante.
+- **La Correction** : Refactorisation de la clé de sauvegarde (commit `fix(storage)`). Le système utilise désormais la valeur métier immuable `codeTranche` (ex: `{"A": 2.50}`). Si une tranche est supprimée, l'override est ignoré proprement (comportement *fail-safe*). J'ai également créé une fonction `resetSimulation()` avec un bouton dédié pour recharger les données certifiées du serveur.
+
+### 4. Audit Bi-semestriel des Fluides (Eau, Gaz, Électricité)
+- Conformément à l'`Issue #24` et l'`Issue #46`, j'ai étendu le diagnostic énergétique. L'algorithme compare désormais les factures du **Semestre 1** avec le **Semestre 2** pour détecter les fuites en cours d'année.
+- J'ai ajouté un garde-fou logique retournant la mention "N/A" si le S1 est vide, empêchant ainsi le crash de l'application par division par zéro.
+- J'ai rédigé la `CHECKLIST_AUDIT_FINALE.md` pour standardiser les futures vérifications (ex: surveiller les cumuls de Ruelle Saint-Pierre et du Gymnase Palestre).
+
+---
+
+## Mardi 28 Avril — Refonte UX "SaaS Premium" et Landing Page
+
+Le mardi a été le jour du design. Mon objectif était de donner à l'outil une crédibilité absolue pour sa présentation en Conseil Municipal.
+
+### 1. Conception de la "Landing Page" Premium
+- **Réalisation** : Création d'une page d'accueil moderne (avant la page de connexion) inspirée des leaders de la tech (style Stripe/Linear).
+- **Contenu** : Intégration d'une "Hero banner" percutante, de statistiques clés mises en avant, et de maquettes CSS animées pour expliquer visuellement le fonctionnement de l'outil.
+
+### 2. Le Dashboard "Squire-style"
+- **Réalisation** : J'ai abandonné l'interface brute pour un Design System très contrasté : une barre latérale (sidebar) sombre ultra-minimaliste couplée à un contenu principal lumineux et épuré.
+- **Décision UX (Transparence)** : La maquette prévoyait initialement des comparaisons avec l'année N-1. Sachant que l'historique 2024 n'est pas encore numérisé, j'ai pris la décision éthique de masquer ces pourcentages plutôt que d'afficher de fausses données générées (Mock) qui auraient pu induire les élus en erreur.
+
+---
+
+## Mercredi 29 Avril — Sécurisation : PostgreSQL et Spring Security
+
+Avec un outil fonctionnel et esthétique, le mercredi a été dédié à la transformation de ce "logiciel" en "plateforme web sécurisée", prête à être hébergée sur l'intranet de la mairie.
+
+### 1. Migration vers PostgreSQL
+- Remplacement du stockage temporaire en mémoire par une véritable base de données relationnelle (PostgreSQL).
+- Cela garantit un stockage robuste et centralisé des futures configurations globales.
+
+### 2. Implémentation de Spring Security
+- Le dashboard financier manipulant des données sensibles (factures de la ville, tarifs des familles), il ne pouvait pas rester accessible par simple lien URL.
+- Mise en place du framework Java **Spring Security** : le serveur exige désormais une authentification stricte et gère les accès via des sessions sécurisées (Real Auth).
+- Ajout visuel de "Pulse indicators" (points d'état clignotants) dans l'interface pour indiquer en temps réel à l'utilisateur que sa connexion au serveur et à la base de données est active.
+
+---
+
+## Jeudi 30 Avril — Optimisation Java et Support AMOA (Direction Générale)
+
+La dernière journée de la semaine a été divisée entre un correctif technique profond et une mission essentielle de support utilisateur (AMOA) de haut niveau.
+
+### 1. Optimisation Java (RAM Fix)
+- **Problème** : Lors du lancement de l'audit complet des factures d'électricité, le programme générait un fichier de logs colossal (le fichier `audit_electricite.log` atteignant plus de 9 000 lignes), provoquant une fuite de mémoire (RAM) et un ralentissement du serveur.
+- **Solution** : Optimisation des méthodes d'écriture du `LogService` via des buffers asynchrones pour soulager la mémoire vive de l'application.
+
+### 2. Mission de Support Stratégique : Les Règles Outlook du DGS
+Avant le départ en congé de **M. Bruno CRAMPE (Directeur Général des Services)**, j'ai été missionné pour auditer et configurer l'automatisation de sa messagerie professionnelle.
+Le but était de créer des règles de filtrage avancées pour hiérarchiser son flux massif d'e-mails professionnels.
+
+**Les actions réalisées :**
+- Création de règles conditionnelles strictes distinguant les e-mails où le Directeur est "Destinataire Principal" (champ À) des e-mails où il est en simple copie informative (champ Cc).
+
+**Résolution d'incident réseau (Compte du Maire) :**
+Lors de la tentative de création d'une règle absolue pour isoler les communications du Maire, le système Microsoft Outlook a levé l'erreur bloquante suivante :
+> *"Désolé... Nous n'avons pas pu créer la règle. Plusieurs destinataires correspondent à l'identité michael.damiati@gmail.com. Spécifiez une valeur unique."*
+
+**Diagnostic technique et Solution (Contournement) :**
+Cette erreur signalait un conflit d'annuaire (l'adresse du Maire était probablement liée à de multiples objets ou groupes dans l'Exchange de la ville, créant une ambiguïté pour le moteur de filtrage Outlook).
+Pour résoudre ce blocage sans risquer d'altérer l'annuaire global de la Mairie, j'ai appliqué un **contournement technique** : l'abandon de la sélection par "Contact Outlook" au profit de la création d'une règle de **filtrage textuel fort** scrutant les métadonnées (En-têtes/Headers) des courriels. Cela a permis de garantir le routage prioritaire des e-mails du Maire malgré l'erreur d'identité Microsoft.
+
+---
+
+## 🏁 Bilan exhaustif de la semaine
+
+### Suivi de Projet (Git & GitHub)
+Durant cette semaine de sprint de consolidation, un suivi rigoureux a été assuré sur GitHub :
+- **Pull Requests (PR) fusionnées** : 
+  - **PR #42 & #44** (`feat/simulateur-what-if-interactif`) : Intégration du simulateur financier interactif et de sa persistance locale sécurisée.
+- **Issues GitHub traitées et clôturées** :
+  - **Issue #41** : Implémentation Simulation HiFi (documentée par un RETEX de conception de +200 lignes).
+  - **Issue #46** : Gestion de l'évolution N/A pour S1 vide et badges informatifs de fiabilité.
+  - **Issue #24** : Audit bi-semestriel des fluides (comparaison S1 vs S2).
+  - **Issues #31, #32, #33, #34** : Refactorisation de l'audit unifié, optimisation du `LogService` et tolérance aux pannes du parseur de fichiers Excel.
+  - **Issues #07 & #09** : Assurance Qualité (Javadoc/Normes de code) et Relocalisation de l'Architecture (Spring Boot/MVC).
+
+### Statistiques Techniques
+| Indicateur | Volume |
+|---|---|
+| Fichiers de documentation générés | `RETEX`, `RAPPORT_HIFI`, `CHECKLIST_AUDIT` |
+| Technologies intégrées | Apache POI, PostgreSQL, Spring Security, JS LocalStorage |
+| Commits documentés (Git) | 19 commits majeurs |
+
+### Compétences Mobilisées
+- **Génie Logiciel** : Migration vers l'Excel natif (Apache POI), refactorisation préventive de la persistance web pour éviter la corruption de données (`codeTranche`), résolution de fuite mémoire (RAM).
+- **Administration Système et Réseau (AMOA)** : Diagnostic de conflits d'annuaire Microsoft (Identity Conflict), élaboration de règles logiques complexes sur client de messagerie professionnel, assistance directe au Top Management.
+- **Sécurité et Base de données** : Modélisation PostgreSQL et verrouillage applicatif via Spring Security.
+
+---
+*Rapport documenté à partir des analyses de code source, de l'historique de versionnement et des rapports d'intervention de la Semaine 4.*

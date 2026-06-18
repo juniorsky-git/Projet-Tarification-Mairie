@@ -6,15 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Contrôleur principal de l'API de Tarification.
- * 
+ *
  * Fournit les données consolidées pour le Dashboard :
- * - Indicateurs budgétaires (Dépenses, Recettes).
- * - Calcul dynamique du taux de couverture.
- * - Intégration du diagnostic analytique des fluides.
- * 
+ * - Indicateurs budgétaires (Dépenses, Recettes, Taux de couverture).
+ * - Diagnostic analytique des fluides.
+ * - Priorité aux données de Saisie Comptable si disponibles pour l'année demandée.
+ *
  * @author Stagiaire DG 2
  */
 @RestController
@@ -24,108 +26,177 @@ public class DashboardController {
     private final AnalytiqueFluideService analytiqueFluideService;
     private final DonneesBudgetaires budgetService;
     private final LogService logService;
+    private final SaisieComptableService saisieService;
+    private final DashboardExcelExportService excelExportService;
 
-    public DashboardController(AnalytiqueFluideService analytiqueFluideService, DonneesBudgetaires budgetService, LogService logService) {
+    public DashboardController(AnalytiqueFluideService analytiqueFluideService,
+                               DonneesBudgetaires budgetService,
+                               LogService logService,
+                               SaisieComptableService saisieService,
+                               DashboardExcelExportService excelExportService) {
         this.analytiqueFluideService = analytiqueFluideService;
         this.budgetService = budgetService;
         this.logService = logService;
+        this.saisieService = saisieService;
+        this.excelExportService = excelExportService;
+    }
+
+    /**
+     * Endpoint d'export Excel du Dashboard, avec formatage natif (Apache POI).
+     */
+    @GetMapping(value = "/dashboard/export-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public ResponseEntity<byte[]> exportDashboardExcel(
+            @RequestParam(required = false, defaultValue = "A") String source,
+            @RequestParam(required = false) Integer annee,
+            @RequestParam(required = false) Integer anneeRef) {
+        try {
+            List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
+            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
+            Map<String, Map<String, Double>> totauxSaisie = annee != null ? saisieService.getTotauxParPole(annee) : null;
+            List<Map<String, Object>> comparatifData = annee != null ? saisieService.getComparatif(annee, anneeRef) : List.of();
+            
+            // On reconstruit la liste des réponses Dashboard pour l'export
+            List<DashboardResponse> dashboardResponses = poles.stream().map(p -> {
+                ResponseEntity<?> responseEntity = getDashboard(p.nom(), source, annee);
+                if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() instanceof DashboardResponse) {
+                    return (DashboardResponse) responseEntity.getBody();
+                }
+                return null;
+            }).filter(r -> r != null).collect(Collectors.toList());
+
+            byte[] excelData = excelExportService.exporterDashboard(annee, poles, recettesReelles, totauxSaisie, dashboardResponses, comparatifData);
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"Tableau_de_Bord_" + (annee != null ? annee : "2025") + ".xlsx\"")
+                    .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
      * Endpoint principal retournant l'état financier complet d'un pôle tarifaire.
-     * 
-     * @param pole Le nom du pôle (ex: Restauration, Accueil de Loisirs).
-     * @return Une réponse JSON contenant tous les indicateurs et le détail des fluides.
+     *
+     * Si le paramètre `annee` est fourni et qu'il existe des données saisies pour
+     * cette année en base, elles sont utilisées EN PRIORITÉ sur les fichiers Excel.
+     *
+     * @param pole   Le nom du pôle (ex: Restauration).
+     * @param source La source de données Excel (A ou B). Ignoré si saisie disponible.
+     * @param annee  L'année (optionnel). Null = données Excel 2025.
      */
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboard(
             @RequestParam String pole,
-            @RequestParam(required = false, defaultValue = "A") String source) {
+            @RequestParam(required = false, defaultValue = "A") String source,
+            @RequestParam(required = false) Integer annee) {
+        if (pole == null || pole.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Le paramètre 'pole' est obligatoire.");
+        }
+        if (annee != null && annee <= 0) {
+            return ResponseEntity.badRequest().body("L'année spécifiée est invalide.");
+        }
         try {
-            // Décodage sécurisé du paramètre URL
             String decodedPole = URLDecoder.decode(pole, StandardCharsets.UTF_8).replace("+", " ").trim();
 
-            // Chargement dynamique depuis la source active (A ou B)
-            List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques(source);
-            Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
+            // Priorité : données de saisie si l'année est connue en base
+            boolean utiliseSaisie = (annee != null) && saisieService.getAnneesDisponibles().contains(annee);
 
-            return tousLesPoles.stream()
-                    .filter(p -> {
-                        return p.nom().equalsIgnoreCase(decodedPole);
-                    })
-                    .findFirst()
-                    .map(p -> {
-                        DashboardResponse r = new DashboardResponse();
-                        r.pole = p.nom();
-                        r.depensesTotales = p.depensesTotales();
-                        r.coutUnitaire = p.coutUnitaire();
-                        r.nombreEnfants = p.nombreEnfants();
-                        r.unitesAnnuelles = p.unitesAnnuelles();
-                        r.detailsCharges = p.chargesDetaillees();
-                        
-                        // --- UTILISATION DES RECETTES RÉELLES (COMPTABILITÉ) ---
-                        double recettes = recettesReelles.getOrDefault(p.nom(), 0.0);
-                        
-                        // Finalisation des indicateurs financiers
-                        r.recettesTotales = recettes;
-                        r.tauxCouverture = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
-                        r.ecart = recettes - p.depensesTotales();
-                        r.distributionTranches = p.distributionTranches();
-                        
-                        // Intégration du diagnostic fluides filtré par pôle
-                        r.detailsFluides = analytiqueFluideService.analyserParPole(p.nom());
-                        
-                        return ResponseEntity.ok(r);
-                    })
-                    .orElse(ResponseEntity.notFound().build());
+            if (utiliseSaisie) {
+                return getDashboardDepuisSaisie(decodedPole, annee, source);
+            } else {
+                return getDashboardDepuisExcel(decodedPole, source);
+            }
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erreur interne du contrôleur : " + e.getMessage());
         }
     }
 
     /**
-     * Mappe le nom d'un pôle utilisateur vers la clé technique de la grille tarifaire.
-     * @param pole Nom du pôle en entrée.
-     * @return Clé tarifaire correspondante ou null.
+     * Construit la réponse dashboard depuis les données de saisie comptable (PostgreSQL).
      */
-    private String getServiceKeyForPole(String pole) {
-        switch (pole) {
-            case "Restauration": 
-                return DonneesTarifs.REPAS;
-            case "Accueil de Loisirs": 
-                return DonneesTarifs.ACCUEIL_JOURNEE;
-            case "Accueil periscolaire": 
-                return DonneesTarifs.PERISCOLAIRE_MATIN_SOIR;
-            case "Etudes surveillees": 
-                return DonneesTarifs.ETUDES_FORFAIT_MENSUEL;
-            case "Espace Ados": 
-                return DonneesTarifs.ADOS_VAC_JOURNEE_REPAS;
-            case "Sejours": 
-                return DonneesTarifs.SEJOUR_5_JOURS;
-            default: 
-                return null;
+    private ResponseEntity<?> getDashboardDepuisSaisie(String pole, Integer annee, String source) {
+        Map<String, Map<String, Double>> totaux = saisieService.getTotauxParPole(annee);
+        Map<String, Double> totauxPole = totaux.get(pole);
+
+        if (totauxPole == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        List<DepensePole> poles = budgetService.chargerPolesDynamiques(source);
+        int defaultEnfants = poles.stream().filter(p -> p.nom().equalsIgnoreCase(pole)).mapToInt(DepensePole::nombreEnfants).findFirst().orElse(0);
+
+        // Détail des charges depuis la base (lignes de type DEPENSE)
+        Map<String, Double> detailCharges = new LinkedHashMap<>();
+        saisieService.getLignesBrutes(annee).stream()
+            .filter(l -> l.getPole().equalsIgnoreCase(pole) && "DEPENSE".equals(l.getTypeLigne()))
+            .forEach(l -> detailCharges.put(l.getLibelle(), l.getMontant()));
+
+        int nombreEnfants = saisieService.getLignesBrutes(annee).stream()
+            .filter(l -> l.getPole().equalsIgnoreCase(pole) && "STAT".equals(l.getTypeLigne()) && "Nombre d'enfants".equals(l.getLibelle()))
+            .mapToInt(l -> (int) Math.round(l.getMontant()))
+            .findFirst()
+            .orElse(defaultEnfants);
+
+        DashboardResponse r = new DashboardResponse();
+        r.pole = pole;
+        r.depensesTotales  = totauxPole.getOrDefault("depenses", 0.0);
+        r.recettesTotales  = totauxPole.getOrDefault("recettes", 0.0);
+        r.tauxCouverture   = totauxPole.getOrDefault("tauxCouverture", 0.0);
+        r.ecart            = r.recettesTotales - r.depensesTotales;
+        r.nombreEnfants    = nombreEnfants;
+        r.coutUnitaire     = nombreEnfants > 0 ? (r.depensesTotales / nombreEnfants) : 0.0;
+        r.unitesAnnuelles  = null;
+        r.detailsCharges   = detailCharges;
+        r.distributionTranches = Map.of();
+        r.detailsFluides   = analytiqueFluideService.analyserParPole(pole);
+
+        return ResponseEntity.ok(r);
     }
 
     /**
-     * Nouvel endpoint pour l'audit complet Réel vs Théorique.
+     * Construit la réponse dashboard depuis les fichiers Excel (comportement original 2025).
      */
+    private ResponseEntity<?> getDashboardDepuisExcel(String pole, String source) {
+        List<DepensePole> tousLesPoles = budgetService.chargerPolesDynamiques(source);
+        Map<String, Double> recettesReelles = budgetService.chargerRecettesReelles(source);
+
+        return tousLesPoles.stream()
+                .filter(p -> p.nom().equalsIgnoreCase(pole))
+                .findFirst()
+                .map(p -> {
+                    DashboardResponse r = new DashboardResponse();
+                    r.pole             = p.nom();
+                    r.depensesTotales  = p.depensesTotales();
+                    r.coutUnitaire     = p.coutUnitaire();
+                    r.nombreEnfants    = p.nombreEnfants();
+                    r.unitesAnnuelles  = p.unitesAnnuelles();
+                    r.detailsCharges   = p.chargesDetaillees();
+
+                    double recettes    = recettesReelles.getOrDefault(p.nom(), 0.0);
+                    r.recettesTotales  = recettes;
+                    r.tauxCouverture   = (p.depensesTotales() > 0) ? (recettes / p.depensesTotales()) : 0;
+                    r.ecart            = recettes - p.depensesTotales();
+                    r.distributionTranches = p.distributionTranches();
+                    r.detailsFluides   = analytiqueFluideService.analyserParPole(p.nom());
+
+                    return ResponseEntity.ok(r);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /** Audit complet Réel vs Théorique des fluides. */
     @GetMapping("/analytique/fluides/audit")
     public ResponseEntity<List<AnalytiqueFluide>> getAuditComplet() {
         return ResponseEntity.ok(analytiqueFluideService.analyserTout());
     }
 
-    /**
-     * Nouvel endpoint pour l'Issue #24 : Audit bi-semestriel des consommations
-     */
+    /** Audit bi-semestriel des consommations (Issue #24). */
     @GetMapping("/analytique/fluides/bi-semestriel")
     public ResponseEntity<List<RapportSemestrielFluide>> getRapportBiSemestriel() {
         return ResponseEntity.ok(analytiqueFluideService.analyserBiSemestriel());
     }
 
-    /**
-     * Endpoint pour récupérer les logs techniques d'audit.
-     */
+    /** Logs techniques d'audit. */
     @GetMapping("/logs/audit")
     public ResponseEntity<String> getLogsAudit() {
         return ResponseEntity.ok(logService.lireDerniersLogs());
